@@ -33,6 +33,7 @@
             this.open = new System.Windows.Forms.Button();
             this.translation = new System.Windows.Forms.Button();
             this.mirror = new System.Windows.Forms.Button();
+            this.zoom = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // close
@@ -85,11 +86,22 @@
             this.mirror.UseVisualStyleBackColor = true;
             this.mirror.Click += new System.EventHandler(this.mirror_Click);
             // 
+            // zoom
+            // 
+            this.zoom.Location = new System.Drawing.Point(25, 264);
+            this.zoom.Name = "zoom";
+            this.zoom.Size = new System.Drawing.Size(75, 23);
+            this.zoom.TabIndex = 8;
+            this.zoom.Text = "图像缩放";
+            this.zoom.UseVisualStyleBackColor = true;
+            this.zoom.Click += new System.EventHandler(this.zoom_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(689, 511);
+            this.Controls.Add(this.zoom);
             this.Controls.Add(this.mirror);
             this.Controls.Add(this.translation);
             this.Controls.Add(this.close);
@@ -109,6 +121,7 @@
         private System.Windows.Forms.Button open;
         private System.Windows.Forms.Button translation;
         private System.Windows.Forms.Button mirror;
+        private System.Windows.Forms.Button zoom;
     }
 }
 

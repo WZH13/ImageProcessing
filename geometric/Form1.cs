@@ -187,6 +187,11 @@ namespace geometric
             }
         }
 
+        /// <summary>
+        /// 图像镜像
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mirror_Click(object sender, EventArgs e)
         {
             if (curBitmap!=null)
@@ -217,7 +222,7 @@ namespace geometric
                     byte temp;
                     byte temp1;
                     byte temp2;
-                    byte temp3;
+                    //byte temp3;
                     if (curBitmap.PixelFormat == PixelFormat.Format8bppIndexed)
                     {
                         if (mirForm.GetMirror)
@@ -294,5 +299,165 @@ namespace geometric
                 Invalidate();
             }
         }
+
+        /// <summary>
+        /// 图像缩放
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void zoom_Click(object sender, EventArgs e)
+        {
+             
+        }
+
+        #region 书上例子-图像缩放
+        //private void zoom_Click(object sender, EventArgs e)
+        //{
+        //    if (curBitmap != null)
+        //    {
+        //        zoom zoomForm = new zoom();
+        //        if (zoomForm.ShowDialog() == DialogResult.OK)
+        //        {
+        //            Rectangle rect = new Rectangle(0, 0, curBitmap.Width, curBitmap.Height);
+        //            BitmapData bmpData = curBitmap.LockBits(rect, ImageLockMode.ReadWrite, curBitmap.PixelFormat);
+        //            IntPtr ptr = bmpData.Scan0;
+        //            int bytes = curBitmap.Width * curBitmap.Height;
+        //            byte[] grayValues = new byte[bytes];
+        //            Marshal.Copy(ptr, grayValues, 0, bytes);
+
+        //            //得到横向和纵向缩放量
+        //            double x = Convert.ToDouble(zoomForm.GetXZoom);
+        //            double y = Convert.ToDouble(zoomForm.GetYZoom);
+
+        //            //图像的几何中心
+        //            int halfWidth = (int)(curBitmap.Width / 2);
+        //            int halfHeight = (int)(curBitmap.Height / 2);
+
+        //            int xz = 0;
+        //            int yz = 0;
+        //            int tempWidth = 0;
+        //            int tempHeight = 0;
+
+        //            byte[] tempArray = new byte[bytes];
+
+        //            if (zoomForm.GetNearOrBil == true)
+        //            {
+        //                //最近邻插值法
+        //                for (int i = 0; i < curBitmap.Height; i++)
+        //                {
+        //                    for (int j = 0; j < curBitmap.Width; j++)
+        //                    {
+        //                        //以图像的几何中心为坐标原点进行坐标变换
+        //                        //按逆向映射得到输入图像的坐标
+        //                        tempHeight = i - halfHeight;
+        //                        tempWidth = j - halfWidth;//以图像的几何中心为坐标原点的横坐标
+
+        //                        //在不同象限进行四舍五入处理
+        //                        if (tempWidth > 0)
+        //                        {
+        //                            //进行缩放
+        //                            xz = (int)(tempWidth / x + 0.5);
+        //                        }
+        //                        else
+        //                        {//tempWidth < 0 ,则-0.5才能四舍五入
+        //                            xz = (int)(tempWidth / x - 0.5);
+        //                        }
+        //                        if (tempHeight > 0)
+        //                        {
+        //                            yz = (int)(tempHeight / y + 0.5);
+        //                        }
+        //                        else
+        //                        {
+        //                            yz = (int)(tempHeight / y - 0.5);
+        //                        }
+
+        //                        //坐标逆变换（坐标原点变回原来的（0,0）点了）
+        //                        //经过缩放的坐标，映射到原来以（0,0）点为坐标原点的坐标系上
+        //                        tempWidth = xz + halfWidth;
+        //                        tempHeight = yz + halfHeight;
+        //                        //得到输出图像像素值
+        //                        if (tempWidth < 0 || tempWidth >= curBitmap.Width || tempHeight < 0 || tempHeight >= curBitmap.Height)
+        //                        {
+        //                            //缩放后留下的空白部分用白色像素代替
+        //                            tempArray[i * curBitmap.Width + j] = 255;
+        //                        }
+        //                        else
+        //                        {
+        //                            //tempArray[i * curBitmap.Width + j]是缩放后的坐标
+        //                            //grayValues[tempHeight * curBitmap.Width + tempWidth]是缩放后对应的原图像素坐标
+        //                            tempArray[i * curBitmap.Width + j] = grayValues[tempHeight * curBitmap.Width + tempWidth];
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                //双线性插值法
+        //                double tempX, tempY, p, q;
+        //                for (int i = 0; i < curBitmap.Height; i++)
+        //                {
+        //                    for (int j = 0; j < curBitmap.Width; j++)
+        //                    {
+        //                        //以图像的几何中心为坐标原点进行坐标变换
+        //                        //按逆向映射得到输入图像的坐标
+        //                        tempHeight = i - halfHeight;
+        //                        tempWidth = j - halfWidth;
+        //                        tempX = tempWidth / x;
+        //                        tempY = tempHeight / y;
+
+        //                        //在不同象限进行四舍五入处理
+        //                        if (tempWidth > 0)
+        //                        {
+        //                            //进行缩放
+        //                            xz = (int)tempX;
+        //                        }
+        //                        else
+        //                        {
+        //                            xz = (int)(tempX - 1);
+        //                        }
+        //                        if (tempHeight > 0)
+        //                        {
+        //                            yz = (int)tempY;
+        //                        }
+        //                        else
+        //                        {
+        //                            yz = (int)(tempY - 1);
+        //                        }
+
+        //                        //f(i+p,j+q)=(1-p)(1-q)f(i,j)+(1-p)qf(i,j+1)+p(1-q)f(i+1,j)+pqf(i+1, j + 1)
+        //                        //得到公式中的p和q
+        //                        p = tempX - xz;
+        //                        q = tempY - yz;
+
+        //                        //坐标逆变换
+        //                        tempWidth = xz + halfWidth;
+        //                        tempHeight = yz + halfHeight;
+        //                        if (tempWidth < 0 || (tempWidth + 1) >= curBitmap.Width || tempHeight < 0 || (tempHeight + 1) >= curBitmap.Height)
+        //                        {
+        //                            //缩放后留下的空白部分用白色像素代替
+        //                            tempArray[i * curBitmap.Width + j] = 255;
+        //                        }
+        //                        else
+        //                        {
+        //                            //应用公式得到双线性插值
+        //                            tempArray[i * curBitmap.Width + j] = (byte)((1.0 - q) * ((1.0 - p) * grayValues[tempHeight * curBitmap.Width + tempWidth] + p * grayValues[tempHeight * curBitmap.Width + tempWidth + 1]) +
+        //                                q * ((1.0 - p) * grayValues[(tempHeight + 1) * curBitmap.Width + tempWidth] + p * grayValues[(tempHeight + 1) * curBitmap.Width + 1 + tempWidth]));
+        //                        }
+        //                    }
+        //                }
+
+        //            }
+
+        //            grayValues = (byte[])tempArray.Clone();
+
+        //            Marshal.Copy(grayValues, 0, ptr, bytes);
+        //            curBitmap.UnlockBits(bmpData);
+        //        }
+
+        //        Invalidate();
+
+        //    }
+        //}
+        #endregion
     }
 }
