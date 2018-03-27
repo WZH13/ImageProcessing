@@ -307,7 +307,110 @@ namespace geometric
         /// <param name="e"></param>
         private void zoom_Click(object sender, EventArgs e)
         {
-             
+            if (curBitmap != null)
+            {
+                zoom zoomForm = new zoom();
+                if (zoomForm.ShowDialog() == DialogResult.OK)
+                {
+                    bool zoomResult = Zoom(curBitmap, curBitmap.Width, curBitmap.Height, out curBitmap, zoomForm.GetNearOrBil);
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 图像缩放
+        /// </summary>
+        /// <param name="srcBmp">原始图像</param>
+        /// <param name="width">目标图像宽度</param>
+        /// <param name="height">目标图像高度</param>
+        /// <param name="dstBmp">目标图像</param>
+        /// <param name="zt">缩放选用的算法</param>
+        /// <returns>处理成功 true 失败 false</returns>
+        public static bool Zoom(Bitmap srcBmp, double width, double height, out Bitmap dstBmp, bool GetNearOrBil)
+        {//ZoomType为自定义的枚举类型
+            if (srcBmp == null)
+            {
+                dstBmp = null;
+                return false;
+            }
+            //若缩放大小与原图一样，则返回原图不做处理
+            if (srcBmp.Width == width && srcBmp.Height == height)
+            {
+                dstBmp = new Bitmap(srcBmp);
+                return true;
+            }
+            //计算缩放比例
+            double ratioH = height / (double)srcBmp.Height;
+            double ratioW = width / (double)srcBmp.Width;
+            dstBmp = new Bitmap((int)width, (int)height);
+
+            BitmapData srcBmpData = srcBmp.LockBits(new Rectangle(0, 0, srcBmp.Width, srcBmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            BitmapData dstBmpData = dstBmp.LockBits(new Rectangle(0, 0, dstBmp.Width, dstBmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            unsafe
+            {
+                byte* srcPtr = null;
+                byte* dstPtr = null;
+                int srcI = 0;
+                int srcJ = 0;
+                double srcdI = 0;
+                double srcdJ = 0;
+                double a = 0;
+                double b = 0;
+                double F1 = 0;//横向插值所得数值
+                double F2 = 0;//纵向插值所得数值
+                if (GetNearOrBil)
+                {//邻近插值法
+
+                    for (int i = 0; i < dstBmp.Height; i++)
+                    {
+                        srcI = (int)(i / ratioH);
+                        srcPtr = (byte*)srcBmpData.Scan0 + srcI * srcBmpData.Stride;
+                        dstPtr = (byte*)dstBmpData.Scan0 + i * dstBmpData.Stride;
+                        for (int j = 0; j < dstBmp.Width; j++)
+                        {
+                            dstPtr[j * 3] = srcPtr[(int)(j / ratioW) * 3];
+                            dstPtr[j * 3 + 1] = srcPtr[(int)(j / ratioW) * 3 + 1];
+                            dstPtr[j * 3 + 2] = srcPtr[(int)(j / ratioW) * 3 + 2];
+                        }
+                    }
+                }
+                else if (!GetNearOrBil)
+                {//双线性插值法
+                    byte* srcPtrNext = null;
+                    for (int i = 0; i < dstBmp.Height; i++)
+                    {
+                        srcdI = i / ratioH;
+                        srcI = (int)srcdI;//当前行对应原始图像的行数
+                        srcPtr = (byte*)srcBmpData.Scan0 + srcI * srcBmpData.Stride;//指原始图像的当前行
+                        srcPtrNext = (byte*)srcBmpData.Scan0 + (srcI + 1) * srcBmpData.Stride;//指向原始图像的下一行
+                        dstPtr = (byte*)dstBmpData.Scan0 + i * dstBmpData.Stride;//指向当前图像的当前行
+                        for (int j = 0; j < dstBmp.Width; j++)
+                        {
+                            srcdJ = j / ratioW;
+                            srcJ = (int)srcdJ;//指向原始图像的列
+                            if (srcdJ < 1 || srcdJ > srcBmp.Width - 1 || srcdI < 1 || srcdI > srcBmp.Height - 1)
+                            {//避免溢出（也可使用循环延拓）
+                                dstPtr[j * 3] = 255;
+                                dstPtr[j * 3 + 1] = 255;
+                                dstPtr[j * 3 + 2] = 255;
+                                continue;
+                            }
+                            a = srcdI - srcI;//计算插入的像素与原始像素距离（决定相邻像素的灰度所占的比例）
+                            b = srcdJ - srcJ;
+                            for (int k = 0; k < 3; k++)
+                            {//插值
+                                F1 = (1 - b) * srcPtr[srcJ * 3 + k] + b * srcPtr[(srcJ + 1) * 3 + k];
+                                F2 = (1 - b) * srcPtrNext[srcJ * 3 + k] + b * srcPtrNext[(srcJ + 1) * 3 + k];
+                                dstPtr[j * 3 + k] = (byte)((1 - a) * F1 + a * F2);
+                            }
+                        }
+                    }
+                }
+            }
+            srcBmp.UnlockBits(srcBmpData);
+            dstBmp.UnlockBits(dstBmpData);
+            return true;
         }
 
         #region 书上例子-图像缩放
