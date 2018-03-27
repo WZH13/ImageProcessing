@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gray", "gray\gray.csproj", "{8FF103AC-1AFD-4BD8-9E0B-27FFBA0B2AF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "histogram", "ModelForm\histogram.csproj", "{AB997035-327F-4887-8244-106148DE54F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "geometric", "geometric\geometric.csproj", "{456ACB57-CB93-4144-9E8A-5E612783EB39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8FF103AC-1AFD-4BD8-9E0B-27FFBA0B2AF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FF103AC-1AFD-4BD8-9E0B-27FFBA0B2AF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FF103AC-1AFD-4BD8-9E0B-27FFBA0B2AF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FF103AC-1AFD-4BD8-9E0B-27FFBA0B2AF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB997035-327F-4887-8244-106148DE54F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB997035-327F-4887-8244-106148DE54F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB997035-327F-4887-8244-106148DE54F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB997035-327F-4887-8244-106148DE54F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{456ACB57-CB93-4144-9E8A-5E612783EB39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{456ACB57-CB93-4144-9E8A-5E612783EB39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{456ACB57-CB93-4144-9E8A-5E612783EB39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{456ACB57-CB93-4144-9E8A-5E612783EB39}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
