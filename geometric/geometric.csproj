@@ -76,6 +76,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="rotation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="rotation.Designer.cs">
+      <DependentUpon>rotation.cs</DependentUpon>
+    </Compile>
     <Compile Include="translation.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -103,6 +109,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="rotation.resx">
+      <DependentUpon>rotation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="translation.resx">
       <DependentUpon>translation.cs</DependentUpon>
     </EmbeddedResource>

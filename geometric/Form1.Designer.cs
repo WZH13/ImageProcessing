@@ -34,6 +34,7 @@
             this.translation = new System.Windows.Forms.Button();
             this.mirror = new System.Windows.Forms.Button();
             this.zoom = new System.Windows.Forms.Button();
+            this.rotation = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // close
@@ -96,11 +97,22 @@
             this.zoom.UseVisualStyleBackColor = true;
             this.zoom.Click += new System.EventHandler(this.zoom_Click);
             // 
+            // rotation
+            // 
+            this.rotation.Location = new System.Drawing.Point(25, 312);
+            this.rotation.Name = "rotation";
+            this.rotation.Size = new System.Drawing.Size(75, 23);
+            this.rotation.TabIndex = 9;
+            this.rotation.Text = "图像旋转";
+            this.rotation.UseVisualStyleBackColor = true;
+            this.rotation.Click += new System.EventHandler(this.rotation_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(689, 511);
+            this.Controls.Add(this.rotation);
             this.Controls.Add(this.zoom);
             this.Controls.Add(this.mirror);
             this.Controls.Add(this.translation);
@@ -122,6 +134,7 @@
         private System.Windows.Forms.Button translation;
         private System.Windows.Forms.Button mirror;
         private System.Windows.Forms.Button zoom;
+        private System.Windows.Forms.Button rotation;
     }
 }
 

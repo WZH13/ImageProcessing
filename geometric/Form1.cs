@@ -23,6 +23,7 @@ namespace geometric
         private string curFileName;
         //图像对象
         private Bitmap curBitmap;
+        public enum ZoomType { NearestNeighborInterpolation , BilinearInterpolation }
 
         /// <summary>
         /// 打开图像文件
@@ -131,7 +132,6 @@ namespace geometric
         {
             this.Close();
         }
-
 
         /// <summary>
         /// 图像平移
@@ -315,7 +315,12 @@ namespace geometric
                     //得到横向和纵向缩放量
                     double x = Convert.ToDouble(zoomForm.GetXZoom);
                     double y = Convert.ToDouble(zoomForm.GetYZoom);
-                    bool zoomResult = Zoom(curBitmap, x, y, out curBitmap, zoomForm.GetNearOrBil);
+                    ZoomType zt = ZoomType.NearestNeighborInterpolation;
+                    if (!zoomForm.GetNearOrBil)
+                    {
+                        zt = ZoomType.BilinearInterpolation;
+                    }
+                    bool zoomResult = Zoom(curBitmap, x, y, out curBitmap, zt);
                     Invalidate();
                 }
             }
@@ -328,9 +333,9 @@ namespace geometric
         /// <param name="width">目标图像宽度</param>
         /// <param name="height">目标图像高度</param>
         /// <param name="dstBmp">目标图像</param>
-        /// <param name="GetNearOrBil">缩放选用的算法</param>
+        /// <param name="GetNearOrBil">缩放选用的算法：true表示最近邻插值，false表示双线性插值</param>
         /// <returns>处理成功 true 失败 false</returns>
-        public static bool Zoom(Bitmap srcBmp, double ratioW, double ratioH, out Bitmap dstBmp, bool GetNearOrBil)
+        public static bool Zoom(Bitmap srcBmp, double ratioW, double ratioH, out Bitmap dstBmp, ZoomType zoomType)
         {//ZoomType为自定义的枚举类型
             if (srcBmp == null)
             {
@@ -362,7 +367,7 @@ namespace geometric
                 double b = 0;
                 double F1 = 0;//横向插值所得数值
                 double F2 = 0;//纵向插值所得数值
-                if (GetNearOrBil)
+                if (zoomType==ZoomType.NearestNeighborInterpolation)
                 {//邻近插值法
 
                     for (int i = 0; i < dstBmp.Height; i++)
@@ -378,7 +383,7 @@ namespace geometric
                         }
                     }
                 }
-                else if (!GetNearOrBil)
+                else if (zoomType==ZoomType.BilinearInterpolation)
                 {//双线性插值法
                     byte* srcPtrNext = null;
                     for (int i = 0; i < dstBmp.Height; i++)
@@ -565,5 +570,272 @@ namespace geometric
         //    }
         //}
         #endregion
+
+        #region 书上例子-图像旋转
+        //private void rotation_Click(object sender, EventArgs e)
+        //{
+        //    if (curBitmap != null)
+        //    {
+        //        rotation rotForm = new rotation();
+        //        if (rotForm.ShowDialog() == DialogResult.OK)
+        //        {
+        //            Rectangle rect = new Rectangle(0, 0, curBitmap.Width, curBitmap.Height);
+        //            BitmapData bmpData = curBitmap.LockBits(rect, ImageLockMode.ReadWrite, curBitmap.PixelFormat);
+        //            IntPtr ptr = bmpData.Scan0;
+        //            int bytes = curBitmap.Width * curBitmap.Height;
+        //            byte[] grayValues = new byte[bytes];
+        //            Marshal.Copy(ptr, grayValues, 0, bytes);
+
+        //            //得到要旋转的角度
+        //            int degree = Convert.ToInt32(rotForm.GetDegree);
+        //            //转换为弧度
+        //            double radian = degree * Math.PI / 180.0;
+        //            double mySin = Math.Sin(radian);
+        //            double myCos = Math.Cos(radian);
+        //            //图像的几何中心
+        //            int halfWidth = (int)(curBitmap.Width / 2);
+        //            int halfHeight = (int)(curBitmap.Height / 2);
+        //            int xr = 0;
+        //            int yr = 0;
+        //            int tempWidth = 0;
+        //            int tempHeight = 0;
+
+        //            byte[] tempArray = new byte[bytes];
+
+        //            double tempX, tempY, p, q;
+        //            for (int i = 0; i < curBitmap.Height; i++)
+        //            {
+        //                for (int j = 0; j < curBitmap.Width; j++)
+        //                {
+        //                    //以图像的几何中心作为坐标原点
+        //                    //tempHeight、tempWidth是新坐标洗坐标
+        //                    tempHeight = i - halfHeight;
+        //                    tempWidth = j - halfWidth;
+        //                    //应用逆变换公式 x=x'cosθ-y'sinθ   y=x'sinθ+y'cosθ
+        //                    //tempX、tempY是原图坐标
+        //                    tempX = tempWidth * myCos - tempHeight * mySin;
+        //                    tempY = tempHeight * myCos + tempWidth * mySin;
+
+        //                    //在不同象限进行处理
+        //                    if (tempWidth > 0)
+        //                    {
+        //                        xr = (int)tempX;
+        //                    }
+        //                    else
+        //                    {
+        //                        xr = (int)(tempX - 1);
+        //                    }
+        //                    if (tempHeight > 0)
+        //                    {
+        //                        yr = (int)tempY;
+        //                    }
+        //                    else
+        //                    {
+        //                        yr = (int)(tempY - 1);
+        //                    }
+
+        //                    p = tempX - xr;
+        //                    q = tempY - yr;
+
+        //                    //坐标逆变换
+        //                    tempWidth = xr + halfWidth;
+        //                    tempHeight = yr + halfHeight;
+
+        //                    if (tempWidth < 0 || (tempWidth + 1) >= curBitmap.Width || tempHeight < 0 || (tempHeight + 1) >= curBitmap.Height)
+        //                    {
+        //                        //旋转后留下的空白部分用白色像素代替
+        //                        tempArray[i * curBitmap.Width + j] = 255;
+        //                    }
+        //                    else
+        //                    {
+        //                        //双线性插值
+        //                        tempArray[i * curBitmap.Width + j] = (byte)((1.0 - q) * ((1.0 - p) * grayValues[tempHeight * curBitmap.Width + tempWidth] + p * grayValues[tempHeight * curBitmap.Width + tempWidth + 1]) +
+        //                            q * ((1.0 - p) * grayValues[(tempHeight + 1) * curBitmap.Width + tempWidth] + p * grayValues[(tempHeight + 1) * curBitmap.Width + 1 + tempWidth]));
+        //                    }
+
+        //                }
+        //            }
+
+        //            grayValues = (byte[])tempArray.Clone();
+
+        //            Marshal.Copy(grayValues, 0, ptr, bytes);
+        //            curBitmap.UnlockBits(bmpData);
+        //        }
+
+        //        Invalidate();
+        //    }
+        //}
+        #endregion
+        
+        /// <summary>
+        /// 图像旋转
+        /// </summary>
+        private void rotation_Click(object sender, EventArgs e)
+        {
+            if (curBitmap != null)
+            {
+                rotation rotForm = new rotation();
+                if (rotForm.ShowDialog() == DialogResult.OK)
+                {
+                    int degree = Convert.ToInt32(rotForm.GetDegree);
+                    Rotation(curBitmap, degree, out curBitmap);
+                }
+                Invalidate();
+            }
+        }
+
+        /// <summary>
+        /// 图像旋转
+        /// </summary>
+        /// <param name="srcBmp">原始图像</param>
+        /// <param name="degree">旋转角度</param>
+        /// <param name="dstBmp">目标图像</param>
+        /// <returns>处理成功 true 失败 false</returns>
+        public static bool Rotation(Bitmap srcBmp, double degree, out Bitmap dstBmp)
+        {
+            if (srcBmp == null)
+            {
+                dstBmp = null;
+                return false;
+            }
+            dstBmp = null;
+            BitmapData srcBmpData = null;
+            BitmapData dstBmpData = null;
+            switch ((int)degree)
+            {
+                case 0:
+                    dstBmp = new Bitmap(srcBmp);
+                    break;
+                case -90:
+                    dstBmp = new Bitmap(srcBmp.Height, srcBmp.Width);
+                    srcBmpData = srcBmp.LockBits(new Rectangle(0, 0, srcBmp.Width, srcBmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                    dstBmpData = dstBmp.LockBits(new Rectangle(0, 0, dstBmp.Width, dstBmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+                    unsafe
+                    {
+                        byte* ptrSrc = (byte*)srcBmpData.Scan0;
+                        byte* ptrDst = (byte*)dstBmpData.Scan0;
+                        for (int i = 0; i < srcBmp.Height; i++)
+                        {
+                            for (int j = 0; j < srcBmp.Width; j++)
+                            {
+                                ptrDst[j * dstBmpData.Stride + (dstBmp.Height - i - 1) * 3] = ptrSrc[i * srcBmpData.Stride + j * 3];
+                                ptrDst[j * dstBmpData.Stride + (dstBmp.Height - i - 1) * 3 + 1] = ptrSrc[i * srcBmpData.Stride + j * 3 + 1];
+                                ptrDst[j * dstBmpData.Stride + (dstBmp.Height - i - 1) * 3 + 2] = ptrSrc[i * srcBmpData.Stride + j * 3 + 2];
+                            }
+                        }
+                    }
+                    srcBmp.UnlockBits(srcBmpData);
+                    dstBmp.UnlockBits(dstBmpData);
+                    break;
+                case 90:
+                    dstBmp = new Bitmap(srcBmp.Height, srcBmp.Width);
+                    srcBmpData = srcBmp.LockBits(new Rectangle(0, 0, srcBmp.Width, srcBmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                    dstBmpData = dstBmp.LockBits(new Rectangle(0, 0, dstBmp.Width, dstBmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+                    unsafe
+                    {
+                        byte* ptrSrc = (byte*)srcBmpData.Scan0;
+                        byte* ptrDst = (byte*)dstBmpData.Scan0;
+                        for (int i = 0; i < srcBmp.Height; i++)
+                        {
+                            for (int j = 0; j < srcBmp.Width; j++)
+                            {
+                                ptrDst[(srcBmp.Width - j - 1) * dstBmpData.Stride + i * 3] = ptrSrc[i * srcBmpData.Stride + j * 3];
+                                ptrDst[(srcBmp.Width - j - 1) * dstBmpData.Stride + i * 3 + 1] = ptrSrc[i * srcBmpData.Stride + j * 3 + 1];
+                                ptrDst[(srcBmp.Width - j - 1) * dstBmpData.Stride + i * 3 + 2] = ptrSrc[i * srcBmpData.Stride + j * 3 + 2];
+                            }
+                        }
+                    }
+                    srcBmp.UnlockBits(srcBmpData);
+                    dstBmp.UnlockBits(dstBmpData);
+                    break;
+                case 180:
+                case -180:
+                    dstBmp = new Bitmap(srcBmp.Width, srcBmp.Height);
+                    srcBmpData = srcBmp.LockBits(new Rectangle(0, 0, srcBmp.Width, srcBmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                    dstBmpData = dstBmp.LockBits(new Rectangle(0, 0, dstBmp.Width, dstBmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+                    unsafe
+                    {
+                        byte* ptrSrc = (byte*)srcBmpData.Scan0;
+                        byte* ptrDst = (byte*)dstBmpData.Scan0;
+                        for (int i = 0; i < srcBmp.Height; i++)
+                        {
+                            for (int j = 0; j < srcBmp.Width; j++)
+                            {
+                                ptrDst[(srcBmp.Width - i - 1) * dstBmpData.Stride + (dstBmp.Height - j - 1) * 3] = ptrSrc[i * srcBmpData.Stride + j * 3];
+                                ptrDst[(srcBmp.Width - i - 1) * dstBmpData.Stride + (dstBmp.Height - j - 1) * 3 + 1] = ptrSrc[i * srcBmpData.Stride + j * 3 + 1];
+                                ptrDst[(srcBmp.Width - i - 1) * dstBmpData.Stride + (dstBmp.Height - j - 1) * 3 + 2] = ptrSrc[i * srcBmpData.Stride + j * 3 + 2];
+                            }
+                        }
+                    }
+                    srcBmp.UnlockBits(srcBmpData);
+                    dstBmp.UnlockBits(dstBmpData);
+                    break;
+                default://任意角度
+                    double radian = degree * Math.PI / 180.0;//将角度转换为弧度
+                                                             //计算正弦和余弦
+                    double sin = Math.Sin(radian);
+                    double cos = Math.Cos(radian);
+                    //计算旋转后的图像大小
+                    int widthDst = (int)(srcBmp.Height * Math.Abs(sin) + srcBmp.Width * Math.Abs(cos));
+                    int heightDst = (int)(srcBmp.Width * Math.Abs(sin) + srcBmp.Height * Math.Abs(cos));
+
+                    dstBmp = new Bitmap(widthDst, heightDst);
+                    //确定旋转点
+                    int dx = (int)(srcBmp.Width / 2 * (1 - cos) + srcBmp.Height / 2 * sin);
+                    int dy = (int)(srcBmp.Width / 2 * (0 - sin) + srcBmp.Height / 2 * (1 - cos));
+
+                    int insertBeginX = srcBmp.Width / 2 - widthDst / 2;
+                    int insertBeginY = srcBmp.Height / 2 - heightDst / 2;
+
+                    //插值公式所需参数
+                    double ku = insertBeginX * cos - insertBeginY * sin + dx;
+                    double kv = insertBeginX * sin + insertBeginY * cos + dy;
+                    double cu1 = cos, cu2 = sin;
+                    double cv1 = sin, cv2 = cos;
+
+                    double fu, fv, a, b, F1, F2;
+                    int Iu, Iv;
+                    srcBmpData = srcBmp.LockBits(new Rectangle(0, 0, srcBmp.Width, srcBmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                    dstBmpData = dstBmp.LockBits(new Rectangle(0, 0, dstBmp.Width, dstBmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+                    unsafe
+                    {
+                        byte* ptrSrc = (byte*)srcBmpData.Scan0;
+                        byte* ptrDst = (byte*)dstBmpData.Scan0;
+                        for (int i = 0; i < heightDst; i++)
+                        {
+                            for (int j = 0; j < widthDst; j++)
+                            {
+                                fu = j * cu1 - i * cu2 + ku;
+                                fv = j * cv1 + i * cv2 + kv;
+                                if ((fv < 1) || (fv > srcBmp.Height - 1) || (fu < 1) || (fu > srcBmp.Width - 1))
+                                {
+
+                                    ptrDst[i * dstBmpData.Stride + j * 3] = 150;
+                                    ptrDst[i * dstBmpData.Stride + j * 3 + 1] = 150;
+                                    ptrDst[i * dstBmpData.Stride + j * 3 + 2] = 150;
+                                }
+                                else
+                                {//双线性插值
+                                    Iu = (int)fu;
+                                    Iv = (int)fv;
+                                    a = fu - Iu;
+                                    b = fv - Iv;
+                                    for (int k = 0; k < 3; k++)
+                                    {
+                                        F1 = (1 - b) * *(ptrSrc + Iv * srcBmpData.Stride + Iu * 3 + k) + b * *(ptrSrc + (Iv + 1) * srcBmpData.Stride + Iu * 3 + k);
+                                        F2 = (1 - b) * *(ptrSrc + Iv * srcBmpData.Stride + (Iu + 1) * 3 + k) + b * *(ptrSrc + (Iv + 1) * srcBmpData.Stride + (Iu + 1) * 3 + k);
+                                        *(ptrDst + i * dstBmpData.Stride + j * 3 + k) = (byte)((1 - a) * F1 + a * F2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    srcBmp.UnlockBits(srcBmpData);
+                    dstBmp.UnlockBits(dstBmpData);
+                    break;
+            }
+            return true;
+        }
     }
 }
