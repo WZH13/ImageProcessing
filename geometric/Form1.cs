@@ -312,7 +312,10 @@ namespace geometric
                 zoom zoomForm = new zoom();
                 if (zoomForm.ShowDialog() == DialogResult.OK)
                 {
-                    bool zoomResult = Zoom(curBitmap, curBitmap.Width, curBitmap.Height, out curBitmap, zoomForm.GetNearOrBil);
+                    //得到横向和纵向缩放量
+                    double x = Convert.ToDouble(zoomForm.GetXZoom);
+                    double y = Convert.ToDouble(zoomForm.GetYZoom);
+                    bool zoomResult = Zoom(curBitmap, x, y, out curBitmap, zoomForm.GetNearOrBil);
                     Invalidate();
                 }
             }
@@ -325,9 +328,9 @@ namespace geometric
         /// <param name="width">目标图像宽度</param>
         /// <param name="height">目标图像高度</param>
         /// <param name="dstBmp">目标图像</param>
-        /// <param name="zt">缩放选用的算法</param>
+        /// <param name="GetNearOrBil">缩放选用的算法</param>
         /// <returns>处理成功 true 失败 false</returns>
-        public static bool Zoom(Bitmap srcBmp, double width, double height, out Bitmap dstBmp, bool GetNearOrBil)
+        public static bool Zoom(Bitmap srcBmp, double ratioW, double ratioH, out Bitmap dstBmp, bool GetNearOrBil)
         {//ZoomType为自定义的枚举类型
             if (srcBmp == null)
             {
@@ -335,14 +338,14 @@ namespace geometric
                 return false;
             }
             //若缩放大小与原图一样，则返回原图不做处理
-            if (srcBmp.Width == width && srcBmp.Height == height)
+            if ((ratioW == 1.0) && ratioH == 1.0)
             {
                 dstBmp = new Bitmap(srcBmp);
                 return true;
             }
-            //计算缩放比例
-            double ratioH = height / (double)srcBmp.Height;
-            double ratioW = width / (double)srcBmp.Width;
+            //计算缩放高宽
+            double height = ratioH * (double)srcBmp.Height;
+            double width = ratioW * (double)srcBmp.Width;
             dstBmp = new Bitmap((int)width, (int)height);
 
             BitmapData srcBmpData = srcBmp.LockBits(new Rectangle(0, 0, srcBmp.Width, srcBmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
@@ -364,12 +367,12 @@ namespace geometric
 
                     for (int i = 0; i < dstBmp.Height; i++)
                     {
-                        srcI = (int)(i / ratioH);
+                        srcI = (int)(i / ratioH);//srcI是此时的i对应的原图像的高
                         srcPtr = (byte*)srcBmpData.Scan0 + srcI * srcBmpData.Stride;
                         dstPtr = (byte*)dstBmpData.Scan0 + i * dstBmpData.Stride;
                         for (int j = 0; j < dstBmp.Width; j++)
                         {
-                            dstPtr[j * 3] = srcPtr[(int)(j / ratioW) * 3];
+                            dstPtr[j * 3] = srcPtr[(int)(j / ratioW) * 3];//j / ratioW求出此时j对应的原图像的宽
                             dstPtr[j * 3 + 1] = srcPtr[(int)(j / ratioW) * 3 + 1];
                             dstPtr[j * 3 + 2] = srcPtr[(int)(j / ratioW) * 3 + 2];
                         }
@@ -399,7 +402,7 @@ namespace geometric
                             a = srcdI - srcI;//计算插入的像素与原始像素距离（决定相邻像素的灰度所占的比例）
                             b = srcdJ - srcJ;
                             for (int k = 0; k < 3; k++)
-                            {//插值
+                            {//插值    公式：f(i+p,j+q)=(1-p)(1-q)f(i,j)+(1-p)qf(i,j+1)+p(1-q)f(i+1,j)+pqf(i+1, j + 1)
                                 F1 = (1 - b) * srcPtr[srcJ * 3 + k] + b * srcPtr[(srcJ + 1) * 3 + k];
                                 F2 = (1 - b) * srcPtrNext[srcJ * 3 + k] + b * srcPtrNext[(srcJ + 1) * 3 + k];
                                 dstPtr[j * 3 + k] = (byte)((1 - a) * F1 + a * F2);
