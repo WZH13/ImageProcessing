@@ -586,7 +586,7 @@ namespace geometric
         //            byte[] grayValues = new byte[bytes];
         //            Marshal.Copy(ptr, grayValues, 0, bytes);
 
-        //            //得到要旋转的角度
+        //            //得到要旋转的角度.
         //            int degree = Convert.ToInt32(rotForm.GetDegree);
         //            //转换为弧度
         //            double radian = degree * Math.PI / 180.0;

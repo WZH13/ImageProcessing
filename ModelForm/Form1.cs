@@ -527,7 +527,6 @@ namespace histogram
 
             if (curBitmap != null)
             {
-                //实例化shapingForm窗体
                 shapinForm sForm = new shapinForm();
 
                 if (sForm.ShowDialog() == DialogResult.OK)
