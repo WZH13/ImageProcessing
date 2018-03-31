@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F077F3CF-664D-4DF1-9C4A-B41A95C9B6C7}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>color</RootNamespace>
+    <AssemblyName>color</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="changeCom.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="changeCom.Designer.cs">
+      <DependentUpon>changeCom.cs</DependentUpon>
+    </Compile>
+    <Compile Include="colorSpace.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="colorSpace.Designer.cs">
+      <DependentUpon>colorSpace.cs</DependentUpon>
+    </Compile>
+    <Compile Include="eColor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="eColor.Designer.cs">
+      <DependentUpon>eColor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="edgeColor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="edgeColor.Designer.cs">
+      <DependentUpon>edgeColor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="pColor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="pColor.Designer.cs">
+      <DependentUpon>pColor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="changeCom.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>changeCom.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="colorSpace.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>colorSpace.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="eColor.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>eColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="edgeColor.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>edgeColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="pColor.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>pColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="segColor.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>segColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="sharpColor.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>sharpColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="smoothColor.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>smoothColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="segColor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="segColor.Designer.cs">
+      <DependentUpon>segColor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="sharpColor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="sharpColor.Designer.cs">
+      <DependentUpon>sharpColor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="smoothColor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="smoothColor.Designer.cs">
+      <DependentUpon>smoothColor.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

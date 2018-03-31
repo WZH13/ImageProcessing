@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D08AC8F4-8E1F-40C0-8996-E5EDC99EC641}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>compression</RootNamespace>
+    <AssemblyName>compression</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Complex.cs" />
+    <Compile Include="dpcmCode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="dpcmCode.Designer.cs">
+      <DependentUpon>dpcmCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="huffmanCode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="huffmanCode.Designer.cs">
+      <DependentUpon>huffmanCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="lzwCode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="lzwCode.Designer.cs">
+      <DependentUpon>lzwCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="dpcmCode.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>dpcmCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="huffmanCode.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>huffmanCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="lzwCode.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>lzwCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rleCode.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>rleCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="shannonC.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>shannonC.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="shannonFannon.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>shannonFannon.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="transCode.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>transCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="wlTrans.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>wlTrans.cs</DependentUpon>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="rleCode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="rleCode.Designer.cs">
+      <DependentUpon>rleCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="shannonC.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="shannonC.Designer.cs">
+      <DependentUpon>shannonC.cs</DependentUpon>
+    </Compile>
+    <Compile Include="shannonFannon.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="shannonFannon.Designer.cs">
+      <DependentUpon>shannonFannon.cs</DependentUpon>
+    </Compile>
+    <Compile Include="transCode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="transCode.Designer.cs">
+      <DependentUpon>transCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="wlTrans.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="wlTrans.Designer.cs">
+      <DependentUpon>wlTrans.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
