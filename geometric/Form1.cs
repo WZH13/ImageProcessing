@@ -203,7 +203,7 @@ namespace geometric
                     BitmapData bmpData = curBitmap.LockBits(rect, ImageLockMode.ReadWrite, curBitmap.PixelFormat);
                     IntPtr ptr = bmpData.Scan0;
                     int bytes = 0;
-                    ////判断是灰度色图像还是彩色图像，给相应的大小
+                    //判断是灰度色图像还是彩色图像，给相应的大小
                     if (curBitmap.PixelFormat==PixelFormat.Format8bppIndexed)
                     {
                         bytes= curBitmap.Width * curBitmap.Height;
