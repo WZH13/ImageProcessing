@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "segmentatioin", "segmentati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "smooth", "smooth\smooth.csproj", "{CFD440FE-DD58-4CC4-AD99-497D04F0EF1E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "changepixel", "changepixel\changepixel.csproj", "{61365CAF-C50C-4F38-AF9B-C012050BF098}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{CFD440FE-DD58-4CC4-AD99-497D04F0EF1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFD440FE-DD58-4CC4-AD99-497D04F0EF1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFD440FE-DD58-4CC4-AD99-497D04F0EF1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61365CAF-C50C-4F38-AF9B-C012050BF098}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61365CAF-C50C-4F38-AF9B-C012050BF098}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61365CAF-C50C-4F38-AF9B-C012050BF098}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61365CAF-C50C-4F38-AF9B-C012050BF098}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

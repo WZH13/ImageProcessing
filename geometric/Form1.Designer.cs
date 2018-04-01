@@ -28,44 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.close = new System.Windows.Forms.Button();
-            this.save = new System.Windows.Forms.Button();
-            this.open = new System.Windows.Forms.Button();
             this.translation = new System.Windows.Forms.Button();
             this.mirror = new System.Windows.Forms.Button();
             this.zoom = new System.Windows.Forms.Button();
             this.rotation = new System.Windows.Forms.Button();
+            this.open = new System.Windows.Forms.Button();
+            this.save = new System.Windows.Forms.Button();
+            this.close = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            // 
-            // close
-            // 
-            this.close.Location = new System.Drawing.Point(25, 114);
-            this.close.Name = "close";
-            this.close.Size = new System.Drawing.Size(75, 23);
-            this.close.TabIndex = 5;
-            this.close.Text = "关闭";
-            this.close.UseVisualStyleBackColor = true;
-            this.close.Click += new System.EventHandler(this.close_Click);
-            // 
-            // save
-            // 
-            this.save.Location = new System.Drawing.Point(24, 68);
-            this.save.Name = "save";
-            this.save.Size = new System.Drawing.Size(75, 23);
-            this.save.TabIndex = 4;
-            this.save.Text = "保存图像";
-            this.save.UseVisualStyleBackColor = true;
-            this.save.Click += new System.EventHandler(this.save_Click);
-            // 
-            // open
-            // 
-            this.open.Location = new System.Drawing.Point(25, 21);
-            this.open.Name = "open";
-            this.open.Size = new System.Drawing.Size(75, 23);
-            this.open.TabIndex = 3;
-            this.open.Text = "打开图像";
-            this.open.UseVisualStyleBackColor = true;
-            this.open.Click += new System.EventHandler(this.open_Click);
             // 
             // translation
             // 
@@ -107,6 +77,36 @@
             this.rotation.UseVisualStyleBackColor = true;
             this.rotation.Click += new System.EventHandler(this.rotation_Click);
             // 
+            // open
+            // 
+            this.open.Location = new System.Drawing.Point(25, 21);
+            this.open.Name = "open";
+            this.open.Size = new System.Drawing.Size(75, 23);
+            this.open.TabIndex = 3;
+            this.open.Text = "打开图像";
+            this.open.UseVisualStyleBackColor = true;
+            this.open.Click += new System.EventHandler(this.open_Click);
+            // 
+            // save
+            // 
+            this.save.Location = new System.Drawing.Point(24, 68);
+            this.save.Name = "save";
+            this.save.Size = new System.Drawing.Size(75, 23);
+            this.save.TabIndex = 4;
+            this.save.Text = "保存图像";
+            this.save.UseVisualStyleBackColor = true;
+            this.save.Click += new System.EventHandler(this.save_Click);
+            // 
+            // close
+            // 
+            this.close.Location = new System.Drawing.Point(25, 114);
+            this.close.Name = "close";
+            this.close.Size = new System.Drawing.Size(75, 23);
+            this.close.TabIndex = 5;
+            this.close.Text = "关闭";
+            this.close.UseVisualStyleBackColor = true;
+            this.close.Click += new System.EventHandler(this.close_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -127,14 +127,13 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Button close;
-        private System.Windows.Forms.Button save;
-        private System.Windows.Forms.Button open;
         private System.Windows.Forms.Button translation;
         private System.Windows.Forms.Button mirror;
         private System.Windows.Forms.Button zoom;
         private System.Windows.Forms.Button rotation;
+        private System.Windows.Forms.Button open;
+        private System.Windows.Forms.Button save;
+        private System.Windows.Forms.Button close;
     }
 }
 
