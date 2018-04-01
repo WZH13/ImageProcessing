@@ -34,28 +34,28 @@ namespace morphology
             switch (sPic)
             {
                 case 0x11:
-                    struPic.Image = System.Drawing.Image.FromFile(Application.StartupPath + "\\images\\row3.jpg");
+                    struPic.Image = Image.FromFile(Application.StartupPath + "\\images\\row3.jpg");
                     break;
                 case 0x12:
-                    struPic.Image = System.Drawing.Image.FromFile(Application.StartupPath + "\\images\\col3.jpg");
+                    struPic.Image = Image.FromFile(Application.StartupPath + "\\images\\col3.jpg");
                     break;
                 case 0x14:
-                    struPic.Image = System.Drawing.Image.FromFile(Application.StartupPath + "\\images\\cross3.jpg");
+                    struPic.Image =  Image.FromFile(Application.StartupPath + "\\images\\cross3.jpg");
                     break;
                 case 0x18:
-                    struPic.Image = System.Drawing.Image.FromFile(Application.StartupPath + "\\images\\square3.jpg");
+                    struPic.Image =  Image.FromFile(Application.StartupPath + "\\images\\square3.jpg");
                     break;
                 case 0x21:
-                    struPic.Image = System.Drawing.Image.FromFile(Application.StartupPath + "\\images\\row5.jpg");
+                    struPic.Image =  Image.FromFile(Application.StartupPath + "\\images\\row5.jpg");
                     break;
                 case 0x22:
-                    struPic.Image = System.Drawing.Image.FromFile(Application.StartupPath + "\\images\\col5.jpg");
+                    struPic.Image =  Image.FromFile(Application.StartupPath + "\\images\\col5.jpg");
                     break;
                 case 0x24:
-                    struPic.Image = System.Drawing.Image.FromFile(Application.StartupPath + "\\images\\cross5.jpg");
+                    struPic.Image =  Image.FromFile(Application.StartupPath + "\\images\\cross5.jpg");
                     break;
                 case 0x28:
-                    struPic.Image = System.Drawing.Image.FromFile(Application.StartupPath + "\\images\\square5.jpg");
+                    struPic.Image =  Image.FromFile(Application.StartupPath + "\\images\\square5.jpg");
                     break;
                 default:
                     break;
@@ -64,7 +64,7 @@ namespace morphology
 
         private void row_CheckedChanged(object sender, EventArgs e)
         {
-            temp = (byte)((temp & 0xf0) | 0x01);
+            temp = (byte)((temp & 0xf0) | 0x01);//0x0f换算成二进制：1111
             showPic(temp);
         }
 
