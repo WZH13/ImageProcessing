@@ -68,6 +68,7 @@ namespace morphology
                     byte[] grayValues = new byte[bytes];
                     System.Runtime.InteropServices.Marshal.Copy(ptr, grayValues, 0, bytes);
 
+                    //得到结构元素
                     byte flagStru = struForm.GetStruction;
 
                     byte[] tempArray = new byte[bytes];
@@ -79,6 +80,7 @@ namespace morphology
                     switch (flagStru)
                     {
                         case 0x11:
+                            //3位水平方向结构元素
                             for (int i = 0; i < curBitmap.Height; i++)
                             {
                                 for (int j = 1; j < curBitmap.Width - 1; j++)
@@ -94,6 +96,7 @@ namespace morphology
                             }
                             break;
                         case 0x21:
+                            //5位水平方向结构元素
                             for (int i = 0; i < curBitmap.Height; i++)
                             {
                                 for (int j = 2; j < curBitmap.Width - 2; j++)
@@ -111,6 +114,7 @@ namespace morphology
                             }
                             break;
                         case 0x12:
+                            //3位垂直方向结构元素
                             for (int i = 1; i < curBitmap.Height - 1; i++)
                             {
                                 for (int j = 0; j < curBitmap.Width; j++)
@@ -126,6 +130,7 @@ namespace morphology
                             }
                             break;
                         case 0x22:
+                            //5位垂直方向结构元素
                             for (int i = 2; i < curBitmap.Height - 2; i++)
                             {
                                 for (int j = 0; j < curBitmap.Width; j++)
@@ -143,6 +148,7 @@ namespace morphology
                             }
                             break;
                         case 0x14:
+                            //3位十字形状结构元素
                             for (int i = 1; i < curBitmap.Height - 1; i++)
                             {
                                 for (int j = 1; j < curBitmap.Width - 1; j++)
@@ -160,6 +166,7 @@ namespace morphology
                             }
                             break;
                         case 0x24:
+                            //5位十字形状结构元素
                             for (int i = 2; i < curBitmap.Height - 2; i++)
                             {
                                 for (int j = 2; j < curBitmap.Width - 2; j++)
@@ -181,6 +188,7 @@ namespace morphology
                             }
                             break;
                         case 0x18:
+                            //3位方形结构元素
                             for (int i = 1; i < curBitmap.Height - 1; i++)
                             {
                                 for (int j = 1; j < curBitmap.Width - 1; j++)
@@ -202,6 +210,7 @@ namespace morphology
                             }
                             break;
                         case 0x28:
+                            //5位方形结构元素
                             for (int i = 2; i < curBitmap.Height - 2; i++)
                             {
                                 for (int j = 2; j < curBitmap.Width - 2; j++)
