@@ -261,7 +261,7 @@ namespace changepixel
         /// <summary>
         /// 双击获取坐标
         /// </summary>
-        private void R_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void Form1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (curBitmap != null)
             {
@@ -277,7 +277,6 @@ namespace changepixel
                     ytxb.Text = (formPoint.Y - 20).ToString();
                 }
             }
-            
         }
     }
 }

@@ -35,6 +35,7 @@
             this.opening = new System.Windows.Forms.Button();
             this.closing = new System.Windows.Forms.Button();
             this.hitMiss = new System.Windows.Forms.Button();
+            this.binaryzation = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // open
@@ -59,7 +60,7 @@
             // 
             // erode
             // 
-            this.erode.Location = new System.Drawing.Point(37, 150);
+            this.erode.Location = new System.Drawing.Point(37, 195);
             this.erode.Name = "erode";
             this.erode.Size = new System.Drawing.Size(75, 23);
             this.erode.TabIndex = 2;
@@ -69,7 +70,7 @@
             // 
             // dilate
             // 
-            this.dilate.Location = new System.Drawing.Point(37, 196);
+            this.dilate.Location = new System.Drawing.Point(37, 241);
             this.dilate.Name = "dilate";
             this.dilate.Size = new System.Drawing.Size(75, 23);
             this.dilate.TabIndex = 3;
@@ -79,7 +80,7 @@
             // 
             // opening
             // 
-            this.opening.Location = new System.Drawing.Point(37, 242);
+            this.opening.Location = new System.Drawing.Point(37, 287);
             this.opening.Name = "opening";
             this.opening.Size = new System.Drawing.Size(75, 23);
             this.opening.TabIndex = 4;
@@ -89,7 +90,7 @@
             // 
             // closing
             // 
-            this.closing.Location = new System.Drawing.Point(37, 288);
+            this.closing.Location = new System.Drawing.Point(37, 333);
             this.closing.Name = "closing";
             this.closing.Size = new System.Drawing.Size(75, 23);
             this.closing.TabIndex = 5;
@@ -99,7 +100,7 @@
             // 
             // hitMiss
             // 
-            this.hitMiss.Location = new System.Drawing.Point(37, 334);
+            this.hitMiss.Location = new System.Drawing.Point(37, 379);
             this.hitMiss.Name = "hitMiss";
             this.hitMiss.Size = new System.Drawing.Size(75, 23);
             this.hitMiss.TabIndex = 6;
@@ -107,11 +108,22 @@
             this.hitMiss.UseVisualStyleBackColor = true;
             this.hitMiss.Click += new System.EventHandler(this.hitMiss_Click);
             // 
+            // binaryzation
+            // 
+            this.binaryzation.Location = new System.Drawing.Point(37, 144);
+            this.binaryzation.Name = "binaryzation";
+            this.binaryzation.Size = new System.Drawing.Size(75, 23);
+            this.binaryzation.TabIndex = 7;
+            this.binaryzation.Text = "二值化";
+            this.binaryzation.UseVisualStyleBackColor = true;
+            this.binaryzation.Click += new System.EventHandler(this.binaryzation_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(792, 565);
+            this.Controls.Add(this.binaryzation);
             this.Controls.Add(this.hitMiss);
             this.Controls.Add(this.closing);
             this.Controls.Add(this.opening);
@@ -138,6 +150,7 @@
         private System.Windows.Forms.Button opening;
         private System.Windows.Forms.Button closing;
         private System.Windows.Forms.Button hitMiss;
+        private System.Windows.Forms.Button binaryzation;
     }
 }
 

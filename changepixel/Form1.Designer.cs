@@ -226,7 +226,7 @@
             this.xtxb.TabIndex = 6;
             this.xtxb.Text = "0";
             // 
-            // R
+            // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -237,10 +237,10 @@
             this.Controls.Add(this.close);
             this.Controls.Add(this.save);
             this.Controls.Add(this.open);
-            this.Name = "R";
+            this.Name = "Form1";
             this.Text = "修改指定点颜色";
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
-            this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.R_MouseDoubleClick);
+            this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDoubleClick);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);

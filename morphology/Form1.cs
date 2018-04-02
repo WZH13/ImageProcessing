@@ -5,6 +5,8 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace morphology
 {
@@ -53,6 +55,49 @@ namespace morphology
             }
         }
 
+        #region 关于图像尺寸的说明
+
+        //本代码只能处理8位深度的512*512图像。可自行修改，如修改3位水平方向结构元素代码：
+
+        //01修改成如下代码即可处理任意尺寸的8位深度的图像
+        //int bytes = bmpData.Stride * curBitmap.Height;
+        //for (int i = 0; i < curBitmap.Height; i++)
+        //{
+        //    for (int j = 1; j < curBitmap.Width - 1; j++)
+        //    {
+        //        if (grayValues[i * bmpData.Stride + j] == 0 &&
+        //            grayValues[i * bmpData.Stride + j + 3] == 0 &&
+        //            grayValues[i * bmpData.Stride + j - 1] == 0)
+        //        {
+        //            tempArray[i * bmpData.Stride + j] = 0;
+        //            tempArray[i * bmpData.Stride + j + 1] = 0;
+        //            tempArray[i * bmpData.Stride + j + 2] = 0;
+        //        }
+        //    }
+        //}
+
+        //02修改成如下代码即可处理任意尺寸的24位深度的图像
+        //int bytes = bmpData.Stride * curBitmap.Height;
+        //for (int i = 0; i < curBitmap.Height; i++)
+        //{
+        //    for (int j = 4; j < curBitmap.Width * 3 - 3; j += 3)
+        //    {
+        //        if (grayValues[i * bmpData.Stride + j] == 0 &&
+        //            grayValues[i * bmpData.Stride + j + 3] == 0 &&
+        //            grayValues[i * bmpData.Stride + j - 1] == 0)
+        //        {
+        //            tempArray[i * bmpData.Stride + j] = 0;
+        //            tempArray[i * bmpData.Stride + j + 1] = 0;
+        //            tempArray[i * bmpData.Stride + j + 2] = 0;
+        //        }
+        //    }
+        //}
+        #endregion
+        /// <summary>
+        /// 图像腐蚀：只能处理位深度为8的512*512图像
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void erode_Click(object sender, EventArgs e)
         {
             if (curBitmap != null)
@@ -62,11 +107,11 @@ namespace morphology
                 if (struForm.ShowDialog() == DialogResult.OK)
                 {
                     Rectangle rect = new Rectangle(0, 0, curBitmap.Width, curBitmap.Height);
-                    System.Drawing.Imaging.BitmapData bmpData = curBitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, curBitmap.PixelFormat);
+                    BitmapData bmpData = curBitmap.LockBits(rect, ImageLockMode.ReadWrite, curBitmap.PixelFormat);
                     IntPtr ptr = bmpData.Scan0;
                     int bytes = curBitmap.Width * curBitmap.Height;
                     byte[] grayValues = new byte[bytes];
-                    System.Runtime.InteropServices.Marshal.Copy(ptr, grayValues, 0, bytes);
+                    Marshal.Copy(ptr, grayValues, 0, bytes);
 
                     //得到结构元素
                     byte flagStru = struForm.GetStruction;
@@ -76,22 +121,20 @@ namespace morphology
                     {
                         tempArray[i] = 255;
                     }
-
                     switch (flagStru)
                     {
                         case 0x11:
                             //3位水平方向结构元素
                             for (int i = 0; i < curBitmap.Height; i++)
                             {
-                                for (int j = 1; j < curBitmap.Width - 1; j++)
+                                for (int j = 1; j < curBitmap.Width  - 1; j ++)
                                 {
-                                    if (grayValues[i * curBitmap.Width + j] == 0 && 
-                                        grayValues[i * curBitmap.Width + j + 1] == 0 && 
+                                    if (grayValues[i * curBitmap.Width + j] == 0 &&
+                                        grayValues[i * curBitmap.Width + j + 1] == 0 &&
                                         grayValues[i * curBitmap.Width + j - 1] == 0)
                                     {
                                         tempArray[i * curBitmap.Width + j] = 0;
                                     }
-
                                 }
                             }
                             break;
@@ -101,15 +144,14 @@ namespace morphology
                             {
                                 for (int j = 2; j < curBitmap.Width - 2; j++)
                                 {
-                                    if (grayValues[i * curBitmap.Width + j] == 0 && 
-                                        grayValues[i * curBitmap.Width + j + 1] == 0 && 
-                                        grayValues[i * curBitmap.Width + j - 1] == 0 && 
-                                        grayValues[i * curBitmap.Width + j + 2] == 0 && 
+                                    if (grayValues[i * curBitmap.Width + j] == 0 &&
+                                        grayValues[i * curBitmap.Width + j + 1] == 0 &&
+                                        grayValues[i * curBitmap.Width + j - 1] == 0 &&
+                                        grayValues[i * curBitmap.Width + j + 2] == 0 &&
                                         grayValues[i * curBitmap.Width + j - 2] == 0)
                                     {
                                         tempArray[i * curBitmap.Width + j] = 0;
                                     }
-
                                 }
                             }
                             break;
@@ -119,8 +161,8 @@ namespace morphology
                             {
                                 for (int j = 0; j < curBitmap.Width; j++)
                                 {
-                                    if (grayValues[i * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i - 1) * curBitmap.Width + j] == 0 && 
+                                    if (grayValues[i * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i - 1) * curBitmap.Width + j] == 0 &&
                                         grayValues[(i + 1) * curBitmap.Width + j] == 0)
                                     {
                                         tempArray[i * curBitmap.Width + j] = 0;
@@ -135,10 +177,10 @@ namespace morphology
                             {
                                 for (int j = 0; j < curBitmap.Width; j++)
                                 {
-                                    if (grayValues[i * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i - 1) * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i + 1) * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i - 2) * curBitmap.Width + j] == 0 && 
+                                    if (grayValues[i * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i - 1) * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i + 1) * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i - 2) * curBitmap.Width + j] == 0 &&
                                         grayValues[(i + 2) * curBitmap.Width + j] == 0)
                                     {
                                         tempArray[i * curBitmap.Width + j] = 0;
@@ -153,10 +195,10 @@ namespace morphology
                             {
                                 for (int j = 1; j < curBitmap.Width - 1; j++)
                                 {
-                                    if (grayValues[i * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i - 1) * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i + 1) * curBitmap.Width + j] == 0 && 
-                                        grayValues[i * curBitmap.Width + j + 1] == 0 && 
+                                    if (grayValues[i * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i - 1) * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i + 1) * curBitmap.Width + j] == 0 &&
+                                        grayValues[i * curBitmap.Width + j + 1] == 0 &&
                                         grayValues[i * curBitmap.Width + j - 1] == 0)
                                     {
                                         tempArray[i * curBitmap.Width + j] = 0;
@@ -171,14 +213,14 @@ namespace morphology
                             {
                                 for (int j = 2; j < curBitmap.Width - 2; j++)
                                 {
-                                    if (grayValues[i * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i - 1) * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i + 1) * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i - 2) * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i + 2) * curBitmap.Width + j] == 0 && 
-                                        grayValues[i * curBitmap.Width + j + 1] == 0 && 
-                                        grayValues[i * curBitmap.Width + j - 1] == 0 && 
-                                        grayValues[i * curBitmap.Width + j + 2] == 0 && 
+                                    if (grayValues[i * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i - 1) * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i + 1) * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i - 2) * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i + 2) * curBitmap.Width + j] == 0 &&
+                                        grayValues[i * curBitmap.Width + j + 1] == 0 &&
+                                        grayValues[i * curBitmap.Width + j - 1] == 0 &&
+                                        grayValues[i * curBitmap.Width + j + 2] == 0 &&
                                         grayValues[i * curBitmap.Width + j - 2] == 0)
                                     {
                                         tempArray[i * curBitmap.Width + j] = 0;
@@ -193,14 +235,14 @@ namespace morphology
                             {
                                 for (int j = 1; j < curBitmap.Width - 1; j++)
                                 {
-                                    if (grayValues[i * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i - 1) * curBitmap.Width + j] == 0 && 
-                                        grayValues[(i + 1) * curBitmap.Width + j] == 0 && 
-                                        grayValues[i * curBitmap.Width + j + 1] == 0 && 
-                                        grayValues[i * curBitmap.Width + j - 1] == 0 && 
-                                        grayValues[(i - 1) * curBitmap.Width + j - 1] == 0 && 
-                                        grayValues[(i + 1) * curBitmap.Width + j - 1] == 0 && 
-                                        grayValues[(i - 1) * curBitmap.Width + j + 1] == 0 && 
+                                    if (grayValues[i * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i - 1) * curBitmap.Width + j] == 0 &&
+                                        grayValues[(i + 1) * curBitmap.Width + j] == 0 &&
+                                        grayValues[i * curBitmap.Width + j + 1] == 0 &&
+                                        grayValues[i * curBitmap.Width + j - 1] == 0 &&
+                                        grayValues[(i - 1) * curBitmap.Width + j - 1] == 0 &&
+                                        grayValues[(i + 1) * curBitmap.Width + j - 1] == 0 &&
+                                        grayValues[(i - 1) * curBitmap.Width + j + 1] == 0 &&
                                         grayValues[(i + 1) * curBitmap.Width + j + 1] == 0)
                                     {
                                         tempArray[i * curBitmap.Width + j] = 0;
@@ -243,7 +285,7 @@ namespace morphology
                                     {
                                         tempArray[i * curBitmap.Width + j] = 0;
                                     }
-                                    
+
                                 }
                             }
                             break;
@@ -252,10 +294,8 @@ namespace morphology
                             break;
                     }
 
-
                     grayValues = (byte[])tempArray.Clone();
-
-                    System.Runtime.InteropServices.Marshal.Copy(grayValues, 0, ptr, bytes);
+                    Marshal.Copy(grayValues, 0, ptr, bytes);
                     curBitmap.UnlockBits(bmpData);
                 }
 
@@ -272,7 +312,7 @@ namespace morphology
                 if (struForm.ShowDialog() == DialogResult.OK)
                 {
                     Rectangle rect = new Rectangle(0, 0, curBitmap.Width, curBitmap.Height);
-                    System.Drawing.Imaging.BitmapData bmpData = curBitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, curBitmap.PixelFormat);
+                    System.Drawing.Imaging.BitmapData bmpData = curBitmap.LockBits(rect, ImageLockMode.ReadWrite, curBitmap.PixelFormat);
                     IntPtr ptr = bmpData.Scan0;
                     int bytes = curBitmap.Width * curBitmap.Height;
                     byte[] grayValues = new byte[bytes];
@@ -477,7 +517,7 @@ namespace morphology
                     IntPtr ptr = bmpData.Scan0;
                     int bytes = curBitmap.Width * curBitmap.Height;
                     byte[] grayValues = new byte[bytes];
-                    System.Runtime.InteropServices.Marshal.Copy(ptr, grayValues, 0, bytes);
+                    Marshal.Copy(ptr, grayValues, 0, bytes);
 
                     byte flagStru = struForm.GetStruction;
 
@@ -1180,7 +1220,7 @@ namespace morphology
 
                     grayValues = (byte[])tempArray.Clone();
 
-                    System.Runtime.InteropServices.Marshal.Copy(grayValues, 0, ptr, bytes);
+                    Marshal.Copy(grayValues, 0, ptr, bytes);
                     curBitmap.UnlockBits(bmpData);
                 }
 
@@ -1200,7 +1240,7 @@ namespace morphology
                     IntPtr ptr = bmpData.Scan0;
                     int bytes = curBitmap.Width * curBitmap.Height;
                     byte[] grayValues = new byte[bytes];
-                    System.Runtime.InteropServices.Marshal.Copy(ptr, grayValues, 0, bytes);
+                    Marshal.Copy(ptr, grayValues, 0, bytes);
 
                     bool[] hitStru = hitAndMiss.GetHitStruction;
                     bool[] missStru = hitAndMiss.GetMissStruction;
@@ -1257,7 +1297,7 @@ namespace morphology
 
                     for (int i = 0; i < bytes; i++)
                     {
-                        if(temp1Array[i] == 0 && temp2Array[i] == 0)
+                        if (temp1Array[i] == 0 && temp2Array[i] == 0)
                         {
                             tempArray[i] = 0;
                         }
@@ -1269,12 +1309,130 @@ namespace morphology
 
                     grayValues = (byte[])tempArray.Clone();
 
-                    System.Runtime.InteropServices.Marshal.Copy(grayValues, 0, ptr, bytes);
+                    Marshal.Copy(grayValues, 0, ptr, bytes);
                     curBitmap.UnlockBits(bmpData);
                 }
 
                 Invalidate();
             }
         }
+
+        /// <summary>
+        /// 图像二值化
+        /// </summary>
+        private void binaryzation_Click(object sender, EventArgs e)
+        {
+            if (curBitmap != null)
+            {
+                OtsuThreshold(curBitmap);
+                Invalidate();
+            }
+        }
+
+        #region Otsu阈值法二值化模块   
+
+        /// <summary>   
+        /// Otsu阈值   
+        /// </summary>   
+        /// <param name="b">位图流</param>   
+        /// <returns></returns>   
+        public Bitmap OtsuThreshold(Bitmap b)
+        {
+            // 图像灰度化   
+            // b = Gray(b);   
+            int width = b.Width;
+            int height = b.Height;
+            byte threshold = 0;
+            int[] hist = new int[256];
+
+            int AllPixelNumber = 0, PixelNumberSmall = 0, PixelNumberBig = 0;
+
+            double MaxValue, AllSum = 0, SumSmall = 0, SumBig, ProbabilitySmall, ProbabilityBig, Probability;
+            BitmapData data = b.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            unsafe
+            {
+                byte* p = (byte*)data.Scan0;
+                int offset = data.Stride - width * 4;
+                for (int j = 0; j < height; j++)
+                {
+                    for (int i = 0; i < width; i++)
+                    {
+                        hist[p[0]]++;
+                        p += 4;
+                    }
+                    p += offset;
+                }
+                b.UnlockBits(data);
+            }
+            //计算灰度为I的像素出现的概率   
+            for (int i = 0; i < 256; i++)
+            {
+                AllSum += i * hist[i];     //   质量矩   
+                AllPixelNumber += hist[i];  //  质量       
+            }
+            MaxValue = -1.0;
+            for (int i = 0; i < 256; i++)
+            {
+                PixelNumberSmall += hist[i];
+                PixelNumberBig = AllPixelNumber - PixelNumberSmall;
+                if (PixelNumberBig == 0)
+                {
+                    break;
+                }
+
+                SumSmall += i * hist[i];
+                SumBig = AllSum - SumSmall;
+                ProbabilitySmall = SumSmall / PixelNumberSmall;
+                ProbabilityBig = SumBig / PixelNumberBig;
+                Probability = PixelNumberSmall * ProbabilitySmall * ProbabilitySmall + PixelNumberBig * ProbabilityBig * ProbabilityBig;
+                if (Probability > MaxValue)
+                {
+                    MaxValue = Probability;
+                    threshold = (byte)i;
+                }
+            }
+            return this.Threshoding(b, threshold);
+        } // end of OtsuThreshold 2  
+        #endregion
+
+        #region      固定阈值法二值化模块
+        public Bitmap Threshoding(Bitmap b, byte threshold)
+        {
+            int width = b.Width;
+            int height = b.Height;
+            BitmapData data = b.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            unsafe
+            {
+                byte* p = (byte*)data.Scan0;
+                int offset = data.Stride - width * 4;
+                byte R, G, B, gray;
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        R = p[2];
+                        G = p[1];
+                        B = p[0];
+                        gray = (byte)((R * 19595 + G * 38469 + B * 7472) >> 16);
+                        if (gray >= threshold)
+                        {
+                            p[0] = p[1] = p[2] = 255;
+                        }
+                        else
+                        {
+                            p[0] = p[1] = p[2] = 0;
+                        }
+                        p += 4;
+                    }
+                    p += offset;
+                }
+                b.UnlockBits(data);
+                return b;
+
+            }
+
+        }
+        #endregion
+
     }
 }
