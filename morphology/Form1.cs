@@ -93,6 +93,7 @@ namespace morphology
         //    }
         //}
         #endregion
+
         /// <summary>
         /// 图像腐蚀：只能处理位深度为8的512*512图像
         /// </summary>
@@ -303,6 +304,11 @@ namespace morphology
             }
         }
 
+        /// <summary>
+        /// 图像膨胀：只能处理位深度为8的512*512图像
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void dilate_Click(object sender, EventArgs e)
         {
             if (curBitmap != null)
@@ -312,11 +318,11 @@ namespace morphology
                 if (struForm.ShowDialog() == DialogResult.OK)
                 {
                     Rectangle rect = new Rectangle(0, 0, curBitmap.Width, curBitmap.Height);
-                    System.Drawing.Imaging.BitmapData bmpData = curBitmap.LockBits(rect, ImageLockMode.ReadWrite, curBitmap.PixelFormat);
+                    BitmapData bmpData = curBitmap.LockBits(rect, ImageLockMode.ReadWrite, curBitmap.PixelFormat);
                     IntPtr ptr = bmpData.Scan0;
                     int bytes = curBitmap.Width * curBitmap.Height;
                     byte[] grayValues = new byte[bytes];
-                    System.Runtime.InteropServices.Marshal.Copy(ptr, grayValues, 0, bytes);
+                    Marshal.Copy(ptr, grayValues, 0, bytes);
 
                     byte flagStru = struForm.GetStruction;
 
@@ -504,6 +510,11 @@ namespace morphology
             }
         }
 
+        /// <summary>
+        /// 开运算：只能处理位深度为8的512*512图像
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void opening_Click(object sender, EventArgs e)
         {
             if (curBitmap != null)
@@ -513,7 +524,7 @@ namespace morphology
                 if (struForm.ShowDialog() == DialogResult.OK)
                 {
                     Rectangle rect = new Rectangle(0, 0, curBitmap.Width, curBitmap.Height);
-                    System.Drawing.Imaging.BitmapData bmpData = curBitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, curBitmap.PixelFormat);
+                     BitmapData bmpData = curBitmap.LockBits(rect,  ImageLockMode.ReadWrite, curBitmap.PixelFormat);
                     IntPtr ptr = bmpData.Scan0;
                     int bytes = curBitmap.Width * curBitmap.Height;
                     byte[] grayValues = new byte[bytes];
@@ -866,6 +877,11 @@ namespace morphology
             }
         }
 
+        /// <summary>
+        /// 闭运算：只能处理位深度为8的512*512图像
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void closing_Click(object sender, EventArgs e)
         {
             if (curBitmap != null)
@@ -875,7 +891,7 @@ namespace morphology
                 if (struForm.ShowDialog() == DialogResult.OK)
                 {
                     Rectangle rect = new Rectangle(0, 0, curBitmap.Width, curBitmap.Height);
-                    System.Drawing.Imaging.BitmapData bmpData = curBitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, curBitmap.PixelFormat);
+                     BitmapData bmpData = curBitmap.LockBits(rect,  ImageLockMode.ReadWrite, curBitmap.PixelFormat);
                     IntPtr ptr = bmpData.Scan0;
                     int bytes = curBitmap.Width * curBitmap.Height;
                     byte[] grayValues = new byte[bytes];
@@ -1228,6 +1244,11 @@ namespace morphology
             }
         }
 
+        /// <summary>
+        /// 击中击不中：只能处理位深度为8的512*512图像
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void hitMiss_Click(object sender, EventArgs e)
         {
             if (curBitmap != null)
@@ -1236,13 +1257,15 @@ namespace morphology
                 if (hitAndMiss.ShowDialog() == DialogResult.OK)
                 {
                     Rectangle rect = new Rectangle(0, 0, curBitmap.Width, curBitmap.Height);
-                    System.Drawing.Imaging.BitmapData bmpData = curBitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, curBitmap.PixelFormat);
+                    BitmapData bmpData = curBitmap.LockBits(rect,  ImageLockMode.ReadWrite, curBitmap.PixelFormat);
                     IntPtr ptr = bmpData.Scan0;
                     int bytes = curBitmap.Width * curBitmap.Height;
                     byte[] grayValues = new byte[bytes];
                     Marshal.Copy(ptr, grayValues, 0, bytes);
 
+                    //得到击中结构元素
                     bool[] hitStru = hitAndMiss.GetHitStruction;
+                    //得到击不中结构元素
                     bool[] missStru = hitAndMiss.GetMissStruction;
 
                     byte[] tempArray = new byte[bytes];
@@ -1250,15 +1273,18 @@ namespace morphology
                     byte[] temp2Array = new byte[bytes];
                     for (int i = 0; i < bytes; i++)
                     {
+                        //原图补集
                         tempArray[i] = (byte)(255 - grayValues[i]);
                         temp1Array[i] = 255;
                         temp2Array[i] = 255;
                     }
 
+                    //应用击中结构元素进行腐蚀运算
                     for (int i = 1; i < curBitmap.Height - 1; i++)
                     {
                         for (int j = 1; j < curBitmap.Width - 1; j++)
                         {
+                            //当前位置是黑色或者是击中结构元素的这一位置没有选中
                             if ((grayValues[(i - 1) * curBitmap.Width + j - 1] == 0 || hitStru[0] == false) &&
                                 (grayValues[(i - 1) * curBitmap.Width + j] == 0 || hitStru[1] == false) &&
                                 (grayValues[(i - 1) * curBitmap.Width + j + 1] == 0 || hitStru[2] == false) &&
@@ -1275,10 +1301,12 @@ namespace morphology
                         }
                     }
 
+                    //应用击不中结构元素进行腐蚀运算
                     for (int i = 1; i < curBitmap.Height - 1; i++)
                     {
                         for (int j = 1; j < curBitmap.Width - 1; j++)
                         {
+                            ////当前位置是黑色或者是击不中结构元素的这一位置没有选中
                             if ((tempArray[(i - 1) * curBitmap.Width + j - 1] == 0 || missStru[0] == false) &&
                                 (tempArray[(i - 1) * curBitmap.Width + j] == 0 || missStru[1] == false) &&
                                 (tempArray[(i - 1) * curBitmap.Width + j + 1] == 0 || missStru[2] == false) &&
@@ -1295,6 +1323,7 @@ namespace morphology
                         }
                     }
 
+                    //两个腐蚀运算结果再进行“与”操作
                     for (int i = 0; i < bytes; i++)
                     {
                         if (temp1Array[i] == 0 && temp2Array[i] == 0)

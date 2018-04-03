@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{61365CAF-C50C-4F38-AF9B-C012050BF098}</ProjectGuid>
+    <ProjectGuid>{4AFB4431-C2B4-4DE7-B22A-8834CA2F899C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>changepixel</RootNamespace>
-    <AssemblyName>changepixel</AssemblyName>
+    <RootNamespace>changepixel2</RootNamespace>
+    <AssemblyName>changepixel2</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

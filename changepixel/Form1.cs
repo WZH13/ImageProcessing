@@ -23,6 +23,11 @@ namespace changepixel
         private string curFileName;
         //图像对象
         private Bitmap curBitmap;
+        //点坐标
+        int x = 0;
+        int y = 0;
+        //类对象
+        PointBitmap pointbmp;
 
         /// <summary>
         /// 打开图像文件
@@ -50,6 +55,8 @@ namespace changepixel
                 try
                 {
                     curBitmap = (Bitmap)Image.FromFile(curFileName);
+                    //实例化PointBitmap类
+                    pointbmp = new PointBitmap(curBitmap);
                 }
                 catch (Exception exp)
                 {
@@ -259,7 +266,7 @@ namespace changepixel
         }
 
         /// <summary>
-        /// 双击获取坐标
+        /// 双击获取坐标、像素值
         /// </summary>
         private void Form1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -273,8 +280,27 @@ namespace changepixel
                 }
                 else
                 {
-                    xtxb.Text = (formPoint.X - 180).ToString();
-                    ytxb.Text = (formPoint.Y - 20).ToString();
+                    x = formPoint.X - 180;
+                    y = formPoint.Y - 20;
+
+                    //坐标显示
+                    xtxb.Text = x.ToString();
+                    ytxb.Text = y.ToString();
+
+                    //锁定Bitmap，通过Pixel访问颜色
+                    pointbmp.LockBits();
+
+                    //获取颜色
+                    Color color = pointbmp.GetPixel(x, y);
+
+                    //像素显示
+                    pixeltxbR.Text = color.R.ToString();
+                    pixeltxbG.Text = color.G.ToString();
+                    pixeltxbB.Text = color.B.ToString();
+
+
+                    //从内存解锁Bitmap
+                    pointbmp.UnlockBits();
                 }
             }
         }

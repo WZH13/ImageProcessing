@@ -15,21 +15,29 @@ namespace morphology
             InitializeComponent();
             flagHit = new bool[9];
             flagMiss = new bool[9];
+            //数组清零（设置为bool）
             Array.Clear(flagHit, 0, 9);
             Array.Clear(flagMiss, 0, 9);
         }
 
+        //击中结构元素组中的第一个按钮空间的Click事件
         private void hit0_Click(object sender, EventArgs e)
         {
             if (flagHit[0] == false)
             {
+                //以前没有被选中
+                //设置相关变量标识
                 flagHit[0] = true;
+                //按钮背景色设置为黑色
                 hit0.BackColor = Color.Black;
                 this.start.Focus();
             }
             else
             {
+                //以前被选中
+                //清除相关变量标识
                 flagHit[0] = false;
+                //按钮背景色设置为白色
                 hit0.BackColor = Color.White;
                 this.start.Focus();
             }
@@ -163,17 +171,24 @@ namespace morphology
             }
         }
 
+        //击不中结构元素组中的第一个按钮空间的Click事件
         private void miss0_Click(object sender, EventArgs e)
         {
             if (flagMiss[0] == false)
             {
+                //以前没有被选中
+                //设置相关变量标识
                 flagMiss[0] = true;
+                //按钮背景色设置为黑色
                 miss0.BackColor = Color.Black;
                 this.start.Focus();
             }
             else
             {
+                //以前被选中
+                //清除相关变量标识
                 flagMiss[0] = false;
+                //按钮背景色设置为白色
                 miss0.BackColor = Color.White;
                 this.start.Focus();
             }
@@ -309,6 +324,7 @@ namespace morphology
 
         private void start_Click(object sender, EventArgs e)
         {
+            //判断两个结构元素是否有相交的部分
             if ((flagHit[0] == true && flagMiss[0] == true) ||
                 (flagHit[1] == true && flagMiss[1] == true) ||
                 (flagHit[2] == true && flagMiss[2] == true) ||
@@ -332,6 +348,7 @@ namespace morphology
             this.Close();
         }
 
+        //为了和主窗体传递数组变量
         public bool[] GetHitStruction
         {
             get
@@ -339,7 +356,6 @@ namespace morphology
                 return flagHit;
             }
         }
-
         public bool[] GetMissStruction
         {
             get
