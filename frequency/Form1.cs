@@ -53,33 +53,43 @@ namespace frequency
             }
         }
 
+        /// <summary>
+        /// 快速傅里叶变换
+        /// </summary>
+        /// <param name="sourceData">待变换的序列</param>
+        /// <param name="countN">序列长度</param>
+        /// <returns>变换后的序列</returns>
         private Complex[] fft(Complex[] sourceData, int countN)
         {
             int r = Convert.ToInt32(Math.Log(countN, 2));//求fft的级数
+            // Math.Log(double a, double newBase)  摘要:返回指定数字在使用指定底时的对数。参数:{a: 要查找其对数的数字。newBase: 对数的底。}
 
-            //求加权系数W
             Complex[] w = new Complex[countN / 2];
             Complex[] interVar1 = new Complex[countN];
             Complex[] interVar2 = new Complex[countN];
             
             interVar1 = (Complex[])sourceData.Clone();
 
+            //求加权系数W
             for (int i = 0; i < countN / 2; i++)
             {
                 double angle = -i * Math.PI * 2 / countN;
                 w[i] = new Complex(Math.Cos(angle), Math.Sin(angle));
             }
 
-            //核心部分
+            //核心部分：蝶形运算
             for (int i = 0; i < r; i++)
             {
                 int interval = 1 << i;
                 int halfN = 1 << (r - i);
+                //对每级的每一组点循环
                 for (int j = 0; j < interval; j++)
                 {
                     int gap = j * halfN;
+                    //对每级的每一组点循环
                     for (int k = 0; k < halfN / 2; k++)
                     {
+                        //进行蝶形算法
                         interVar2[k + gap] = interVar1[k + gap] + interVar1[k + gap + halfN / 2];
                         interVar2[k + halfN / 2 + gap] = (interVar1[k + gap] - interVar1[k + gap + halfN / 2]) * w[k * interval];
                     }
@@ -87,10 +97,12 @@ namespace frequency
                 interVar1 = (Complex[])interVar2.Clone();
             }
 
+            //按位取反
             for (uint j = 0; j < countN; j++)
             {
                 uint rev = 0;
                 uint num = j;
+                //重新排序
                 for (int i = 0; i < r; i++)
                 {
                     rev <<= 1;
@@ -102,16 +114,25 @@ namespace frequency
             return interVar2;
         }
 
+        /// <summary>
+        /// 快速傅里叶逆变换
+        /// </summary>
+        /// <param name="sourceData">待变换的序列</param>
+        /// <param name="countN">序列长度</param>
+        /// <returns>变换后的序列</returns>
         private Complex[] ifft(Complex[] sourceData, int countN)
         {
+            //共轭变换
             for (int i = 0; i < countN; i++)
             {
                 sourceData[i] = sourceData[i].Conjugate();
             }
 
             Complex[] interVar = new Complex[countN];
+            //调用快速傅里叶变换
             interVar = fft(sourceData, countN);
 
+            //共轭变换，并除以长度
             for (int i = 0; i < countN; i++)
             {
                 interVar[i] = new Complex(interVar[i].Real / countN, -interVar[i].Imaginary / countN);
@@ -120,6 +141,15 @@ namespace frequency
             return interVar;
         }
 
+        /// <summary>
+        /// 用于图像处理的二维快速傅里叶变换
+        /// </summary>
+        /// <param name="imageData">图像序列</param>
+        /// <param name="imageWidth">图像的宽度</param>
+        /// <param name="imageHeight">图像的长度</param>
+        /// <param name="inv">标识是否进行坐标位移变换
+        ///                         true：进行坐标位移变换 false：不进行坐标位移变换</param>
+        /// <returns>变换后的频域数据</returns>
         private Complex[] fft2(byte[] imageData, int imageWidth, int imageHeight, bool inv)
         {
             int bytes = imageWidth * imageHeight;
@@ -128,10 +158,12 @@ namespace frequency
             
             bmpValues = (byte[])imageData.Clone();
             
+            //赋值：把实数变为复数，即虚部为0
             for (int i = 0; i < bytes; i++)
             {
                 if (inv == true)
                 {
+                    //进行频域坐标位移
                     if ((i / imageWidth + i % imageWidth) % 2 == 0)
                     {
                         tempCom1[i] = new Complex(bmpValues[i], 0);
@@ -143,34 +175,45 @@ namespace frequency
                 }
                 else
                 {
+                    //不进行频域坐标位移
                     tempCom1[i] = new Complex(bmpValues[i], 0);
                 }
             }
 
+            //水平方向快速傅里叶变换
             Complex[] tempCom2 = new Complex[imageWidth];
             Complex[] tempCom3 = new Complex[imageWidth];
             for (int i = 0; i < imageHeight; i++)//水平方向
             {
+                //得到水平方向复数序列
                 for (int j = 0; j < imageWidth; j++)
                 {
                     tempCom2[j] = tempCom1[i * imageWidth + j];
                 }
+                //调用一维傅里叶变换
                 tempCom3 = fft(tempCom2, imageWidth);
+                //把结果赋值回去
                 for (int j = 0; j < imageWidth; j++)
                 {
                     tempCom1[i * imageWidth + j] = tempCom3[j];
                 }
             }
-                        
+            
+            //垂直方向快速傅里叶变换
             Complex[] tempCom4 = new Complex[imageHeight];
             Complex[] tempCom5 = new Complex[imageHeight];
             for (int i = 0; i < imageWidth; i++)//垂直方向
             {
+                //得到垂直方向复数序列
                 for (int j = 0; j < imageHeight; j++)
                 {
                     tempCom4[j] = tempCom1[j * imageWidth + i];
                 }
+
+                //调用一维傅里叶变换
                 tempCom5 = fft(tempCom4, imageHeight);
+                
+                //把结果赋值回去
                 for (int j = 0; j < imageHeight; j++)
                 {
                     tempCom1[j * imageHeight + i] = tempCom5[j];
@@ -180,6 +223,15 @@ namespace frequency
             return tempCom1;
         }
 
+        /// <summary>
+        /// 用于图像处理的二维快速傅里叶逆变换
+        /// </summary>
+        /// <param name="freData">频域数据</param>
+        /// <param name="imageWidth">图像宽度</param>
+        /// <param name="imageHeight">图像长度</param>
+        /// <param name="inv">标识是否进行坐标位移变换，要与二维快速傅里叶正变换一致
+        ///                         true：进行坐标位移变换 false：不进行坐标位移变换</param>
+        /// <returns>变换后的空间域数据（即图像数据）</returns>
         private byte[] ifft2(Complex[] freData, int imageWidth, int imageHeight, bool inv)
         {
             int bytes = imageWidth * imageHeight;
@@ -188,41 +240,55 @@ namespace frequency
             
             tempCom1 = (Complex[])freData.Clone();
             
+            //水平方向快速傅里叶逆变换
             Complex[] tempCom2 = new Complex[imageWidth];
             Complex[] tempCom3 = new Complex[imageWidth];
             for (int i = 0; i < imageHeight; i++)//水平方向
             {
+                //得到水平方向复数序列
                 for (int j = 0; j < imageWidth; j++)
                 {
                     tempCom2[j] = tempCom1[i * imageWidth + j];
                 }
+
+                //调用一维傅里叶变换
                 tempCom3 = ifft(tempCom2, imageWidth);
+
+                //把结果赋值回去
                 for (int j = 0; j < imageWidth; j++)
                 {
                     tempCom1[i * imageWidth + j] = tempCom3[j];
                 }
             }
 
+            //垂直方向快速傅里叶逆变换
             Complex[] tempCom4 = new Complex[imageHeight];
             Complex[] tempCom5 = new Complex[imageHeight];
             for (int i = 0; i < imageWidth; i++)//垂直方向
             {
+                //得到垂直方向复数序列
                 for (int j = 0; j < imageHeight; j++)
                 {
                     tempCom4[j] = tempCom1[j * imageWidth + i];
                 }
+
+                //调用一维傅里叶变换
                 tempCom5 = ifft(tempCom4, imageHeight);
+
+                //把结果赋值回去
                 for (int j = 0; j < imageHeight; j++)
                 {
                     tempCom1[j * imageHeight + i] = tempCom5[j];
                 }
             }
 
+            //赋值：把复数转换为实数，只保留复数的实数部分
             double tempDouble;
             for (int i = 0; i < bytes; i++)
             {
                 if (inv == true)
                 {
+                    //进行坐标位移
                     if ((i / curBitmap.Width + i % curBitmap.Width) % 2 == 0)
                     {
                         tempDouble = tempCom1[i].Real;
@@ -234,6 +300,7 @@ namespace frequency
                 }
                 else
                 {
+                    //不进行坐标位移
                     tempDouble = tempCom1[i].Real;
                 }
 
@@ -257,6 +324,9 @@ namespace frequency
             return bmpValues;
         }
 
+        /// <summary>
+        /// 幅度图像
+        /// </summary>
         private void amplitude_Click(object sender, EventArgs e)
         {
             if (curBitmap != null)
@@ -271,8 +341,10 @@ namespace frequency
                 Complex[] freDom = new Complex[bytes];
                 double[] tempArray = new double[bytes];
 
+                //调用二维傅里叶变换，需要进行坐标位移
                 freDom = fft2(grayValues, curBitmap.Width, curBitmap.Height, true);
                 
+                //变量变换，并取幅度系数
                 for (int i = 0; i < bytes; i++)
                 {
                     tempArray[i] = Math.Log(1 + freDom[i].Abs(), 2);                   
@@ -281,6 +353,7 @@ namespace frequency
                 //灰度级拉伸
                 double  a = 1000.0, b = 0.0;
                 double p;
+                //找到最大值和最小值
                 for (int i = 0; i < bytes; i++)
                 {
                     if (a > tempArray[i])
@@ -292,6 +365,7 @@ namespace frequency
                         b = tempArray[i];
                     }
                 }
+                //得到比例系数
                 p = 255.0 / (b - a);
                 for (int i = 0; i < bytes; i++)
                 {
@@ -306,6 +380,9 @@ namespace frequency
             }
         }
 
+        /// <summary>
+        /// 相位图像
+        /// </summary>
         private void phase_Click(object sender, EventArgs e)
         {
             if (curBitmap != null)
@@ -319,8 +396,10 @@ namespace frequency
 
                 Complex[] freDom = new Complex[bytes];
                 double[] tempArray = new double[bytes];
+                //调用二维傅里叶变换，不进行坐标位移
                 freDom = fft2(grayValues, curBitmap.Width, curBitmap.Height, false);
 
+                //取相位系数，并进行了变量变换
                 for (int i = 0; i < bytes; i++)
                 {
                     tempArray[i] = freDom[i].Angle() + 2 * Math.PI;
@@ -329,6 +408,7 @@ namespace frequency
                 //灰度级拉伸
                 double a = 1000.0, b = 0.0;
                 double p;
+                //找到最大值和最小值
                 for (int i = 0; i < bytes; i++)
                 {
                     if (a > tempArray[i])
@@ -340,6 +420,7 @@ namespace frequency
                         b = tempArray[i];
                     }
                 }
+                //得到比例系数
                 p = 255.0 / (b - a);
                 for (int i = 0; i < bytes; i++)
                 {
