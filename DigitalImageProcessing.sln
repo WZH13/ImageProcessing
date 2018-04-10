@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "smooth", "smooth\smooth.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "changepixel", "changepixel\changepixel.csproj", "{61365CAF-C50C-4F38-AF9B-C012050BF098}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageProcessing", "ImageProcessing\ImageProcessing.csproj", "{0A7FE5D0-4036-4B7D-B27A-184B4117A6D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{61365CAF-C50C-4F38-AF9B-C012050BF098}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61365CAF-C50C-4F38-AF9B-C012050BF098}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61365CAF-C50C-4F38-AF9B-C012050BF098}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A7FE5D0-4036-4B7D-B27A-184B4117A6D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A7FE5D0-4036-4B7D-B27A-184B4117A6D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A7FE5D0-4036-4B7D-B27A-184B4117A6D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A7FE5D0-4036-4B7D-B27A-184B4117A6D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
