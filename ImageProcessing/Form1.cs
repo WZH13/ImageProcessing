@@ -22,6 +22,8 @@ namespace ImageProcessing
             skinEngine1.SkinFile = Environment.CurrentDirectory + "\\Skins\\MSN.ssk";  //选择皮肤文件MidsummerColor1  MSN   
             //btn_open.Tag = 9999;//设置不需要被渲染的控件Tag值为9999
         }
+        //1.声明自适应类实例  
+        AutoSizeFormClass asc = new AutoSizeFormClass();
 
         //文件名
         private string curFileName;
@@ -32,6 +34,7 @@ namespace ImageProcessing
         int y = 0;
         //类对象
         PointBitmap pointbmp;
+        ImageProcessing imageProcessing;
 
         private void btn_open_Click(object sender, EventArgs e)
         {
@@ -56,8 +59,9 @@ namespace ImageProcessing
                 try
                 {
                     curBitmap = (Bitmap)Image.FromFile(curFileName);
-                    //实例化PointBitmap类
+                    //实例化类
                     pointbmp = new PointBitmap(curBitmap);
+                    imageProcessing= new ImageProcessing(curBitmap);
                 }
                 catch (Exception exp)
                 {
@@ -67,7 +71,8 @@ namespace ImageProcessing
             //对窗体进行重新绘制，这将强制执行paint事件处理程序
             Invalidate();
         }
-                //在控件需要重新绘制时发生
+
+        //在控件需要重新绘制时发生
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             //获取Graphics对象
@@ -79,6 +84,22 @@ namespace ImageProcessing
                 //curBitmap.Width, curBitmap.Height图像的宽度和高度
                 g.DrawImage(curBitmap, 20, 99, curBitmap.Width, curBitmap.Height);
             }
+        }
+
+        private void btn_restore_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                curBitmap = (Bitmap)Image.FromFile(curFileName);
+                //实例化类
+                pointbmp = new PointBitmap(curBitmap);
+                imageProcessing = new ImageProcessing(curBitmap);
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show(exp.Message);
+            }
+            Invalidate();
         }
 
         private void btn_save_Click(object sender, EventArgs e)
@@ -254,173 +275,85 @@ namespace ImageProcessing
 
         private void btn_gray_Click(object sender, EventArgs e)
         {
+            curBitmap= imageProcessing.RgbToGrayScale(curBitmap);
+            Invalidate();
+        }
+
+        private void btn_histogram_Click(object sender, EventArgs e)
+        {
             if (curBitmap != null)
             {
-                //位图矩形
-                Rectangle rect = new Rectangle(0, 0, curBitmap.Width, curBitmap.Height);
-                //以可读写的方式锁定全部位图像素
-                System.Drawing.Imaging.BitmapData bmpData = curBitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, curBitmap.PixelFormat);
-                //得到首地址
-                IntPtr ptr = bmpData.Scan0;
-
-                //定义被锁定的数组大小，由位图数据与未用空间组成的
-                int bytes = bmpData.Stride * bmpData.Height;
-                //定义位图数组
-                byte[] rgbValues = new byte[bytes];
-                //复制被锁定的位图像素值到该数组内
-                Marshal.Copy(ptr, rgbValues, 0, bytes);
-
-                //灰度化
-                double colorTemp = 0;
-                for (int i = 0; i < bmpData.Height; i++)
-                {
-                    //只处理每行中是图像像素的数据，舍弃未用空间
-                    for (int j = 0; j < bmpData.Width * 3; j += 3)
-                    {
-                        //利用公式计算灰度值
-                        colorTemp = rgbValues[i * bmpData.Stride + j + 2] * 0.299 + rgbValues[i * bmpData.Stride + j + 1] * 0.587 + rgbValues[i * bmpData.Stride + j] * 0.114;
-                        //R=G=B
-                        rgbValues[i * bmpData.Stride + j] = rgbValues[i * bmpData.Stride + j + 1] = rgbValues[i * bmpData.Stride + j + 2] = (byte)colorTemp;
-                    }
-                }
-
-                //把数组复制回位图
-                Marshal.Copy(rgbValues, 0, ptr, bytes);
-                //解锁位图像素
-                curBitmap.UnlockBits(bmpData);
-                //对窗体进行重新绘制，这将强制执行Paint事件处理程序
-                Invalidate();
+                //定义并实例化新窗体，并把图像数据传递给它
+                histForm histoGram = new histForm(curBitmap);
+                histoGram.ShowDialog();
             }
         }
 
-        /// <summary>
-        /// 二值化
-        /// </summary>
         private void btn_binaryzation_Click(object sender, EventArgs e)
         {
-            if (curBitmap != null)
-            {
-                OtsuThreshold(curBitmap);
-                Invalidate();
-            }
+            curBitmap= imageProcessing.OtsuThreshold();
+            Invalidate();
         }
 
-        #region Otsu阈值法二值化模块   
-
-        /// <summary>   
-        /// Otsu阈值   
-        /// </summary>   
-        /// <param name="b">位图流</param>   
-        /// <returns></returns>   
-        public Bitmap OtsuThreshold(Bitmap b)
+        private void btn_linearPO_Click(object sender, EventArgs e)
         {
-            // 图像灰度化   
-            // b = Gray(b);   
-            int width = b.Width;
-            int height = b.Height;
-            byte threshold = 0;
-            int[] hist = new int[256];
-
-            int AllPixelNumber = 0, PixelNumberSmall = 0, PixelNumberBig = 0;
-
-            double MaxValue, AllSum = 0, SumSmall = 0, SumBig, ProbabilitySmall, ProbabilityBig, Probability;
-            BitmapData data = b.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            unsafe
+            //实例化linearPOForm窗体
+            linearPOForm linearForm = new linearPOForm();
+            //点击确定按钮
+            if (linearForm.ShowDialog() == DialogResult.OK)
             {
-                byte* p = (byte*)data.Scan0;
-                int offset = data.Stride - width * 4;
-                for (int j = 0; j < height; j++)
-                {
-                    for (int i = 0; i < width; i++)
-                    {
-                        hist[p[0]]++;
-                        p += 4;
-                    }
-                    p += offset;
-                }
-                b.UnlockBits(data);
-            }
-            //计算灰度为I的像素出现的概率   
-            for (int i = 0; i < 256; i++)
-            {
-                AllSum += i * hist[i];     //   质量矩   
-                AllPixelNumber += hist[i];  //  质量       
-            }
-            MaxValue = -1.0;
-            for (int i = 0; i < 256; i++)
-            {
-                PixelNumberSmall += hist[i];
-                PixelNumberBig = AllPixelNumber - PixelNumberSmall;
-                if (PixelNumberBig == 0)
-                {
-                    break;
-                }
-
-                SumSmall += i * hist[i];
-                SumBig = AllSum - SumSmall;
-                ProbabilitySmall = SumSmall / PixelNumberSmall;
-                ProbabilityBig = SumBig / PixelNumberBig;
-                Probability = PixelNumberSmall * ProbabilitySmall * ProbabilitySmall + PixelNumberBig * ProbabilityBig * ProbabilityBig;
-                if (Probability > MaxValue)
-                {
-                    MaxValue = Probability;
-                    threshold = (byte)i;
-                }
-            }
-            return this.Threshoding(b, threshold);
-        } // end of OtsuThreshold 2  
-        #endregion
-
-        #region      固定阈值法二值化模块
-        public Bitmap Threshoding(Bitmap b, byte threshold)
-        {
-            int width = b.Width;
-            int height = b.Height;
-            BitmapData data = b.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            unsafe
-            {
-                byte* p = (byte*)data.Scan0;
-                int offset = data.Stride - width * 4;
-                byte R, G, B, gray;
-                for (int y = 0; y < height; y++)
-                {
-                    for (int x = 0; x < width; x++)
-                    {
-                        R = p[2];
-                        G = p[1];
-                        B = p[0];
-                        gray = (byte)((R * 19595 + G * 38469 + B * 7472) >> 16);
-                        if (gray >= threshold)
-                        {
-                            p[0] = p[1] = p[2] = 255;
-                        }
-                        else
-                        {
-                            p[0] = p[1] = p[2] = 0;
-                        }
-                        p += 4;
-                    }
-                    p += offset;
-                }
-                b.UnlockBits(data);
-                return b;
-
-            }
-
-        }
-        #endregion
-
-        private void btn_restore_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                curBitmap = (Bitmap)Image.FromFile(curFileName);
-            }
-            catch (Exception exp)
-            {
-                MessageBox.Show(exp.Message);
+                //得到斜率
+                double scaling = Convert.ToDouble(linearForm.GetScaling);
+                //得到偏移量
+                double offset = Convert.ToDouble(linearForm.GetOffset);
+                imageProcessing.linearPO(scaling, offset);
             }
             Invalidate();
         }
+
+        private void btn_stretch_Click(object sender, EventArgs e)
+        {
+            imageProcessing.Stretch(curBitmap, out curBitmap);
+            Invalidate();
+        }
+
+        private void btn_equalization_Click(object sender, EventArgs e)
+        {
+            imageProcessing.Balance(curBitmap, out curBitmap);
+            Invalidate();
+        }
+
+        private void btn_shaping_Click(object sender, EventArgs e)
+        {
+
+                shapinForm sForm = new shapinForm();
+
+                if (sForm.ShowDialog() == DialogResult.OK)
+                {
+                imageProcessing.HistogramMatching(curBitmap, sForm.GetmatchingBmp, out curBitmap);
+                }
+            Invalidate();
+        }
+
+        private void btn_exit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        #region 窗体自适应
+
+        //2. 为窗体添加Load事件，并在其方法Form1_Load中，调用类的初始化方法，记录窗体和其控件的初始位置和大小  
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            asc.controllInitializeSize(this);
+        }
+
+        //3.为窗体添加SizeChanged事件，并在其方法Form1_SizeChanged中，调用类的自适应方法，完成自适应  
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            asc.controlAutoSize(this);
+        }
+
+        #endregion
     }
 }

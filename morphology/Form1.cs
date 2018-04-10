@@ -502,7 +502,7 @@ namespace morphology
 
                     grayValues = (byte[])tempArray.Clone();
 
-                    System.Runtime.InteropServices.Marshal.Copy(grayValues, 0, ptr, bytes);
+                    Marshal.Copy(grayValues, 0, ptr, bytes);
                     curBitmap.UnlockBits(bmpData);
                 }
 
