@@ -156,8 +156,7 @@ namespace ImageProcessing
         /// </summary>
         private void btn_change_Click(object sender, EventArgs e)
         {
-            if (curBitmap != null)
-            {
+            try {
                 Rectangle rect = new Rectangle(0, 0, curBitmap.Width, curBitmap.Height);
                 BitmapData bmpData = curBitmap.LockBits(rect, ImageLockMode.ReadWrite, curBitmap.PixelFormat);
                 IntPtr ptr = bmpData.Scan0;
@@ -231,6 +230,14 @@ namespace ImageProcessing
                 curBitmap.UnlockBits(bmpData);
                 Invalidate();
             }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("请选择图片");
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show(exp.Message);
+            }
         }
 
         /// <summary>
@@ -275,8 +282,19 @@ namespace ImageProcessing
 
         private void btn_gray_Click(object sender, EventArgs e)
         {
-            curBitmap= imageProcessing.RgbToGrayScale(curBitmap);
-            Invalidate();
+            try
+            {
+                curBitmap = imageProcessing.RgbToGrayScale(curBitmap);
+                Invalidate();
+            }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("请选择图片");
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show(exp.Message);
+            }
         }
 
         private void btn_histogram_Click(object sender, EventArgs e)
@@ -286,53 +304,114 @@ namespace ImageProcessing
                 //定义并实例化新窗体，并把图像数据传递给它
                 histForm histoGram = new histForm(curBitmap);
                 histoGram.ShowDialog();
+                Invalidate();
+            }
+            else
+            {
+                MessageBox.Show("请选择图片");
             }
         }
 
         private void btn_binaryzation_Click(object sender, EventArgs e)
         {
-            curBitmap= imageProcessing.OtsuThreshold();
-            Invalidate();
+
+            try
+            {
+                curBitmap = imageProcessing.OtsuThreshold();
+                Invalidate();
+            }
+            catch (NullReferenceException)
+            {   
+                MessageBox.Show("请选择图片");
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show(exp.Message);
+            }
         }
 
         private void btn_linearPO_Click(object sender, EventArgs e)
         {
-            //实例化linearPOForm窗体
-            linearPOForm linearForm = new linearPOForm();
-            //点击确定按钮
-            if (linearForm.ShowDialog() == DialogResult.OK)
+            try
             {
-                //得到斜率
-                double scaling = Convert.ToDouble(linearForm.GetScaling);
-                //得到偏移量
-                double offset = Convert.ToDouble(linearForm.GetOffset);
-                imageProcessing.linearPO(scaling, offset);
+                //实例化linearPOForm窗体
+                linearPOForm linearForm = new linearPOForm();
+                //点击确定按钮
+                if (linearForm.ShowDialog() == DialogResult.OK)
+                {
+                    //得到斜率
+                    double scaling = Convert.ToDouble(linearForm.GetScaling);
+                    //得到偏移量
+                    double offset = Convert.ToDouble(linearForm.GetOffset);
+                    imageProcessing.linearPO(scaling, offset);
+                }
+                Invalidate();
             }
-            Invalidate();
-        }
+            catch (NullReferenceException exp)
+            {
+                MessageBox.Show("请选择图片");
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show(exp.Message);
+            }
+            }
 
         private void btn_stretch_Click(object sender, EventArgs e)
         {
-            imageProcessing.Stretch(curBitmap, out curBitmap);
-            Invalidate();
+            try
+            {
+                imageProcessing.Stretch(curBitmap, out curBitmap);
+                Invalidate();
+            }
+            catch (NullReferenceException exp)
+            {
+                MessageBox.Show("请选择图片");
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show(exp.Message);
+            }
         }
 
         private void btn_equalization_Click(object sender, EventArgs e)
         {
-            imageProcessing.Balance(curBitmap, out curBitmap);
-            Invalidate();
+            try
+            {
+                imageProcessing.Balance(curBitmap, out curBitmap);
+                Invalidate();
+            }
+            catch (NullReferenceException exp)
+            {
+                MessageBox.Show("请选择图片");
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show(exp.Message);
+            }
         }
 
         private void btn_shaping_Click(object sender, EventArgs e)
         {
+            try
+            {
 
                 shapinForm sForm = new shapinForm();
 
                 if (sForm.ShowDialog() == DialogResult.OK)
                 {
-                imageProcessing.HistogramMatching(curBitmap, sForm.GetmatchingBmp, out curBitmap);
+                    imageProcessing.HistogramMatching(curBitmap, sForm.GetmatchingBmp, out curBitmap);
                 }
-            Invalidate();
+                Invalidate();
+            }
+            catch (NullReferenceException exp)
+            {
+                MessageBox.Show("请选择图片");
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show(exp.Message);
+            }
         }
 
         private void btn_exit_Click(object sender, EventArgs e)

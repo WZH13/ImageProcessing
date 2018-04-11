@@ -58,15 +58,18 @@
             this.btn_save = new System.Windows.Forms.Button();
             this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
             this.btn_exit = new System.Windows.Forms.Button();
+            this.tab_file = new System.Windows.Forms.TabPage();
             this.tabControl1.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tab_preprocessing.SuspendLayout();
+            this.tab_file.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
+            this.tabControl1.Controls.Add(this.tab_file);
             this.tabControl1.Controls.Add(this.tab_changepixel);
             this.tabControl1.Controls.Add(this.tab_preprocessing);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
@@ -355,7 +358,7 @@
             this.btn_restore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_restore.Image = ((System.Drawing.Image)(resources.GetObject("btn_restore.Image")));
             this.btn_restore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_restore.Location = new System.Drawing.Point(1022, 683);
+            this.btn_restore.Location = new System.Drawing.Point(127, 12);
             this.btn_restore.Name = "btn_restore";
             this.btn_restore.Size = new System.Drawing.Size(84, 26);
             this.btn_restore.TabIndex = 3;
@@ -370,7 +373,7 @@
             this.btn_open.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_open.Image = ((System.Drawing.Image)(resources.GetObject("btn_open.Image")));
             this.btn_open.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_open.Location = new System.Drawing.Point(916, 683);
+            this.btn_open.Location = new System.Drawing.Point(21, 12);
             this.btn_open.Name = "btn_open";
             this.btn_open.Size = new System.Drawing.Size(84, 26);
             this.btn_open.TabIndex = 2;
@@ -385,7 +388,7 @@
             this.btn_save.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_save.Image = ((System.Drawing.Image)(resources.GetObject("btn_save.Image")));
             this.btn_save.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_save.Location = new System.Drawing.Point(1112, 683);
+            this.btn_save.Location = new System.Drawing.Point(234, 12);
             this.btn_save.Name = "btn_save";
             this.btn_save.Size = new System.Drawing.Size(88, 26);
             this.btn_save.TabIndex = 1;
@@ -418,16 +421,25 @@
             this.btn_exit.UseVisualStyleBackColor = true;
             this.btn_exit.Click += new System.EventHandler(this.btn_exit_Click);
             // 
+            // tab_file
+            // 
+            this.tab_file.Controls.Add(this.btn_restore);
+            this.tab_file.Controls.Add(this.btn_open);
+            this.tab_file.Controls.Add(this.btn_save);
+            this.tab_file.Location = new System.Drawing.Point(4, 22);
+            this.tab_file.Name = "tab_file";
+            this.tab_file.Size = new System.Drawing.Size(1310, 53);
+            this.tab_file.TabIndex = 3;
+            this.tab_file.Text = "文件";
+            this.tab_file.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1318, 725);
-            this.Controls.Add(this.btn_restore);
-            this.Controls.Add(this.btn_open);
             this.Controls.Add(this.btn_exit);
             this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.btn_save);
             this.Name = "Form1";
             this.Text = "图像处理";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -441,6 +453,7 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.tab_preprocessing.ResumeLayout(false);
+            this.tab_file.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -476,6 +489,7 @@
         private System.Windows.Forms.Button btn_linearPO;
         private System.Windows.Forms.Button btn_shaping;
         private System.Windows.Forms.Button btn_exit;
+        private System.Windows.Forms.TabPage tab_file;
     }
 }
 

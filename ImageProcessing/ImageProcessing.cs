@@ -25,6 +25,86 @@ namespace ImageProcessing
         private int maxPixel;
 
         /// <summary>
+        /// 获取像素值
+        /// </summary>
+        /// <param name="x">需要获取的横坐标</param>
+        /// <param name="y">需要获取的纵坐标</param>
+        /// <returns>ARGB 颜色（alpha、红色、绿色、蓝色）</returns>
+        public Color GetPixel(int x, int y, Bitmap srcBitmap)
+        {
+            Rectangle rect = new Rectangle(0, 0, srcBitmap.Width, srcBitmap.Height);
+            BitmapData bmpData = srcBitmap.LockBits(rect,
+                ImageLockMode.ReadWrite, srcBitmap.PixelFormat);
+            IntPtr Iptr = bmpData.Scan0;
+            int Depth = Bitmap.GetPixelFormatSize(srcBitmap.PixelFormat);
+            unsafe
+            {
+                byte* ptr = (byte*)Iptr;
+                ptr = ptr + bmpData.Stride * y;
+                ptr += Depth * x / 8;
+                Color c = Color.Empty;
+                if (Depth == 32)
+                {
+                    int a = ptr[3];
+                    int r = ptr[2];
+                    int g = ptr[1];
+                    int b = ptr[0];
+                    c = Color.FromArgb(a, r, g, b);
+                }
+                else if (Depth == 24)
+                {
+                    int r = ptr[2];
+                    int g = ptr[1];
+                    int b = ptr[0];
+                    c = Color.FromArgb(r, g, b);
+                }
+                else if (Depth == 8)
+                {
+                    int r = ptr[0];
+                    c = Color.FromArgb(r, r, r);
+                }
+                srcBitmap.UnlockBits(bmpData);
+                return c;
+            }
+        }
+
+        /// <summary>
+        /// 判断图像是否是8位灰度图像
+        /// </summary>
+        /// <param name="srcBitmap">源图像</param>
+        /// <returns></returns>
+        public bool is8BitGray(Bitmap srcBitmap)
+        {
+            Rectangle rect = new Rectangle(0, 0, srcBitmap.Width, srcBitmap.Height);
+            BitmapData bmpData = srcBitmap.LockBits(rect,
+                ImageLockMode.ReadWrite, srcBitmap.PixelFormat);
+            int Depth = Bitmap.GetPixelFormatSize(srcBitmap.PixelFormat);
+            Color color = Color.Empty;
+            if (Depth!=8)
+            {
+                srcBitmap.UnlockBits(bmpData);
+                return false;
+            }
+            else
+            {
+                for (int i = 0; i < bmpData.Height; i++)
+                {
+                    for (int j = 0; j < bmpData.Width; j++)
+                    {
+                        color = GetPixel(i, j,srcBitmap);
+                        if (color.R!= color.G ||color.G != color.B||color.R!=color.B)
+                        {
+                            srcBitmap.UnlockBits(bmpData);
+                            return false;
+                        }
+                    }
+                }
+                srcBitmap.UnlockBits(bmpData);
+                return true;
+            }
+        }
+
+        /// <summary>
         /// 绘制灰度直方图
         /// </summary>
         /// <param name="width">直方图画布宽</param>
@@ -35,27 +115,41 @@ namespace ImageProcessing
             BitmapData bmpData = bitmap.LockBits(rect,
                 ImageLockMode.ReadWrite, bitmap.PixelFormat);
             IntPtr ptr = bmpData.Scan0;
-            int bytes = bitmap.Width * bitmap.Height;
+            int bytes = bmpData.Stride * bitmap.Height;
             byte[] grayValues = new byte[bytes];
             Marshal.Copy(ptr, grayValues, 0, bytes);//灰度值数据存入grayValues中
+            int offset = bmpData.Stride - bmpData.Width;
 
-            byte temp1 = 0;
+            byte temp = 0;
             maxPixel = 0;
             //灰度等级数组清零
             Array.Clear(countPixel, 0, 256);
+
+            //判断图像是否是灰度图，如果不是就先转化为8位灰度图再画出灰度直方图
+            if (!is8BitGray(bitmap))
+            {
+                RgbToGrayScale(bitmap);
+            }
+
             //计算各个灰度级的像素个数
             for (int i = 0; i < bytes; i++)
             {
                 //灰度级
-                temp1 = grayValues[i];
+                temp = grayValues[i];
                 //计数加1
-                countPixel[temp1]++;
-                if (countPixel[temp1] > maxPixel)
+                countPixel[temp]++;
+                if (countPixel[temp] > maxPixel)
                 {
                     //找到灰度频率最大的像素数，用于绘制直方图
-                    maxPixel = countPixel[temp1];
+                    maxPixel = countPixel[temp];
+                }
+                //跳过未用空间
+                if ((i + 1) % bmpData.Width == 0)
+                {
+                    i += offset;
                 }
             }
+
 
             //解锁
             Marshal.Copy(grayValues, 0, ptr, bytes);
@@ -89,12 +183,12 @@ namespace ImageProcessing
             g.DrawString(maxPixel.ToString(), new Font("New Timer", 8), Brushes.Black, new PointF(18, 34));
 
             //绘制直方图
-            double temp = 0;
+            double temp1 = 0;
             for (int i = 0; i < 256; i++)
             {
                 //纵坐标长度
-                temp = 200.0 * countPixel[i] / maxPixel;
-                g.DrawLine(curPen, 50 + i, 240, 50 + i, 240 - (int)temp);
+                temp1 = 200.0 * countPixel[i] / maxPixel;
+                g.DrawLine(curPen, 50 + i, 240, 50 + i, 240 - (int)temp1);
             }
             //释放对象
             curPen.Dispose();
@@ -114,36 +208,47 @@ namespace ImageProcessing
             if (bitmap != null)
             {
                 Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
-                BitmapData bmpData = bitmap.LockBits(rect, ImageLockMode.ReadWrite, bitmap.PixelFormat);
-                IntPtr ptr = bmpData.Scan0;
-                int bytes = bitmap.Width * bitmap.Height;
-                byte[] grayValues = new byte[bytes];
-                Marshal.Copy(ptr, grayValues, 0, bytes);
-
-                int temp = 0;
-
-                for (int i = 0; i < bytes; i++)
+                BitmapData bmpData = bitmap.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+                int temp0 = 0;
+                int temp1 = 0;
+                int temp2 = 0;
+                unsafe
                 {
-                    //根据公式计算线性点运算
-                    //加0.5表示四舍五入
-                    temp = (int)(scaling * grayValues[i] + offset + 0.5);
+                    for (int i = 0; i < bmpData.Height; i++)
+                    {
+                        byte* ptr = (byte*)bmpData.Scan0 + i * bmpData.Stride;
+                        for (int j = 0; j < bmpData.Width; j++)
+                        {
+                            //根据公式计算线性点运算
+                            //加0.5表示四舍五入
+                            *(ptr + j * 3) = (byte)(scaling * *(ptr + j * 3) + offset + 0.5);
+                            *(ptr + j * 3 + 1) = (byte)(scaling * *(ptr + j * 3 + 1) + offset + 0.5);
+                            *(ptr + j * 3 + 2) = (byte)(scaling * *(ptr + j * 3 + 2) + offset + 0.5);
+                            //灰度值限制在0~255之间
+                            //大于255，则为255；小于0则为0
+                            if (temp0 > 255)
+                                *(ptr + j * 3) = 255;
+                            else if (temp0 < 0)
+                                *(ptr + j * 3) = 0;
+                            else
+                                *(ptr + j * 3) = (byte)temp0;
 
-                    //灰度值限制在0~255之间
-                    //大于255，则为255；小于0则为0
-                    if (temp > 255)
-                    {
-                        grayValues[i] = 255;
-                    }
-                    else if (temp < 0)
-                    {
-                        grayValues[i] = 0;
-                    }
-                    else
-                    {
-                        grayValues[i] = (byte)temp;
+                            if (temp1 > 255)
+                                *(ptr + j * 3) = 255;
+                            else if (temp1 < 0)
+                                *(ptr + j * 3) = 0;
+                            else
+                                *(ptr + j * 3) = (byte)temp1;
+
+                            if (temp2 > 255)
+                                *(ptr + j * 3) = 255;
+                            else if (temp2 < 0)
+                                *(ptr + j * 3) = 0;
+                            else
+                                *(ptr + j * 3) = (byte)temp2;
+                        }
                     }
                 }
-                Marshal.Copy(grayValues, 0, ptr, bytes);
                 bitmap.UnlockBits(bmpData);
             }
         }
@@ -757,8 +862,9 @@ namespace ImageProcessing
             }
             else
             {
-                return null;
+                return original;
             }
+
         }
 
         /// <summary>
