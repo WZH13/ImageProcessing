@@ -301,10 +301,17 @@ namespace ImageProcessing
         {
             if (curBitmap != null)
             {
-                //定义并实例化新窗体，并把图像数据传递给它
-                histForm histoGram = new histForm(curBitmap);
-                histoGram.ShowDialog();
-                Invalidate();
+                if (curBitmap.PixelFormat != PixelFormat.Format8bppIndexed)
+                {
+                    MessageBox.Show("请先进性灰度化");
+                }
+                else
+                {
+                    //定义并实例化新窗体，并把图像数据传递给它
+                    histForm histoGram = new histForm(curBitmap);
+                    histoGram.ShowDialog();
+                    Invalidate();
+                }
             }
             else
             {
@@ -434,5 +441,10 @@ namespace ImageProcessing
         }
 
         #endregion
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Environment.Exit(0);//关闭窗体的时候退出所有线程
+        }
     }
 }

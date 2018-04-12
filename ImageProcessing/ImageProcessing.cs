@@ -758,37 +758,38 @@ namespace ImageProcessing
             {
                 k = j * stride;//因图像宽度不同、有的可能有填充字节需要跳越
                 x = 0;
-                ab = 0;
+                ab = 0;     //ab标识当前字节的值
                 for (int i = 0; i < srcBitmap.Width; i++)
                 {
                     //从灰度变单色（下法如果直接从彩色变单色效果不太好，不过反相也可以在这里控制）
                     if ((srcBitmap.GetPixel(i, j)).ToArgb() > midrgb)
                     {
-                        ab = ab * 2 + 1;
+                        ab = ab * 2 + 1;        //ab * 2 + 1   二进制位记1
                     }
                     else
                     {
-                        ab = ab * 2;
+                        ab = ab * 2;        //ab * 2   二进制位记0
                     }
-                    x++;
+                    x++;        //x标识当前字节共赋值了几位
                     if (x == 8)
                     {
-                        buf[k++] = (byte)ab;//每字节赋值一次，数组buf中存储的是十进制。
+                        buf[k++] = (byte)ab;//每字节给数组buf赋值一次
                         ab = 0;
                         x = 0;
                     }
                 }
                 if (x > 0)
                 {
-                    //循环实现：剩余有效数据不满1字节的情况下须把它们移往字节的高位部分
+                    //循环实现：剩余有效数据不满1字节的情况下须把它们移往字节的高位部分,如11011移位成11011000
                     for (int t = x; t < 8; t++) ab = ab * 2;
                     buf[k++] = (byte)ab;
                 }
             }
             int width = srcBitmap.Width;
             int height = srcBitmap.Height;
+            //int stride=
             Bitmap dstBitmap = new Bitmap(width, height, PixelFormat.Format1bppIndexed);
-            BitmapData dt = dstBitmap.LockBits(new Rectangle(0, 0, dstBitmap.Width, dstBitmap.Height), ImageLockMode.ReadWrite, dstBitmap.PixelFormat);
+            BitmapData dt = dstBitmap.LockBits(new Rectangle(0, 0, width, dstBitmap.Height), ImageLockMode.ReadWrite, dstBitmap.PixelFormat);
             Marshal.Copy(buf, 0, dt.Scan0, buf.Length);
             dstBitmap.UnlockBits(dt);
             return dstBitmap;

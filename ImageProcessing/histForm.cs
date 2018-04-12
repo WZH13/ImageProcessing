@@ -37,7 +37,6 @@ namespace ImageProcessing
         //记录最大的灰度级个数
         private int maxPixel;
 
-
         /// <summary>
         /// 计算各个灰度级所具有的像素个数
         /// </summary>
@@ -48,9 +47,10 @@ namespace ImageProcessing
             BitmapData bmpData = bmpHist.LockBits(rect,
                 ImageLockMode.ReadWrite, bmpHist.PixelFormat);
             IntPtr ptr = bmpData.Scan0;
-            int bytes = bmpHist.Width * bmpHist.Height;
+            int bytes = bmpData.Stride * bmpHist.Height;
             byte[] grayValues = new byte[bytes];
             Marshal.Copy(ptr, grayValues, 0, bytes);//灰度值数据存入grayValues中
+            int offset = bmpData.Stride - bmpData.Width;
 
             byte temp = 0;
             maxPixel = 0;
@@ -68,13 +68,17 @@ namespace ImageProcessing
                     //找到灰度频率最大的像素数，用于绘制直方图
                     maxPixel = countPixel[temp];
                 }
+                //跳过未用空间
+                if ((i + 1) % bmpData.Width == 0)
+                {
+                    i += offset;
+                }
             }
 
             //解锁
             Marshal.Copy(grayValues, 0, ptr, bytes);
             bmpHist.UnlockBits(bmpData);
         }
-
 
         /// <summary>
         /// 绘制直方图

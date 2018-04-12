@@ -30,6 +30,10 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tab_file = new System.Windows.Forms.TabPage();
+            this.btn_restore = new System.Windows.Forms.Button();
+            this.btn_open = new System.Windows.Forms.Button();
+            this.btn_save = new System.Windows.Forms.Button();
             this.tab_changepixel = new System.Windows.Forms.TabPage();
             this.btn_change = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -53,18 +57,14 @@
             this.btn_histogram = new System.Windows.Forms.Button();
             this.btn_binaryzation = new System.Windows.Forms.Button();
             this.btn_gray = new System.Windows.Forms.Button();
-            this.btn_restore = new System.Windows.Forms.Button();
-            this.btn_open = new System.Windows.Forms.Button();
-            this.btn_save = new System.Windows.Forms.Button();
             this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
             this.btn_exit = new System.Windows.Forms.Button();
-            this.tab_file = new System.Windows.Forms.TabPage();
             this.tabControl1.SuspendLayout();
+            this.tab_file.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tab_preprocessing.SuspendLayout();
-            this.tab_file.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -77,6 +77,62 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1318, 79);
             this.tabControl1.TabIndex = 0;
+            // 
+            // tab_file
+            // 
+            this.tab_file.Controls.Add(this.btn_restore);
+            this.tab_file.Controls.Add(this.btn_open);
+            this.tab_file.Location = new System.Drawing.Point(4, 22);
+            this.tab_file.Name = "tab_file";
+            this.tab_file.Size = new System.Drawing.Size(1310, 53);
+            this.tab_file.TabIndex = 3;
+            this.tab_file.Text = "文件";
+            this.tab_file.UseVisualStyleBackColor = true;
+            // 
+            // btn_restore
+            // 
+            this.btn_restore.FlatAppearance.BorderSize = 0;
+            this.btn_restore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_restore.Image = ((System.Drawing.Image)(resources.GetObject("btn_restore.Image")));
+            this.btn_restore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_restore.Location = new System.Drawing.Point(127, 12);
+            this.btn_restore.Name = "btn_restore";
+            this.btn_restore.Size = new System.Drawing.Size(84, 26);
+            this.btn_restore.TabIndex = 3;
+            this.btn_restore.Text = "还原图像";
+            this.btn_restore.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_restore.UseVisualStyleBackColor = true;
+            this.btn_restore.Click += new System.EventHandler(this.btn_restore_Click);
+            // 
+            // btn_open
+            // 
+            this.btn_open.FlatAppearance.BorderSize = 0;
+            this.btn_open.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_open.Image = ((System.Drawing.Image)(resources.GetObject("btn_open.Image")));
+            this.btn_open.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_open.Location = new System.Drawing.Point(21, 12);
+            this.btn_open.Name = "btn_open";
+            this.btn_open.Size = new System.Drawing.Size(84, 26);
+            this.btn_open.TabIndex = 2;
+            this.btn_open.Text = "打开文件";
+            this.btn_open.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_open.UseVisualStyleBackColor = true;
+            this.btn_open.Click += new System.EventHandler(this.btn_open_Click);
+            // 
+            // btn_save
+            // 
+            this.btn_save.FlatAppearance.BorderSize = 0;
+            this.btn_save.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_save.Image = ((System.Drawing.Image)(resources.GetObject("btn_save.Image")));
+            this.btn_save.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_save.Location = new System.Drawing.Point(1111, 683);
+            this.btn_save.Name = "btn_save";
+            this.btn_save.Size = new System.Drawing.Size(88, 26);
+            this.btn_save.TabIndex = 1;
+            this.btn_save.Text = "保存文件";
+            this.btn_save.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_save.UseVisualStyleBackColor = true;
+            this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
             // tab_changepixel
             // 
@@ -352,51 +408,6 @@
             this.btn_gray.UseVisualStyleBackColor = true;
             this.btn_gray.Click += new System.EventHandler(this.btn_gray_Click);
             // 
-            // btn_restore
-            // 
-            this.btn_restore.FlatAppearance.BorderSize = 0;
-            this.btn_restore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_restore.Image = ((System.Drawing.Image)(resources.GetObject("btn_restore.Image")));
-            this.btn_restore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_restore.Location = new System.Drawing.Point(127, 12);
-            this.btn_restore.Name = "btn_restore";
-            this.btn_restore.Size = new System.Drawing.Size(84, 26);
-            this.btn_restore.TabIndex = 3;
-            this.btn_restore.Text = "还原图像";
-            this.btn_restore.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_restore.UseVisualStyleBackColor = true;
-            this.btn_restore.Click += new System.EventHandler(this.btn_restore_Click);
-            // 
-            // btn_open
-            // 
-            this.btn_open.FlatAppearance.BorderSize = 0;
-            this.btn_open.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_open.Image = ((System.Drawing.Image)(resources.GetObject("btn_open.Image")));
-            this.btn_open.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_open.Location = new System.Drawing.Point(21, 12);
-            this.btn_open.Name = "btn_open";
-            this.btn_open.Size = new System.Drawing.Size(84, 26);
-            this.btn_open.TabIndex = 2;
-            this.btn_open.Text = "打开文件";
-            this.btn_open.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_open.UseVisualStyleBackColor = true;
-            this.btn_open.Click += new System.EventHandler(this.btn_open_Click);
-            // 
-            // btn_save
-            // 
-            this.btn_save.FlatAppearance.BorderSize = 0;
-            this.btn_save.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_save.Image = ((System.Drawing.Image)(resources.GetObject("btn_save.Image")));
-            this.btn_save.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_save.Location = new System.Drawing.Point(234, 12);
-            this.btn_save.Name = "btn_save";
-            this.btn_save.Size = new System.Drawing.Size(88, 26);
-            this.btn_save.TabIndex = 1;
-            this.btn_save.Text = "保存文件";
-            this.btn_save.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_save.UseVisualStyleBackColor = true;
-            this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
-            // 
             // skinEngine1
             // 
             this.skinEngine1.@__DrawButtonFocusRectangle = true;
@@ -421,18 +432,6 @@
             this.btn_exit.UseVisualStyleBackColor = true;
             this.btn_exit.Click += new System.EventHandler(this.btn_exit_Click);
             // 
-            // tab_file
-            // 
-            this.tab_file.Controls.Add(this.btn_restore);
-            this.tab_file.Controls.Add(this.btn_open);
-            this.tab_file.Controls.Add(this.btn_save);
-            this.tab_file.Location = new System.Drawing.Point(4, 22);
-            this.tab_file.Name = "tab_file";
-            this.tab_file.Size = new System.Drawing.Size(1310, 53);
-            this.tab_file.TabIndex = 3;
-            this.tab_file.Text = "文件";
-            this.tab_file.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -440,20 +439,22 @@
             this.ClientSize = new System.Drawing.Size(1318, 725);
             this.Controls.Add(this.btn_exit);
             this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.btn_save);
             this.Name = "Form1";
             this.Text = "图像处理";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDoubleClick);
             this.tabControl1.ResumeLayout(false);
+            this.tab_file.ResumeLayout(false);
             this.tab_changepixel.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.tab_preprocessing.ResumeLayout(false);
-            this.tab_file.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
