@@ -965,6 +965,7 @@ namespace ImageProcessing
                                 t++;
                                 Xbmp[i][t] = j;
                                 isFirst1 = false;
+                                isFirst0 = true;
                             }
                         }
                         else
@@ -973,9 +974,13 @@ namespace ImageProcessing
                             {
                                 t++;
                                 Xbmp[i][t] = j;
+                                isFirst0 = false;
+                                isFirst1 = true;
                             }
                         }
                     }
+                    isFirst1 = true;
+                    isFirst0 = false;
                 }
                 Xbmp[i][0] = t;
                 t = 0;
