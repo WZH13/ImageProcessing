@@ -446,5 +446,10 @@ namespace ImageProcessing
         {
             Environment.Exit(0);//关闭窗体的时候退出所有线程
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            imageProcessing.JumpMethod(curBitmap);
+        }
     }
 }

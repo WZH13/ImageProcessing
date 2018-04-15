@@ -78,9 +78,9 @@ namespace ImageProcessing
             Rectangle rect = new Rectangle(0, 0, srcBitmap.Width, srcBitmap.Height);
             BitmapData bmpData = srcBitmap.LockBits(rect,
                 ImageLockMode.ReadWrite, srcBitmap.PixelFormat);
-            int Depth = Bitmap.GetPixelFormatSize(srcBitmap.PixelFormat);
+            int depth = Bitmap.GetPixelFormatSize(srcBitmap.PixelFormat);
             Color color = Color.Empty;
-            if (Depth!=8)
+            if (depth != 8)
             {
                 srcBitmap.UnlockBits(bmpData);
                 return false;
@@ -922,7 +922,79 @@ namespace ImageProcessing
         }
         #endregion
 
-        
+        #region 跳转法
+
+        public void JumpMethod(Bitmap srcBitmap)
+        {
+            if (srcBitmap == null)
+            {
+                return;
+            }
+            Rectangle rect = new Rectangle(0, 0, srcBitmap.Width, srcBitmap.Height);
+            BitmapData bmpData = srcBitmap.LockBits(rect,
+                ImageLockMode.ReadWrite, srcBitmap.PixelFormat);
+            int depth = Bitmap.GetPixelFormatSize(srcBitmap.PixelFormat);
+            //位深度不为1，返回
+            if (depth != 1)
+            {
+                return;
+            }
+            IntPtr ptr = bmpData.Scan0;
+            int bytes = bmpData.Stride * bitmap.Height;
+            byte[] bmpValues = new byte[bytes];
+            Marshal.Copy(ptr, bmpValues, 0, bytes);
+            int offset = bmpData.Stride - bmpData.Width;
+
+            int[][] Xbmp = { };
+            bool is1 = false;
+            int t = 0;//记录总跳数
+            bool isFirst1 = true;//是否是上跳的第一个1
+            bool isFirst0 = false;//是否是下跳的第一个0
+
+            for (int i = 0; i < bmpData.Height; i++)
+            {
+                for (int j = 0; j < bmpData.Stride; j++)
+                {
+                    for (int k = 1; k < 9; k++)
+                    {
+                        is1 = ByteGetBit(bmpValues[j + i * bmpData.Stride], k);
+                        if (is1)
+                        {
+                            if (isFirst1)
+                            {
+                                t++;
+                                Xbmp[i][t] = j;
+                                isFirst1 = false;
+                            }
+                        }
+                        else
+                        {
+                            if (isFirst0)
+                            {
+                                t++;
+                                Xbmp[i][t] = j;
+                            }
+                        }
+                    }
+                }
+                Xbmp[i][0] = t;
+                t = 0;
+            }
+
+        }
+
+        /// <summary>
+        /// 判断某个byte的某个位是否为1
+        /// </summary>
+        /// <param name="pos">第几位，大于等于1</param>
+        public static bool ByteGetBit(byte b, int pos)
+        {
+            byte[] BITS = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+            int temp = BITS[pos - 1];
+            return (b & temp) != 0;
+        }
+
+        #endregion
 
     }
 }

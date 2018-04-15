@@ -33,7 +33,6 @@
             this.tab_file = new System.Windows.Forms.TabPage();
             this.btn_restore = new System.Windows.Forms.Button();
             this.btn_open = new System.Windows.Forms.Button();
-            this.btn_save = new System.Windows.Forms.Button();
             this.tab_changepixel = new System.Windows.Forms.TabPage();
             this.btn_change = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -57,8 +56,10 @@
             this.btn_histogram = new System.Windows.Forms.Button();
             this.btn_binaryzation = new System.Windows.Forms.Button();
             this.btn_gray = new System.Windows.Forms.Button();
+            this.btn_save = new System.Windows.Forms.Button();
             this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
             this.btn_exit = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tab_file.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
@@ -80,6 +81,7 @@
             // 
             // tab_file
             // 
+            this.tab_file.Controls.Add(this.button1);
             this.tab_file.Controls.Add(this.btn_restore);
             this.tab_file.Controls.Add(this.btn_open);
             this.tab_file.Location = new System.Drawing.Point(4, 22);
@@ -118,21 +120,6 @@
             this.btn_open.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btn_open.UseVisualStyleBackColor = true;
             this.btn_open.Click += new System.EventHandler(this.btn_open_Click);
-            // 
-            // btn_save
-            // 
-            this.btn_save.FlatAppearance.BorderSize = 0;
-            this.btn_save.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_save.Image = ((System.Drawing.Image)(resources.GetObject("btn_save.Image")));
-            this.btn_save.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_save.Location = new System.Drawing.Point(1111, 683);
-            this.btn_save.Name = "btn_save";
-            this.btn_save.Size = new System.Drawing.Size(88, 26);
-            this.btn_save.TabIndex = 1;
-            this.btn_save.Text = "保存文件";
-            this.btn_save.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_save.UseVisualStyleBackColor = true;
-            this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
             // tab_changepixel
             // 
@@ -408,6 +395,21 @@
             this.btn_gray.UseVisualStyleBackColor = true;
             this.btn_gray.Click += new System.EventHandler(this.btn_gray_Click);
             // 
+            // btn_save
+            // 
+            this.btn_save.FlatAppearance.BorderSize = 0;
+            this.btn_save.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_save.Image = ((System.Drawing.Image)(resources.GetObject("btn_save.Image")));
+            this.btn_save.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_save.Location = new System.Drawing.Point(1111, 683);
+            this.btn_save.Name = "btn_save";
+            this.btn_save.Size = new System.Drawing.Size(88, 26);
+            this.btn_save.TabIndex = 1;
+            this.btn_save.Text = "保存文件";
+            this.btn_save.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_save.UseVisualStyleBackColor = true;
+            this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
+            // 
             // skinEngine1
             // 
             this.skinEngine1.@__DrawButtonFocusRectangle = true;
@@ -431,6 +433,16 @@
             this.btn_exit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btn_exit.UseVisualStyleBackColor = true;
             this.btn_exit.Click += new System.EventHandler(this.btn_exit_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(359, 14);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
@@ -491,6 +503,7 @@
         private System.Windows.Forms.Button btn_shaping;
         private System.Windows.Forms.Button btn_exit;
         private System.Windows.Forms.TabPage tab_file;
+        private System.Windows.Forms.Button button1;
     }
 }
 
