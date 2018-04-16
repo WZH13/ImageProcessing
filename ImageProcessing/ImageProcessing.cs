@@ -754,15 +754,15 @@ namespace ImageProcessing
             int k = srcBitmap.Height * stride;
             byte[] buf = new byte[k];
             int x = 0, ab = 0;
-            for (int j = 0; j < srcBitmap.Height; j++)
+            for (int i = 0; i < srcBitmap.Height; i++)
             {
-                k = j * stride;//因图像宽度不同、有的可能有填充字节需要跳越
+                k = i * stride;//因图像宽度不同、有的可能有填充字节需要跳越
                 x = 0;
                 ab = 0;     //ab标识当前字节的值
-                for (int i = 0; i < srcBitmap.Width; i++)
+                for (int j = 0; j < srcBitmap.Width; j++)
                 {
                     //从灰度变单色（下法如果直接从彩色变单色效果不太好，不过反相也可以在这里控制）
-                    if ((srcBitmap.GetPixel(i, j)).ToArgb() > midrgb)
+                    if ((srcBitmap.GetPixel(j, i)).ToArgb() > midrgb)
                     {
                         ab = ab * 2 + 1;        //ab * 2 + 1   二进制位记1
                     }
@@ -955,7 +955,7 @@ namespace ImageProcessing
             {
                 for (int j = 0; j < bmpData.Stride; j++)
                 {
-                    for (int k = 1; k < 9; k++)
+                    for (int k = 0; k < 8; k++)
                     {
                         is1 = ByteGetBit(bmpValues[j + i * bmpData.Stride], k);
                         if (is1)
@@ -995,7 +995,7 @@ namespace ImageProcessing
         public static bool ByteGetBit(byte b, int pos)
         {
             byte[] BITS = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
-            int temp = BITS[pos - 1];
+            int temp = BITS[pos];
             return (b & temp) != 0;
         }
 
