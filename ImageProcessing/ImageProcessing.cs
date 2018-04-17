@@ -787,7 +787,7 @@ namespace ImageProcessing
             }
             int width = srcBitmap.Width;
             int height = srcBitmap.Height;
-            //int stride=
+
             Bitmap dstBitmap = new Bitmap(width, height, PixelFormat.Format1bppIndexed);
             BitmapData dt = dstBitmap.LockBits(new Rectangle(0, 0, width, dstBitmap.Height), ImageLockMode.ReadWrite, dstBitmap.PixelFormat);
             Marshal.Copy(buf, 0, dt.Scan0, buf.Length);
@@ -922,14 +922,15 @@ namespace ImageProcessing
         }
         #endregion
 
-        #region 跳转法
+        #region 跳转法_由位图求X跳转
 
-        public void JumpMethod(Bitmap srcBitmap)
+        /// <summary>
+        /// 由位图求X跳转
+        /// </summary>
+        /// <param name="srcBitmap">源图像</param>
+        /// <returns>保存X跳的数组</returns>
+        public int[,] JumpMethod(Bitmap srcBitmap)
         {
-            if (srcBitmap == null)
-            {
-                return;
-            }
             Rectangle rect = new Rectangle(0, 0, srcBitmap.Width, srcBitmap.Height);
             BitmapData bmpData = srcBitmap.LockBits(rect,
                 ImageLockMode.ReadWrite, srcBitmap.PixelFormat);
@@ -937,33 +938,32 @@ namespace ImageProcessing
             //位深度不为1，返回
             if (depth != 1)
             {
-                return;
+
             }
             IntPtr ptr = bmpData.Scan0;
             int bytes = bmpData.Stride * bitmap.Height;
             byte[] bmpValues = new byte[bytes];
             Marshal.Copy(ptr, bmpValues, 0, bytes);
 
-            int[,] Xbmp = new int[bmpData.Height,100];
-            bool is1 = false;
+            int[,]  Xbmp = new int[bmpData.Height,200];//X跳数组
+            bool is1 = false;//记录当前位是否是1
             int t = 0;//记录总跳数
-            bool isFirst1 = true;//是否是上跳的第一个1
-            bool isFirst0 = false;//是否是下跳的第一个0
+            bool isFirst1 = true;//是否是上跳的第一个1,isFirst1=true：是上跳；isFirst1=false:不是第一个1
+            bool isFirst0 = false;//是否是下跳的第一个0,isFirst0=true：是上跳；isFirst0=false:不是第一个1
             int k1 = 0;
             int j1 = 0;
             
-            int bitNum = bmpData.Stride / 8 * 8 + bmpData.Stride % 8;//宽度位数
             for (int i = 0; i < bmpData.Height; i++)
             {
                 for (int j = 0; j < bmpData.Stride; j++)
                 {
                     for (int k = 0;k<8; k++)
-                    {
-                        is1 = ByteGetBit(bmpValues[j + i * bmpData.Stride], k);
+                    {//按字节处理
+                        is1 = ByteGetBit(bmpValues[j + i * bmpData.Stride], k);//调用ByteGetBit判断当前位是否是1
                         if (is1)
-                        {
+                        {//当前位是1
                             if (isFirst1)
-                            {
+                            {//是否是上跳位置
                                 t++;
                                 Xbmp[i, t] = j * 8 + k;
                                 isFirst1 = false;
@@ -975,30 +975,28 @@ namespace ImageProcessing
                             if (isFirst0)
                             {
                                 t++;
-                                Xbmp[i,t] = j;
+                                Xbmp[i,t] = j * 8 + k;
                                 isFirst0 = false;
                                 isFirst1 = true;
                             }
                         }
                         k1 = k;
-                        if (j * 8 + k < bitNum)
-                        {
-                            break;
-                        }
                     }
                     j1 = j;
                 }
-                if (isFirst0==true||isFirst1==true)
+                if (isFirst0==true)     //如果有上跳没有下跳则行尾增加下跳
                 {
-                    Xbmp[i, t] = j1 * 8 + k1;
+                    t++;
+                    Xbmp[i, t] = j1 * 8 + k1;   
                 }
-                Xbmp[i,0] = t;
+                Xbmp[i,0] = t;      //总跳数赋值
                 t = 0;
 
-                isFirst1 = true;
+                isFirst1 = true;    //下一行恢复默认值
                 isFirst0 = false;
             }
-
+            srcBitmap.UnlockBits(bmpData);
+            return Xbmp;
         }
 
         /// <summary>
@@ -1014,5 +1012,11 @@ namespace ImageProcessing
 
         #endregion
 
+
+        #region 跳转法_由X跳转求位图
+
+
+
+        #endregion
     }
 }
