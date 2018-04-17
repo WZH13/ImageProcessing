@@ -943,19 +943,21 @@ namespace ImageProcessing
             int bytes = bmpData.Stride * bitmap.Height;
             byte[] bmpValues = new byte[bytes];
             Marshal.Copy(ptr, bmpValues, 0, bytes);
-            int offset = bmpData.Stride - bmpData.Width;
 
-            int[][] Xbmp = { };
+            int[,] Xbmp = new int[bmpData.Height,100];
             bool is1 = false;
             int t = 0;//记录总跳数
             bool isFirst1 = true;//是否是上跳的第一个1
             bool isFirst0 = false;//是否是下跳的第一个0
-
+            int k1 = 0;
+            int j1 = 0;
+            
+            int bitNum = bmpData.Stride / 8 * 8 + bmpData.Stride % 8;//宽度位数
             for (int i = 0; i < bmpData.Height; i++)
             {
                 for (int j = 0; j < bmpData.Stride; j++)
                 {
-                    for (int k = 0; k < 8; k++)
+                    for (int k = 0;k<8; k++)
                     {
                         is1 = ByteGetBit(bmpValues[j + i * bmpData.Stride], k);
                         if (is1)
@@ -963,7 +965,7 @@ namespace ImageProcessing
                             if (isFirst1)
                             {
                                 t++;
-                                Xbmp[i][t] = j;
+                                Xbmp[i, t] = j * 8 + k;
                                 isFirst1 = false;
                                 isFirst0 = true;
                             }
@@ -973,17 +975,28 @@ namespace ImageProcessing
                             if (isFirst0)
                             {
                                 t++;
-                                Xbmp[i][t] = j;
+                                Xbmp[i,t] = j;
                                 isFirst0 = false;
                                 isFirst1 = true;
                             }
                         }
+                        k1 = k;
+                        if (j * 8 + k < bitNum)
+                        {
+                            break;
+                        }
                     }
-                    isFirst1 = true;
-                    isFirst0 = false;
+                    j1 = j;
                 }
-                Xbmp[i][0] = t;
+                if (isFirst0==true||isFirst1==true)
+                {
+                    Xbmp[i, t] = j1 * 8 + k1;
+                }
+                Xbmp[i,0] = t;
                 t = 0;
+
+                isFirst1 = true;
+                isFirst0 = false;
             }
 
         }
