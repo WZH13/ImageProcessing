@@ -151,7 +151,7 @@ namespace frequency
             //计算模
             if (x > y)
             {
-                return (x * Math.Sqrt(1 + (y / x) * (y / x)));
+                return (x * Math.Sqrt(1 + (y / x) * (y / x)));      //模计算公式：∣z∣=√（a^2+b^2)
             }
             else
             {
@@ -159,7 +159,9 @@ namespace frequency
             }
         }
 
-        //求相位角
+        /// <summary>
+        /// 求相位角
+        /// </summary>
         public double Angle()
         {
             //实部和虚部都为0

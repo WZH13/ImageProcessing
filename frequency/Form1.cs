@@ -158,7 +158,7 @@ namespace frequency
             
             bmpValues = (byte[])imageData.Clone();
             
-            //赋值：把实数变为复数，即虚部为0
+            //赋值：把实数变为复数，即虚部为0 
             for (int i = 0; i < bytes; i++)
             {
                 if (inv == true)
