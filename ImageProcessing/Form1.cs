@@ -447,9 +447,15 @@ namespace ImageProcessing
             Environment.Exit(0);//关闭窗体的时候退出所有线程
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btn_Xjump_Click(object sender, EventArgs e)
         {
             imageProcessing.JumpMethod(curBitmap);
+        }
+
+        private void btn_hough_Click(object sender, EventArgs e)
+        {
+            curBitmap = imageProcessing.hough_line(curBitmap, 10);
+            Invalidate();
         }
     }
 }

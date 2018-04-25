@@ -31,7 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tab_file = new System.Windows.Forms.TabPage();
-            this.button1 = new System.Windows.Forms.Button();
             this.btn_restore = new System.Windows.Forms.Button();
             this.btn_open = new System.Windows.Forms.Button();
             this.tab_changepixel = new System.Windows.Forms.TabPage();
@@ -60,6 +59,8 @@
             this.btn_save = new System.Windows.Forms.Button();
             this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
             this.btn_exit = new System.Windows.Forms.Button();
+            this.btn_hough = new System.Windows.Forms.Button();
+            this.btn_Xjump = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tab_file.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
@@ -81,7 +82,6 @@
             // 
             // tab_file
             // 
-            this.tab_file.Controls.Add(this.button1);
             this.tab_file.Controls.Add(this.btn_restore);
             this.tab_file.Controls.Add(this.btn_open);
             this.tab_file.Location = new System.Drawing.Point(4, 22);
@@ -90,16 +90,6 @@
             this.tab_file.TabIndex = 3;
             this.tab_file.Text = "文件";
             this.tab_file.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(359, 14);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "X跳转";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // btn_restore
             // 
@@ -286,6 +276,8 @@
             // 
             // tab_preprocessing
             // 
+            this.tab_preprocessing.Controls.Add(this.btn_hough);
+            this.tab_preprocessing.Controls.Add(this.btn_Xjump);
             this.tab_preprocessing.Controls.Add(this.btn_shaping);
             this.tab_preprocessing.Controls.Add(this.btn_stretch);
             this.tab_preprocessing.Controls.Add(this.btn_equalization);
@@ -444,6 +436,26 @@
             this.btn_exit.UseVisualStyleBackColor = true;
             this.btn_exit.Click += new System.EventHandler(this.btn_exit_Click);
             // 
+            // btn_hough
+            // 
+            this.btn_hough.Location = new System.Drawing.Point(792, 16);
+            this.btn_hough.Name = "btn_hough";
+            this.btn_hough.Size = new System.Drawing.Size(75, 23);
+            this.btn_hough.TabIndex = 12;
+            this.btn_hough.Text = "Hough变换";
+            this.btn_hough.UseVisualStyleBackColor = true;
+            this.btn_hough.Click += new System.EventHandler(this.btn_hough_Click);
+            // 
+            // btn_Xjump
+            // 
+            this.btn_Xjump.Location = new System.Drawing.Point(696, 15);
+            this.btn_Xjump.Name = "btn_Xjump";
+            this.btn_Xjump.Size = new System.Drawing.Size(75, 23);
+            this.btn_Xjump.TabIndex = 11;
+            this.btn_Xjump.Text = "X跳转";
+            this.btn_Xjump.UseVisualStyleBackColor = true;
+            this.btn_Xjump.Click += new System.EventHandler(this.btn_Xjump_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -503,7 +515,8 @@
         private System.Windows.Forms.Button btn_shaping;
         private System.Windows.Forms.Button btn_exit;
         private System.Windows.Forms.TabPage tab_file;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btn_hough;
+        private System.Windows.Forms.Button btn_Xjump;
     }
 }
 

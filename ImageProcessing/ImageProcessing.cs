@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Windows.Media.Imaging;
+using System.IO;
+
 
 namespace ImageProcessing
 {
@@ -694,7 +697,7 @@ namespace ImageProcessing
                 }
             }
             this.Threshoding(bitmap, threshold);
-            bitmap = twoBit(bitmap);
+            //bitmap = twoBit(bitmap);
             return bitmap; ;
         } 
         #endregion
@@ -1015,6 +1018,172 @@ namespace ImageProcessing
         #region 跳转法_由X跳转求位图
 
 
+
+        #endregion
+
+        #region Hough变换
+
+        /// <summary>
+        /// Hough transform of line detectting process.
+        /// </summary>
+        /// <param name="src">The source image.</param>
+        /// <param name="threshould">The threshould to adjust the number of lines.</param>
+        /// <returns></returns>
+        //public static WriteableBitmap HoughLineDetect(WriteableBitmap src, int threshould)////2 Hough 变换直线检测
+        //{
+        //    if (src != null)
+        //    {
+        //        int w = src.PixelWidth;
+        //        int h = src.PixelHeight;
+        //        WriteableBitmap srcImage = new WriteableBitmap(src);
+        //        byte[] temp = src.PixelBuffer.ToArray();
+        //        int roMax = (int)Math.Sqrt(w * w + h * h) + 1;
+        //        int[,] mark = new int[roMax, 180];
+        //        double[] theta = new double[180];
+        //        for (int i = 0; i < 180; i++)
+        //        {
+        //            theta[i] = (double)i * Math.PI / 180.0;
+        //        }
+        //        double roValue = 0.0;
+        //        int transValue = 0;
+        //        for (int y = 0; y < h; y++)
+        //        {
+        //            for (int x = 0; x < w; x++)
+        //            {
+        //                if (temp[x * 4 + y * w * 4] == 0)
+        //                {
+        //                    for (int k = 0; k < 180; k++)
+        //                    {
+        //                        roValue = (double)x * Math.Cos(theta[k]) + (double)y * Math.Sin(theta[k]);
+        //                        transValue = (int)Math.Round(roValue / 2 + roMax / 2);
+        //                        mark[transValue, k]++;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        for (int y = 0; y < h; y++)
+        //        {
+        //            for (int x = 0; x < w; x++)
+        //            {
+        //                int T = x * 4 + y * w * 4;
+        //                if (temp[T] == 0)
+        //                {
+        //                    for (int k = 0; k < 180; k++)
+        //                    {
+        //                        roValue = (double)x * Math.Cos(theta[k]) + (double)y * Math.Sin(theta[k]);
+        //                        transValue = (int)Math.Round(roValue / 2 + roMax / 2);
+        //                        if (mark[transValue, k] > threshould)
+        //                        {
+        //                            temp[T + 2] = (byte)255;
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        Stream sTemp = srcImage.PixelBuffer.AsStream();
+        //        sTemp.Seek(0, SeekOrigin.Begin);
+        //        sTemp.Write(temp, 0, w * 4 * h);
+        //        return srcImage;
+        //    }
+        //    else
+        //    {
+        //        return null;
+        //    }
+        //}
+
+        /// <summary>
+        /// 检测直线
+        /// </summary>
+        /// <param name="cross_num">hough变换后的曲线交点个数，取值越大，找出的直线越少</param>
+        public Bitmap hough_line(Bitmap bmpobj, int cross_num)
+        {
+            int x = bmpobj.Width;
+            int y = bmpobj.Height;
+            int rho_max = (int)Math.Floor(Math.Sqrt(x * x + y * y)) + 1; //由原图数组坐标算出ρ最大值，并取整数部分加1
+                                                                         //此值作为ρ，θ坐标系ρ最大值
+            int[,] accarray = new int[rho_max, 180]; //定义ρ，θ坐标系的数组，初值为0。
+                                                     //θ的最大值，180度
+
+            double[] Theta = new double[180];
+            //定义θ数组，确定θ取值范围
+            double i = 0;
+            for (int index = 0; index < 180; index++)
+            {
+                Theta[index] = i;
+                i += Math.PI / 180;     //radians = angle * (Math.PI/180); i为每增加一度增加的弧度
+            }
+
+            double rho;
+            int rho_int;
+            for (int n = 0; n < x; n++)
+            {
+                for (int m = 0; m < y; m++)
+                {
+                    Color pixel = bmpobj.GetPixel(n, m);
+                    if (pixel.R == 0)
+                    {
+                        for (int k = 0; k < 180; k++)
+                        {
+                            //将θ值代入hough变换方程，求ρ值
+                            rho = (m * Math.Cos(Theta[k])) + (n * Math.Sin(Theta[k]));
+                            //将ρ值与ρ最大值的和的一半作为ρ的坐标值（数组坐标），这样做是为了防止ρ值出现负数
+                            rho_int = (int)Math.Round(rho / 2 + rho_max / 2);
+                            //在ρθ坐标（数组）中标识点，即计数累加
+                            accarray[rho_int, k] = accarray[rho_int, k] + 1;
+                        }
+                    }
+                }
+            }
+
+            //=======利用hough变换提取直线======
+            //寻找100个像素以上的直线在hough变换后形成的点
+            const int max_line = 100;
+            int[] case_accarray_n = new int[max_line];
+            int[] case_accarray_m = new int[max_line];
+            int K = 0; //存储数组计数器
+            for (int rho_n = 0; rho_n < rho_max; rho_n++) //在hough变换后的数组中搜索
+            {
+                for (int theta_m = 0; theta_m < 180; theta_m++)
+                {
+                    if (accarray[rho_n, theta_m] >= cross_num && K < max_line) //设定直线的最小值
+                    {
+                        case_accarray_n[K] = rho_n; //存储搜索出的数组下标
+                        case_accarray_m[K] = theta_m;
+                        K = K + 1;
+                    }
+                }
+            }
+
+            //把这些点构成的直线提取出来,输出图像数组为I_out
+            //I_out=ones(x,y).*255;
+            Bitmap I_out = new Bitmap(x, y);
+            for (int n = 0; n < x; n++)
+            {
+                for (int m = 0; m < y; m++)
+                {
+                    //首先设置为白色
+                    I_out.SetPixel(n, m, Color.White);
+                    Color pixel = bmpobj.GetPixel(n, m);
+                    if (pixel.R == 0)
+                    {
+                        for (int k = 0; k < 180; k++)
+                        {
+                            rho = (m * Math.Cos(Theta[k])) + (n * Math.Sin(Theta[k]));
+                            rho_int = (int)Math.Round(rho / 2 + rho_max / 2);
+                            //如果正在计算的点属于100像素以上点，则把它提取出来
+                            for (int a = 0; a < K - 1; a++)
+                            {
+                                //if rho_int==case_accarray_n(a) && k==case_accarray_m(a)%%%==gai==%%% k==case_accarray_m(a)&rho_int==case_accarray_n(a)
+                                if (rho_int == case_accarray_n[a] && k == case_accarray_m[a])
+                                    I_out.SetPixel(n, m, Color.Black);
+                            }
+                        }
+                    }
+
+                }
+            }
+            return I_out;
+        }
 
         #endregion
     }
