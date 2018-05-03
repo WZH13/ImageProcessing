@@ -31,10 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tab_file = new System.Windows.Forms.TabPage();
-            this.btn_restore = new System.Windows.Forms.Button();
-            this.btn_open = new System.Windows.Forms.Button();
             this.tab_changepixel = new System.Windows.Forms.TabPage();
-            this.btn_change = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.pixeltxbB = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -49,18 +46,17 @@
             this.label1 = new System.Windows.Forms.Label();
             this.xtxb = new System.Windows.Forms.TextBox();
             this.tab_preprocessing = new System.Windows.Forms.TabPage();
-            this.btn_shaping = new System.Windows.Forms.Button();
-            this.btn_stretch = new System.Windows.Forms.Button();
-            this.btn_equalization = new System.Windows.Forms.Button();
-            this.btn_linearPO = new System.Windows.Forms.Button();
+            this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
+            this.btn_exit = new System.Windows.Forms.Button();
+            this.btn_restore = new System.Windows.Forms.Button();
+            this.btn_open = new System.Windows.Forms.Button();
+            this.btn_change = new System.Windows.Forms.Button();
+            this.btn_hough = new System.Windows.Forms.Button();
+            this.btn_Xjump = new System.Windows.Forms.Button();
             this.btn_histogram = new System.Windows.Forms.Button();
             this.btn_binaryzation = new System.Windows.Forms.Button();
             this.btn_gray = new System.Windows.Forms.Button();
             this.btn_save = new System.Windows.Forms.Button();
-            this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
-            this.btn_exit = new System.Windows.Forms.Button();
-            this.btn_hough = new System.Windows.Forms.Button();
-            this.btn_Xjump = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tab_file.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
@@ -91,36 +87,6 @@
             this.tab_file.Text = "文件";
             this.tab_file.UseVisualStyleBackColor = true;
             // 
-            // btn_restore
-            // 
-            this.btn_restore.FlatAppearance.BorderSize = 0;
-            this.btn_restore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_restore.Image = ((System.Drawing.Image)(resources.GetObject("btn_restore.Image")));
-            this.btn_restore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_restore.Location = new System.Drawing.Point(127, 12);
-            this.btn_restore.Name = "btn_restore";
-            this.btn_restore.Size = new System.Drawing.Size(84, 26);
-            this.btn_restore.TabIndex = 3;
-            this.btn_restore.Text = "还原图像";
-            this.btn_restore.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_restore.UseVisualStyleBackColor = true;
-            this.btn_restore.Click += new System.EventHandler(this.btn_restore_Click);
-            // 
-            // btn_open
-            // 
-            this.btn_open.FlatAppearance.BorderSize = 0;
-            this.btn_open.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_open.Image = ((System.Drawing.Image)(resources.GetObject("btn_open.Image")));
-            this.btn_open.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_open.Location = new System.Drawing.Point(21, 12);
-            this.btn_open.Name = "btn_open";
-            this.btn_open.Size = new System.Drawing.Size(84, 26);
-            this.btn_open.TabIndex = 2;
-            this.btn_open.Text = "打开文件";
-            this.btn_open.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_open.UseVisualStyleBackColor = true;
-            this.btn_open.Click += new System.EventHandler(this.btn_open_Click);
-            // 
             // tab_changepixel
             // 
             this.tab_changepixel.Controls.Add(this.btn_change);
@@ -133,21 +99,6 @@
             this.tab_changepixel.TabIndex = 1;
             this.tab_changepixel.Text = "更改像素";
             this.tab_changepixel.UseVisualStyleBackColor = true;
-            // 
-            // btn_change
-            // 
-            this.btn_change.FlatAppearance.BorderSize = 0;
-            this.btn_change.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_change.Image = ((System.Drawing.Image)(resources.GetObject("btn_change.Image")));
-            this.btn_change.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_change.Location = new System.Drawing.Point(1049, 16);
-            this.btn_change.Name = "btn_change";
-            this.btn_change.Size = new System.Drawing.Size(84, 26);
-            this.btn_change.TabIndex = 14;
-            this.btn_change.Text = "确定更改";
-            this.btn_change.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_change.UseVisualStyleBackColor = true;
-            this.btn_change.Click += new System.EventHandler(this.btn_change_Click);
             // 
             // groupBox1
             // 
@@ -278,10 +229,6 @@
             // 
             this.tab_preprocessing.Controls.Add(this.btn_hough);
             this.tab_preprocessing.Controls.Add(this.btn_Xjump);
-            this.tab_preprocessing.Controls.Add(this.btn_shaping);
-            this.tab_preprocessing.Controls.Add(this.btn_stretch);
-            this.tab_preprocessing.Controls.Add(this.btn_equalization);
-            this.tab_preprocessing.Controls.Add(this.btn_linearPO);
             this.tab_preprocessing.Controls.Add(this.btn_histogram);
             this.tab_preprocessing.Controls.Add(this.btn_binaryzation);
             this.tab_preprocessing.Controls.Add(this.btn_gray);
@@ -292,65 +239,104 @@
             this.tab_preprocessing.Text = "图像预处理";
             this.tab_preprocessing.UseVisualStyleBackColor = true;
             // 
-            // btn_shaping
+            // skinEngine1
             // 
-            this.btn_shaping.FlatAppearance.BorderSize = 0;
-            this.btn_shaping.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_shaping.Image = ((System.Drawing.Image)(resources.GetObject("btn_shaping.Image")));
-            this.btn_shaping.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_shaping.Location = new System.Drawing.Point(587, 13);
-            this.btn_shaping.Name = "btn_shaping";
-            this.btn_shaping.Size = new System.Drawing.Size(94, 26);
-            this.btn_shaping.TabIndex = 10;
-            this.btn_shaping.Text = "直方图匹配";
-            this.btn_shaping.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_shaping.UseVisualStyleBackColor = true;
-            this.btn_shaping.Click += new System.EventHandler(this.btn_shaping_Click);
+            this.skinEngine1.@__DrawButtonFocusRectangle = true;
+            this.skinEngine1.DisabledButtonTextColor = System.Drawing.Color.Gray;
+            this.skinEngine1.DisabledMenuFontColor = System.Drawing.SystemColors.GrayText;
+            this.skinEngine1.InactiveCaptionColor = System.Drawing.SystemColors.InactiveCaptionText;
+            this.skinEngine1.SerialNumber = "";
+            this.skinEngine1.SkinFile = null;
             // 
-            // btn_stretch
+            // btn_exit
             // 
-            this.btn_stretch.FlatAppearance.BorderSize = 0;
-            this.btn_stretch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_stretch.Image = ((System.Drawing.Image)(resources.GetObject("btn_stretch.Image")));
-            this.btn_stretch.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_stretch.Location = new System.Drawing.Point(379, 14);
-            this.btn_stretch.Name = "btn_stretch";
-            this.btn_stretch.Size = new System.Drawing.Size(83, 26);
-            this.btn_stretch.TabIndex = 9;
-            this.btn_stretch.Text = "灰度拉伸";
-            this.btn_stretch.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_stretch.UseVisualStyleBackColor = true;
-            this.btn_stretch.Click += new System.EventHandler(this.btn_stretch_Click);
+            this.btn_exit.FlatAppearance.BorderSize = 0;
+            this.btn_exit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_exit.Image = ((System.Drawing.Image)(resources.GetObject("btn_exit.Image")));
+            this.btn_exit.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_exit.Location = new System.Drawing.Point(1217, 683);
+            this.btn_exit.Name = "btn_exit";
+            this.btn_exit.Size = new System.Drawing.Size(84, 26);
+            this.btn_exit.TabIndex = 2;
+            this.btn_exit.Text = "退出系统";
+            this.btn_exit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_exit.UseVisualStyleBackColor = true;
+            this.btn_exit.Click += new System.EventHandler(this.btn_exit_Click);
             // 
-            // btn_equalization
+            // btn_restore
             // 
-            this.btn_equalization.FlatAppearance.BorderSize = 0;
-            this.btn_equalization.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_equalization.Image = ((System.Drawing.Image)(resources.GetObject("btn_equalization.Image")));
-            this.btn_equalization.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_equalization.Location = new System.Drawing.Point(475, 13);
-            this.btn_equalization.Name = "btn_equalization";
-            this.btn_equalization.Size = new System.Drawing.Size(106, 26);
-            this.btn_equalization.TabIndex = 8;
-            this.btn_equalization.Text = "直方图均衡化";
-            this.btn_equalization.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_equalization.UseVisualStyleBackColor = true;
-            this.btn_equalization.Click += new System.EventHandler(this.btn_equalization_Click);
+            this.btn_restore.FlatAppearance.BorderSize = 0;
+            this.btn_restore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_restore.Image = ((System.Drawing.Image)(resources.GetObject("btn_restore.Image")));
+            this.btn_restore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_restore.Location = new System.Drawing.Point(127, 12);
+            this.btn_restore.Name = "btn_restore";
+            this.btn_restore.Size = new System.Drawing.Size(84, 26);
+            this.btn_restore.TabIndex = 3;
+            this.btn_restore.Text = "还原图像";
+            this.btn_restore.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_restore.UseVisualStyleBackColor = true;
+            this.btn_restore.Click += new System.EventHandler(this.btn_restore_Click);
             // 
-            // btn_linearPO
+            // btn_open
             // 
-            this.btn_linearPO.FlatAppearance.BorderSize = 0;
-            this.btn_linearPO.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_linearPO.Image = ((System.Drawing.Image)(resources.GetObject("btn_linearPO.Image")));
-            this.btn_linearPO.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_linearPO.Location = new System.Drawing.Point(273, 13);
-            this.btn_linearPO.Name = "btn_linearPO";
-            this.btn_linearPO.Size = new System.Drawing.Size(94, 26);
-            this.btn_linearPO.TabIndex = 7;
-            this.btn_linearPO.Text = "线性点运算";
-            this.btn_linearPO.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_linearPO.UseVisualStyleBackColor = true;
-            this.btn_linearPO.Click += new System.EventHandler(this.btn_linearPO_Click);
+            this.btn_open.FlatAppearance.BorderSize = 0;
+            this.btn_open.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_open.Image = ((System.Drawing.Image)(resources.GetObject("btn_open.Image")));
+            this.btn_open.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_open.Location = new System.Drawing.Point(21, 12);
+            this.btn_open.Name = "btn_open";
+            this.btn_open.Size = new System.Drawing.Size(84, 26);
+            this.btn_open.TabIndex = 2;
+            this.btn_open.Text = "打开文件";
+            this.btn_open.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_open.UseVisualStyleBackColor = true;
+            this.btn_open.Click += new System.EventHandler(this.btn_open_Click);
+            // 
+            // btn_change
+            // 
+            this.btn_change.FlatAppearance.BorderSize = 0;
+            this.btn_change.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_change.Image = ((System.Drawing.Image)(resources.GetObject("btn_change.Image")));
+            this.btn_change.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_change.Location = new System.Drawing.Point(1049, 16);
+            this.btn_change.Name = "btn_change";
+            this.btn_change.Size = new System.Drawing.Size(84, 26);
+            this.btn_change.TabIndex = 14;
+            this.btn_change.Text = "确定更改";
+            this.btn_change.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_change.UseVisualStyleBackColor = true;
+            this.btn_change.Click += new System.EventHandler(this.btn_change_Click);
+            // 
+            // btn_hough
+            // 
+            this.btn_hough.FlatAppearance.BorderSize = 0;
+            this.btn_hough.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btn_hough.Image = ((System.Drawing.Image)(resources.GetObject("btn_hough.Image")));
+            this.btn_hough.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_hough.Location = new System.Drawing.Point(370, 15);
+            this.btn_hough.Name = "btn_hough";
+            this.btn_hough.Size = new System.Drawing.Size(85, 23);
+            this.btn_hough.TabIndex = 12;
+            this.btn_hough.Text = "Hough变换";
+            this.btn_hough.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_hough.UseVisualStyleBackColor = true;
+            this.btn_hough.Click += new System.EventHandler(this.btn_hough_Click);
+            // 
+            // btn_Xjump
+            // 
+            this.btn_Xjump.FlatAppearance.BorderSize = 0;
+            this.btn_Xjump.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_Xjump.Image = ((System.Drawing.Image)(resources.GetObject("btn_Xjump.Image")));
+            this.btn_Xjump.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_Xjump.Location = new System.Drawing.Point(281, 15);
+            this.btn_Xjump.Name = "btn_Xjump";
+            this.btn_Xjump.Size = new System.Drawing.Size(65, 23);
+            this.btn_Xjump.TabIndex = 11;
+            this.btn_Xjump.Text = "X跳转";
+            this.btn_Xjump.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_Xjump.UseVisualStyleBackColor = true;
+            this.btn_Xjump.Click += new System.EventHandler(this.btn_Xjump_Click);
             // 
             // btn_histogram
             // 
@@ -412,50 +398,6 @@
             this.btn_save.UseVisualStyleBackColor = true;
             this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
-            // skinEngine1
-            // 
-            this.skinEngine1.@__DrawButtonFocusRectangle = true;
-            this.skinEngine1.DisabledButtonTextColor = System.Drawing.Color.Gray;
-            this.skinEngine1.DisabledMenuFontColor = System.Drawing.SystemColors.GrayText;
-            this.skinEngine1.InactiveCaptionColor = System.Drawing.SystemColors.InactiveCaptionText;
-            this.skinEngine1.SerialNumber = "";
-            this.skinEngine1.SkinFile = null;
-            // 
-            // btn_exit
-            // 
-            this.btn_exit.FlatAppearance.BorderSize = 0;
-            this.btn_exit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_exit.Image = ((System.Drawing.Image)(resources.GetObject("btn_exit.Image")));
-            this.btn_exit.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_exit.Location = new System.Drawing.Point(1217, 683);
-            this.btn_exit.Name = "btn_exit";
-            this.btn_exit.Size = new System.Drawing.Size(84, 26);
-            this.btn_exit.TabIndex = 2;
-            this.btn_exit.Text = "退出系统";
-            this.btn_exit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_exit.UseVisualStyleBackColor = true;
-            this.btn_exit.Click += new System.EventHandler(this.btn_exit_Click);
-            // 
-            // btn_hough
-            // 
-            this.btn_hough.Location = new System.Drawing.Point(792, 16);
-            this.btn_hough.Name = "btn_hough";
-            this.btn_hough.Size = new System.Drawing.Size(75, 23);
-            this.btn_hough.TabIndex = 12;
-            this.btn_hough.Text = "Hough变换";
-            this.btn_hough.UseVisualStyleBackColor = true;
-            this.btn_hough.Click += new System.EventHandler(this.btn_hough_Click);
-            // 
-            // btn_Xjump
-            // 
-            this.btn_Xjump.Location = new System.Drawing.Point(696, 15);
-            this.btn_Xjump.Name = "btn_Xjump";
-            this.btn_Xjump.Size = new System.Drawing.Size(75, 23);
-            this.btn_Xjump.TabIndex = 11;
-            this.btn_Xjump.Text = "X跳转";
-            this.btn_Xjump.UseVisualStyleBackColor = true;
-            this.btn_Xjump.Click += new System.EventHandler(this.btn_Xjump_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -509,10 +451,6 @@
         private System.Windows.Forms.Button btn_gray;
         private System.Windows.Forms.Button btn_binaryzation;
         private System.Windows.Forms.Button btn_histogram;
-        private System.Windows.Forms.Button btn_stretch;
-        private System.Windows.Forms.Button btn_equalization;
-        private System.Windows.Forms.Button btn_linearPO;
-        private System.Windows.Forms.Button btn_shaping;
         private System.Windows.Forms.Button btn_exit;
         private System.Windows.Forms.TabPage tab_file;
         private System.Windows.Forms.Button btn_hough;

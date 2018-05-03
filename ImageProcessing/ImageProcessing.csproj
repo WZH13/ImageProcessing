@@ -102,6 +102,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="shapinForm.resx">
       <DependentUpon>shapinForm.cs</DependentUpon>
@@ -118,6 +119,156 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k11.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k3.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k4.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k5.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k6.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k7.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k8.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k9.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k10.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k12.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k13.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\k14.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r3.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r4.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r5.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r6.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r7.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r8.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r9.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r10.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r11.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r12.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r13.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r14.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\r15.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w3.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w4.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w5.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w6.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w7.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w8.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w9.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w10.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w11.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w12.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w13.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w14.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w15.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w16.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w17.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w18.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w19.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w20.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\icon\w21.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
