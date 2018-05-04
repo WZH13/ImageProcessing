@@ -457,5 +457,10 @@ namespace ImageProcessing
             curBitmap = imageProcessing.hough_line(curBitmap, 10);
             Invalidate();
         }
+
+        private void btn_projection_Click(object sender, EventArgs e)
+        {
+            imageProcessing.VerticalProjection(curBitmap, @"C:\Users\wzh\Desktop\print");
+        }
     }
 }

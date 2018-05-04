@@ -8,7 +8,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.IO;
-
+using System.Windows.Forms;
 
 namespace ImageProcessing
 {
@@ -1183,6 +1183,279 @@ namespace ImageProcessing
                 }
             }
             return I_out;
+        }
+
+        #endregion
+
+        #region 行字切分_投影法
+
+        /// <summary>
+        /// Get the vertical projection of the image
+        /// </summary>
+        /// <param name="imageSrc">the path of src image</param>
+        public  void VerticalProjection(Bitmap bmp, string imageDestPath)
+        {
+            int imgWidth = bmp.Width;
+
+            int imgHeight = bmp.Height;
+
+            //用于存储当前横坐标垂直方向上的有效像素点数量(组成字符的像素点)
+            int[] verticalPoints = new int[imgHeight]; 
+            Array.Clear(verticalPoints, 0, imgHeight);
+               
+            int threshold = 0;
+
+            //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
+            Byte[,] BinaryArray = ToBinaryArray(bmp,out threshold);
+
+            //用于存储竖直投影后的二值化数组
+            Byte[,] verticalProArray = new Byte[imgHeight, imgWidth];
+            //先将该二值化数组初始化为白色
+            for (int x = 0; x < imgHeight; x++)
+            {
+                for (int y = 0; y < imgWidth; y++)
+                {
+                    verticalProArray[x, y] = 255;
+                }
+            }
+
+            //统计源图像的二值化数组中在每一个横坐标的垂直方向所包含的像素点数
+            for (int x = 0; x < imgHeight; x++)
+            {
+                for (int y = 0; y < imgWidth; y++)
+                {
+                    if (0 == BinaryArray[x, y])
+                    {
+                        verticalPoints[x]++;
+                    }
+                }
+            }
+
+            //将源图像中横坐标垂直方向上所包含的像素点按垂直方向依次从imgWidth开始叠放在竖直投影二值化数组中
+            for (int x = 0; x < imgHeight; x++)
+            {
+                for (int y = 0; y < verticalPoints[x]; y++)
+                {
+                    verticalProArray[x, y] = 0;
+                }
+            }
+
+            //将竖直投影的二值化数组转换为二值化图像并保存
+            Bitmap verBmp = BinaryArrayToBinaryBitmap(verticalProArray);
+
+            //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+            //调用SaveFileDialog
+            SaveFileDialog saveDlg = new SaveFileDialog();
+            //设置对话框标题
+            saveDlg.Title = "保存为";
+            //改写已存在文件时提示用户
+            saveDlg.OverwritePrompt = true;
+            //为图像选择一个筛选器
+            saveDlg.Filter = "BMP文件(*.bmp)|*.bmp|" + "Gif文件(*.gif)|*.gif|" + "JPEG文件(*.jpg)|*.jpg|" + "PNG文件(*.png)|*.png";
+            //启用“帮助”按钮
+            saveDlg.ShowHelp = true;
+
+            //如果选择了格式，则保存图像
+            if (saveDlg.ShowDialog() == DialogResult.OK)
+            {
+                //获取用户选择的文件名
+                string filename = saveDlg.FileName;
+                string strFilExtn = filename.Remove(0, filename.Length - 3);
+
+                //保存文件
+                switch (strFilExtn)
+                {
+                    //以指定格式保存
+                    case "bmp":
+                        verBmp.Save(filename, ImageFormat.Bmp);
+                        break;
+                    case "jpg":
+                        verBmp.Save(filename, ImageFormat.Jpeg);
+                        break;
+                    case "gif":
+                        verBmp.Save(filename, ImageFormat.Gif);
+                        break;
+                    case "tif":
+                        verBmp.Save(filename, ImageFormat.Tiff);
+                        break;
+                    case "png":
+                        verBmp.Save(filename, ImageFormat.Png);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 全局阈值图像二值化
+        /// </summary>
+        /// <param name="bmp">原始图像</param>
+        /// <param name="method">二值化方法</param>
+        /// <param name="threshold">输出：全局阈值</param>
+        /// <returns>二值化后的图像数组</returns>       
+        public static Byte[,] ToBinaryArray(Bitmap bmp,  out int threshold)
+        {   // 位图转换为灰度数组
+            Byte[,] GrayArray = ToGrayArray(bmp);
+
+            // 计算全局阈值
+                threshold = OtsuThreshold(GrayArray);
+
+            // 根据阈值进行二值化
+            int PixelHeight = bmp.Height;
+            int PixelWidth = bmp.Width;
+            Byte[,] BinaryArray = new Byte[PixelHeight, PixelWidth];
+            for (int i = 0; i < PixelHeight; i++)
+            {
+                for (int j = 0; j < PixelWidth; j++)
+                {
+                    BinaryArray[i, j] = Convert.ToByte((GrayArray[i, j] > threshold) ? 255 : 0);
+                }
+            }
+
+            return BinaryArray;
+        }
+
+        /// <summary>
+        /// 大津法计算阈值
+        /// </summary>
+        /// <param name="grayArray">灰度数组</param>
+        /// <returns>二值化阈值</returns>
+        public static int OtsuThreshold(Byte[,] grayArray)
+        {   // 建立统计直方图
+            int[] Histogram = new int[256];
+            Array.Clear(Histogram, 0, 256);     // 初始化
+            foreach (Byte b in grayArray)
+            {
+                Histogram[b]++;                 // 统计直方图
+            }
+
+            // 总的质量矩和图像点数
+            int SumC = grayArray.Length;    // 总的图像点数
+            Double SumU = 0;                  // 双精度避免方差运算中数据溢出
+            for (int i = 1; i < 256; i++)
+            {
+                SumU += i * Histogram[i];     // 总的质量矩               
+            }
+
+            // 灰度区间
+            int MinGrayLevel = Array.FindIndex(Histogram, NonZero);       // 最小灰度值
+            int MaxGrayLevel = Array.FindLastIndex(Histogram, NonZero);   // 最大灰度值
+
+            // 计算最大类间方差
+            int Threshold = MinGrayLevel;
+            Double MaxVariance = 0.0;       // 初始最大方差
+            Double U0 = 0;                  // 初始目标质量矩
+            int C0 = 0;                   // 初始目标点数
+            for (int i = MinGrayLevel; i < MaxGrayLevel; i++)
+            {
+                if (Histogram[i] == 0) continue;
+
+                // 目标的质量矩和点数               
+                U0 += i * Histogram[i];
+                C0 += Histogram[i];
+
+                // 计算目标和背景的类间方差
+                Double Diference = U0 * SumC - SumU * C0;
+                Double Variance = Diference * Diference / C0 / (SumC - C0); // 方差
+                if (Variance > MaxVariance)
+                {
+                    MaxVariance = Variance;
+                    Threshold = i;
+                }
+            }
+
+            // 返回类间方差最大阈值
+            return Threshold;
+        }
+
+        /// <summary>
+        /// 检测非零值
+        /// </summary>
+        /// <param name="value">要检测的数值</param>
+        /// <returns>
+        ///     true：非零
+        ///     false：零
+        /// </returns>
+        private static Boolean NonZero(Int32 value)
+        {
+            return (value != 0) ? true : false;
+        }
+
+        /// <summary>
+        /// 将位图转换为灰度数组（256级灰度）
+        /// </summary>
+        /// <param name="bmp">原始位图</param>
+        /// <returns>灰度数组</returns>
+        public static Byte[,] ToGrayArray(Bitmap bmp)
+        {
+            Int32 PixelHeight = bmp.Height; // 图像高度
+            Int32 PixelWidth = bmp.Width;   // 图像宽度
+            Int32 Stride = ((PixelWidth * 3 + 3) >> 2) << 2;    // 跨距宽度
+            Byte[] Pixels = new Byte[PixelHeight * Stride];
+
+            // 锁定位图到系统内存
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, PixelWidth, PixelHeight), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            Marshal.Copy(bmpData.Scan0, Pixels, 0, Pixels.Length);  // 从非托管内存拷贝数据到托管内存
+            bmp.UnlockBits(bmpData);    // 从系统内存解锁位图
+
+            // 将像素数据转换为灰度数组
+            Byte[,] GrayArray = new Byte[PixelHeight, PixelWidth];
+            for (Int32 i = 0; i < PixelHeight; i++)
+            {
+                Int32 Index = i * Stride;
+                for (Int32 j = 0; j < PixelWidth; j++)
+                {
+                    GrayArray[i, j] = Convert.ToByte((Pixels[Index + 2] * 19595 + Pixels[Index + 1] * 38469 + Pixels[Index] * 7471 + 32768) >> 16);
+                    Index += 3;
+                }
+            }
+
+            return GrayArray;
+        }
+
+
+
+        /// <summary>
+        /// 将二值化数组转换为二值化图像
+        /// </summary>
+        /// <param name="binaryArray">二值化数组</param>
+        /// <returns>二值化图像</returns>
+        public static Bitmap BinaryArrayToBinaryBitmap(Byte[,] binaryArray)
+        {   // 将二值化数组转换为二值化数据
+            int PixelHeight = binaryArray.GetLength(0);
+            int PixelWidth = binaryArray.GetLength(1);
+            int Stride = ((PixelWidth + 31) >> 5) << 2;
+            Byte[] Pixels = new Byte[PixelHeight * Stride];
+            for (int i = 0; i < PixelHeight; i++)
+            {
+                int Base = i * Stride;
+                for (int j = 0; j < PixelWidth; j++)
+                {
+                    if (binaryArray[i, j] != 0)
+                    {
+                        Pixels[Base + (j >> 3)] |= Convert.ToByte(0x80 >> (j & 0x7));
+                    }
+                }
+            }
+
+            // 创建黑白图像
+            Bitmap BinaryBmp = new Bitmap(PixelWidth, PixelHeight, PixelFormat.Format1bppIndexed);
+
+            // 设置调色表
+            ColorPalette cp = BinaryBmp.Palette;
+            cp.Entries[0] = Color.Black;    // 黑色
+            cp.Entries[1] = Color.White;    // 白色
+            BinaryBmp.Palette = cp;
+
+            // 设置位图图像特性
+            BitmapData BinaryBmpData = BinaryBmp.LockBits(new Rectangle(0, 0, PixelWidth, PixelHeight), ImageLockMode.WriteOnly, PixelFormat.Format1bppIndexed);
+            Marshal.Copy(Pixels, 0, BinaryBmpData.Scan0, Pixels.Length);
+            BinaryBmp.UnlockBits(BinaryBmpData);
+
+            return BinaryBmp;
         }
 
         #endregion
