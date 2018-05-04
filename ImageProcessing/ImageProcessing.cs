@@ -1190,41 +1190,141 @@ namespace ImageProcessing
         #region 行字切分_投影法
 
         /// <summary>
-        /// Get the vertical projection of the image
+        /// 水平投影
         /// </summary>
-        /// <param name="imageSrc">the path of src image</param>
-        public  void VerticalProjection(Bitmap bmp, string imageDestPath)
+        /// <param name="imageSrc">Bitmap</param>
+        public void HorizontalProjection(Bitmap bmp)
         {
             int imgWidth = bmp.Width;
 
             int imgHeight = bmp.Height;
 
-            //用于存储当前横坐标垂直方向上的有效像素点数量(组成字符的像素点)
-            int[] verticalPoints = new int[imgHeight]; 
-            Array.Clear(verticalPoints, 0, imgHeight);
+            //用于存储当前纵坐标垂直方向上的有效像素点数量(组成字符的像素点)
+            int[] horizontalProjection = new int[imgHeight]; 
+            Array.Clear(horizontalProjection, 0, imgHeight);
                
             int threshold = 0;
 
             //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
             Byte[,] BinaryArray = ToBinaryArray(bmp,out threshold);
 
-            //用于存储竖直投影后的二值化数组
-            Byte[,] verticalProArray = new Byte[imgHeight, imgWidth];
+            //用于存储水平投影后的二值化数组
+            Byte[,] horizontalProArray = new Byte[imgHeight, imgWidth];
             //先将该二值化数组初始化为白色
             for (int x = 0; x < imgHeight; x++)
             {
                 for (int y = 0; y < imgWidth; y++)
                 {
-                    verticalProArray[x, y] = 255;
+                    horizontalProArray[x, y] = 255;
                 }
             }
 
-            //统计源图像的二值化数组中在每一个横坐标的垂直方向所包含的像素点数
+            //统计源图像的二值化数组中在每一个纵坐标的垂直方向所包含的像素点数
             for (int x = 0; x < imgHeight; x++)
             {
                 for (int y = 0; y < imgWidth; y++)
                 {
                     if (0 == BinaryArray[x, y])
+                    {
+                        horizontalProjection[x]++;
+                    }
+                }
+            }
+
+            //将源图像中纵坐标垂直方向上所包含的像素点按水平方向依次从imgHeight开始叠放在水平投影二值化数组中
+            for (int x = 0; x < imgHeight; x++)
+            {
+                for (int y = 0; y < horizontalProjection[x]; y++)
+                {
+                    horizontalProArray[x, y] = 0;
+                }
+            }
+
+            //将水平投影的二值化数组转换为二值化图像并保存
+            Bitmap verBmp = BinaryArrayToBinaryBitmap(horizontalProArray);
+
+            //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+            //调用SaveFileDialog
+            SaveFileDialog saveDlg = new SaveFileDialog();
+            //设置对话框标题
+            saveDlg.Title = "保存为";
+            //改写已存在文件时提示用户
+            saveDlg.OverwritePrompt = true;
+            //为图像选择一个筛选器
+            saveDlg.Filter = "BMP文件(*.bmp)|*.bmp|" + "Gif文件(*.gif)|*.gif|" + "JPEG文件(*.jpg)|*.jpg|" + "PNG文件(*.png)|*.png";
+            //启用“帮助”按钮
+            saveDlg.ShowHelp = true;
+
+            //如果选择了格式，则保存图像
+            if (saveDlg.ShowDialog() == DialogResult.OK)
+            {
+                //获取用户选择的文件名
+                string filename = saveDlg.FileName;
+                string strFilExtn = filename.Remove(0, filename.Length - 3);
+
+                //保存文件
+                switch (strFilExtn)
+                {
+                    //以指定格式保存
+                    case "bmp":
+                        verBmp.Save(filename, ImageFormat.Bmp);
+                        break;
+                    case "jpg":
+                        verBmp.Save(filename, ImageFormat.Jpeg);
+                        break;
+                    case "gif":
+                        verBmp.Save(filename, ImageFormat.Gif);
+                        break;
+                    case "tif":
+                        verBmp.Save(filename, ImageFormat.Tiff);
+                        break;
+                    case "png":
+                        verBmp.Save(filename, ImageFormat.Png);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Get the vertical projection of the image
+        /// </summary>
+        /// <param name="imageSrc">the path of src image</param>
+        public void VerticalProjection(Bitmap bmp)
+        {
+            int imgWidth = bmp.Width;
+
+            int imgHeight = bmp.Height;
+
+            //用于存储当前横坐标垂直方向上的有效像素点数量(组成字符的像素点)
+            int[] verticalPoints = new int[imgWidth];
+            Array.Clear(verticalPoints, 0, imgWidth);
+
+            int threshold = 0;
+
+            //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
+            Byte[,] BinaryArray = ToBinaryArray(bmp, out threshold);
+
+            //用于存储竖直投影后的二值化数组
+            Byte[,] verticalProArray = new Byte[imgHeight, imgWidth];
+            //先将该二值化数组初始化为白色
+            for (int x = 0; x < imgWidth; x++)
+            {
+                for (int y = 0; y < imgHeight; y++)
+                {
+                    verticalProArray[y, x] = 255;
+                }
+            }
+
+            //统计源图像的二值化数组中在每一个横坐标的垂直方向所包含的像素点数
+            for (int x = 0; x < imgWidth; x++)
+            {
+                for (int y = 0; y < imgHeight; y++)
+                {
+                    if (0 == BinaryArray[y, x])
                     {
                         verticalPoints[x]++;
                     }
@@ -1232,11 +1332,11 @@ namespace ImageProcessing
             }
 
             //将源图像中横坐标垂直方向上所包含的像素点按垂直方向依次从imgWidth开始叠放在竖直投影二值化数组中
-            for (int x = 0; x < imgHeight; x++)
+            for (int x = 0; x < imgWidth; x++)
             {
-                for (int y = 0; y < verticalPoints[x]; y++)
+                for (int y = (imgHeight - 1); y > (imgHeight - verticalPoints[x] - 1); y--)
                 {
-                    verticalProArray[x, y] = 0;
+                    verticalProArray[y, x] = 0;
                 }
             }
 
@@ -1286,7 +1386,6 @@ namespace ImageProcessing
                         break;
                 }
             }
-
         }
 
         /// <summary>

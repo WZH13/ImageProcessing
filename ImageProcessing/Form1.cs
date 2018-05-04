@@ -460,7 +460,8 @@ namespace ImageProcessing
 
         private void btn_projection_Click(object sender, EventArgs e)
         {
-            imageProcessing.VerticalProjection(curBitmap, @"C:\Users\wzh\Desktop\print");
+            imageProcessing.HorizontalProjection(curBitmap);
+            imageProcessing.VerticalProjection(curBitmap);
         }
     }
 }
