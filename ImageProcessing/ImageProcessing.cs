@@ -932,7 +932,7 @@ namespace ImageProcessing
         /// </summary>
         /// <param name="srcBitmap">源图像</param>
         /// <returns>保存X跳的数组</returns>
-        public int[,] JumpMethod(Bitmap srcBitmap)
+        public int[,] XJumpMethod(Bitmap srcBitmap)
         {
             Rectangle rect = new Rectangle(0, 0, srcBitmap.Width, srcBitmap.Height);
             BitmapData bmpData = srcBitmap.LockBits(rect,
@@ -1012,6 +1012,82 @@ namespace ImageProcessing
             int temp = BITS[pos];
             return (b & temp) != 0;
         }
+
+        #endregion
+
+        #region 跳转法_由位图求Y跳转（未完成）
+
+        //Y跳要判断垂直方向对应每个字节每一位是否发生上跳下跳
+        public int[,] YJumpMethod(Bitmap srcBitmap)
+        {
+            Rectangle rect = new Rectangle(0, 0, srcBitmap.Width, srcBitmap.Height);
+            BitmapData bmpData = srcBitmap.LockBits(rect,
+                ImageLockMode.ReadWrite, srcBitmap.PixelFormat);
+            int depth = Bitmap.GetPixelFormatSize(srcBitmap.PixelFormat);
+            //位深度不为1，返回
+            if (depth != 1)
+            {
+
+            }
+            IntPtr ptr = bmpData.Scan0;
+            int bytes = bmpData.Stride * bitmap.Height;
+            byte[] bmpValues = new byte[bytes];
+            Marshal.Copy(ptr, bmpValues, 0, bytes);
+
+            int[,] Xbmp = new int[bmpData.Height, 200];//X跳数组
+            bool is1 = false;//记录当前位是否是1
+            int t = 0;//记录总跳数
+            bool isFirst1 = true;//是否是上跳的第一个1,isFirst1=true：是上跳；isFirst1=false:不是第一个1
+            bool isFirst0 = false;//是否是下跳的第一个0,isFirst0=true：是上跳；isFirst0=false:不是第一个1
+            int k1 = 0;
+            int j1 = 0;
+
+            for (int i = 0; i < bmpData.Height; i++)
+            {
+                for (int j = 0; j < bmpData.Stride; j++)
+                {
+                    for (int k = 0; k < 8; k++)
+                    {//按字节处理
+                        is1 = ByteGetBit(bmpValues[j + i * bmpData.Stride], k);//调用ByteGetBit判断当前位是否是1
+                        if (is1)
+                        {//当前位是1
+                            if (isFirst1)
+                            {//是否是上跳位置
+                                t++;
+                                Xbmp[i, t] = j * 8 + k;
+                                isFirst1 = false;
+                                isFirst0 = true;
+                            }
+                        }
+                        else
+                        {
+                            if (isFirst0)
+                            {
+                                t++;
+                                Xbmp[i, t] = j * 8 + k;
+                                isFirst0 = false;
+                                isFirst1 = true;
+                            }
+                        }
+                        k1 = k;
+                    }
+                    j1 = j;
+                }
+                if (isFirst0 == true)     //如果有上跳没有下跳则行尾增加下跳
+                {
+                    t++;
+                    Xbmp[i, t] = j1 * 8 + k1;
+                }
+                Xbmp[i, 0] = t;      //总跳数赋值
+                t = 0;
+
+                isFirst1 = true;    //下一行恢复默认值
+                isFirst0 = false;
+            }
+            srcBitmap.UnlockBits(bmpData);
+            return Xbmp;
+        }
+
 
         #endregion
 
@@ -1242,50 +1318,60 @@ namespace ImageProcessing
 
             //将水平投影的二值化数组转换为二值化图像并保存
             Bitmap verBmp = BinaryArrayToBinaryBitmap(horizontalProArray);
+            bool is1 = false;
+            int[,] lineNum = new int[100, 3];//记录行信息：0行开始的纵坐标；1行结束的纵坐标；2这一行的峰值
+            int row = 0;
+            bool isLineStart = true;//标识新出现的1是否是行结束位置
+            bool isLineEnd = false;//标识新出现的1是否是行结束位置
+            bool isX1 = false;//标识是否是黑色像素
+            int peakValueLoc = 0;
+
+            //for (int y = 0; y < imgHeight;y++)    作用是找出每一行的起始位置和结束位置的纵坐标
+            for (int h = 0; h < imgHeight;h++)
+            {
+                is1 = ByteGetBit(horizontalProArray[h,0], 0);//调用ByteGetBit判断第一位是否是1
+                //0是黑色,1是白色
+                if (!is1)//出现不是1的位，行开始
+                {
+                    if (isLineStart)
+                    {
+                        lineNum[row, 0] = h;
+                        isLineStart = false;
+                        isLineEnd = true;
+                    }
+                    
+                }
+                else//出现是1的位，接着判断是不是行结束位置
+                {
+                    if (isLineEnd)//是行结束位置，记录下行结束纵坐标
+                    {
+                        lineNum[row, 1] = h;
+                        lineNum[row, 2] = peakValueLoc;//文字行结束，记录峰值位置
+                        peakValueLoc = 0;
+                        isLineStart = true;
+                        isLineEnd = false;
+                    }
+                }
+            }
+
+            ////找出每一行的峰值填充到数组里（思路不对，这样找不出原图上的行宽,应该对原图进行处理了，找出原图中每一行横坐标最大的黑像素点）
+            //for (int w = 0; w < imgWidth; w++)
+            //{
+            //    for (int k = 0; k < 8; k++)
+            //    {//按字节处理
+            //        isX1 = ByteGetBit(horizontalProArray[h, w], k);
+            //        if (isX1)//出现白色像素了
+            //        {
+            //            if (((w -1)* 8 + k - 1) > peakValueLoc)
+            //            {
+            //                peakValueLoc = (w - 1) * 8 + k - 1;//(w - 1) * 8 + k - 1 为该像素行最后一个黑色像素位置
+            //            }
+            //        }
+            //    }
+            //}
 
             //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-            //调用SaveFileDialog
-            SaveFileDialog saveDlg = new SaveFileDialog();
-            //设置对话框标题
-            saveDlg.Title = "保存为";
-            //改写已存在文件时提示用户
-            saveDlg.OverwritePrompt = true;
-            //为图像选择一个筛选器
-            saveDlg.Filter = "BMP文件(*.bmp)|*.bmp|" + "Gif文件(*.gif)|*.gif|" + "JPEG文件(*.jpg)|*.jpg|" + "PNG文件(*.png)|*.png";
-            //启用“帮助”按钮
-            saveDlg.ShowHelp = true;
-
-            //如果选择了格式，则保存图像
-            if (saveDlg.ShowDialog() == DialogResult.OK)
-            {
-                //获取用户选择的文件名
-                string filename = saveDlg.FileName;
-                string strFilExtn = filename.Remove(0, filename.Length - 3);
-
-                //保存文件
-                switch (strFilExtn)
-                {
-                    //以指定格式保存
-                    case "bmp":
-                        verBmp.Save(filename, ImageFormat.Bmp);
-                        break;
-                    case "jpg":
-                        verBmp.Save(filename, ImageFormat.Jpeg);
-                        break;
-                    case "gif":
-                        verBmp.Save(filename, ImageFormat.Gif);
-                        break;
-                    case "tif":
-                        verBmp.Save(filename, ImageFormat.Tiff);
-                        break;
-                    case "png":
-                        verBmp.Save(filename, ImageFormat.Png);
-                        break;
-                    default:
-                        break;
-                }
-            }
 
         }
 
@@ -1478,7 +1564,7 @@ namespace ImageProcessing
         ///     true：非零
         ///     false：零
         /// </returns>
-        private static Boolean NonZero(Int32 value)
+        private static Boolean NonZero(int value)
         {
             return (value != 0) ? true : false;
         }
@@ -1490,9 +1576,9 @@ namespace ImageProcessing
         /// <returns>灰度数组</returns>
         public static Byte[,] ToGrayArray(Bitmap bmp)
         {
-            Int32 PixelHeight = bmp.Height; // 图像高度
-            Int32 PixelWidth = bmp.Width;   // 图像宽度
-            Int32 Stride = ((PixelWidth * 3 + 3) >> 2) << 2;    // 跨距宽度
+            int PixelHeight = bmp.Height; // 图像高度
+            int PixelWidth = bmp.Width;   // 图像宽度
+            int Stride = ((PixelWidth * 3 + 3) >> 2) << 2;    // 跨距宽度
             Byte[] Pixels = new Byte[PixelHeight * Stride];
 
             // 锁定位图到系统内存
@@ -1502,10 +1588,10 @@ namespace ImageProcessing
 
             // 将像素数据转换为灰度数组
             Byte[,] GrayArray = new Byte[PixelHeight, PixelWidth];
-            for (Int32 i = 0; i < PixelHeight; i++)
+            for (int i = 0; i < PixelHeight; i++)
             {
-                Int32 Index = i * Stride;
-                for (Int32 j = 0; j < PixelWidth; j++)
+                int Index = i * Stride;
+                for (int j = 0; j < PixelWidth; j++)
                 {
                     GrayArray[i, j] = Convert.ToByte((Pixels[Index + 2] * 19595 + Pixels[Index + 1] * 38469 + Pixels[Index] * 7471 + 32768) >> 16);
                     Index += 3;
@@ -1514,8 +1600,6 @@ namespace ImageProcessing
 
             return GrayArray;
         }
-
-
 
         /// <summary>
         /// 将二值化数组转换为二值化图像

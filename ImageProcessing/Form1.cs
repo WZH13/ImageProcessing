@@ -449,7 +449,7 @@ namespace ImageProcessing
 
         private void btn_Xjump_Click(object sender, EventArgs e)
         {
-            imageProcessing.JumpMethod(curBitmap);
+            imageProcessing.XJumpMethod(curBitmap);
         }
 
         private void btn_hough_Click(object sender, EventArgs e)
