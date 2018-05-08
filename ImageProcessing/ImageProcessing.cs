@@ -1318,13 +1318,11 @@ namespace ImageProcessing
 
             //将水平投影的二值化数组转换为二值化图像并保存
             Bitmap verBmp = BinaryArrayToBinaryBitmap(horizontalProArray);
-            bool is1 = false;
-            int[,] lineNum = new int[100, 3];//记录行信息：0行开始的纵坐标；1行结束的纵坐标；2这一行的峰值
+            bool is1 = false;//标识是否是1（白像素）
+            int[,] lineNum = new int[100, 4];//记录行信息：0行开始的纵坐标；1行结束的纵坐标；2这一行的起始字符位置(横坐标)；3这一行结束字符位置(横坐标)
             int row = 0;
-            bool isLineStart = true;//标识新出现的1是否是行结束位置
-            bool isLineEnd = false;//标识新出现的1是否是行结束位置
-            bool isX1 = false;//标识是否是黑色像素
-            int peakValueLoc = 0;
+            bool isLineStart = true;//标识新出现的0是否是行开始位置
+            bool isLineEnd = false;//标识新出现的0是否是行结束位置
 
             //for (int y = 0; y < imgHeight;y++)    作用是找出每一行的起始位置和结束位置的纵坐标
             for (int h = 0; h < imgHeight;h++)
@@ -1346,34 +1344,74 @@ namespace ImageProcessing
                     if (isLineEnd)//是行结束位置，记录下行结束纵坐标
                     {
                         lineNum[row, 1] = h;
-                        lineNum[row, 2] = peakValueLoc;//文字行结束，记录峰值位置
-                        peakValueLoc = 0;
                         isLineStart = true;
                         isLineEnd = false;
+                        row++;
                     }
                 }
             }
 
-            ////找出每一行的峰值填充到数组里（思路不对，这样找不出原图上的行宽,应该对原图进行处理了，找出原图中每一行横坐标最大的黑像素点）
-            //for (int w = 0; w < imgWidth; w++)
-            //{
-            //    for (int k = 0; k < 8; k++)
-            //    {//按字节处理
-            //        isX1 = ByteGetBit(horizontalProArray[h, w], k);
-            //        if (isX1)//出现白色像素了
-            //        {
-            //            if (((w -1)* 8 + k - 1) > peakValueLoc)
-            //            {
-            //                peakValueLoc = (w - 1) * 8 + k - 1;//(w - 1) * 8 + k - 1 为该像素行最后一个黑色像素位置
-            //            }
-            //        }
-            //    }
-            //}
+            bool isBlackPixel = false;//标识是否是黑色像素
+            int headLine = imgWidth*8;//行首
+            int tailLine = 0;//行尾
+            bool isHeadLine = true;//标识新出现的0是否是行首位置
+            bool isTailLine = false;//标识新出现的0是否是行尾位置
 
-            //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
+            for (int i = 0; i <= row; i++)
+            {
+                for (int h = lineNum[i, 0]; h < lineNum[i, 1]; h++)
+                {
+                    for (int w = 0; w < imgWidth; w++)
+                    {
+                        for (int k = 0; k < 8; k++)
+                        {//按字节处理
+                            is1 = ByteGetBit(BinaryArray[h, w], k);
+                            
+                            if (!is1&& isHeadLine)
+                            {//当前位是0并且是行首位置
+                                    if (h * imgWidth * 8 + k < headLine)
+                                    {//
+                                        headLine = h * imgWidth * 8 + k;
+                                    }
+                                    isHeadLine = false;//判断完行首将标识是否为行首isHeadLine置为false
+                            }
+
+                            if (!is1)
+                            {
+                                if (h * imgWidth * 8 + k > tailLine)
+                                {
+                                    tailLine = h * imgWidth * 8 + k;
+                                }
+                            }
+                            
+                        }
+                    }
+                    lineNum[row, 2] = headLine;
+                    lineNum[row, 3] = tailLine;
+
+                }
+            }
+
+                    ////找出每一行的峰值填充到数组里（思路不对，这样找不出原图上的行宽,应该对原图进行处理了，找出原图中每一行横坐标最大的黑像素点）
+                    //for (int w = 0; w < imgWidth; w++)
+                    //{
+                    //    for (int k = 0; k < 8; k++)
+                    //    {//按字节处理
+                    //        isX1 = ByteGetBit(horizontalProArray[h, w], k);
+                    //        if (isX1)//出现白色像素了
+                    //        {
+                    //            if (((w -1)* 8 + k - 1) > peakValueLoc)
+                    //            {
+                    //                peakValueLoc = (w - 1) * 8 + k - 1;//(w - 1) * 8 + k - 1 为该像素行最后一个黑色像素位置
+                    //            }
+                    //        }
+                    //    }
+                    //}
+
+                    //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
 
 
-        }
+                }
 
         /// <summary>
         /// Get the vertical projection of the image
