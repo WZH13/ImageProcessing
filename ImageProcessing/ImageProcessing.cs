@@ -1269,7 +1269,7 @@ namespace ImageProcessing
         /// 水平投影
         /// </summary>
         /// <param name="imageSrc">Bitmap</param>
-        public void HorizontalProjection(Bitmap bmp)
+        public int[,] HorizontalProjection(Bitmap bmp)
         {
             int imgWidth = bmp.Width;
 
@@ -1390,28 +1390,30 @@ namespace ImageProcessing
                     lineNum[row, 3] = tailLine;
 
                 }
+
+                
             }
 
-                    ////找出每一行的峰值填充到数组里（思路不对，这样找不出原图上的行宽,应该对原图进行处理了，找出原图中每一行横坐标最大的黑像素点）
-                    //for (int w = 0; w < imgWidth; w++)
-                    //{
-                    //    for (int k = 0; k < 8; k++)
-                    //    {//按字节处理
-                    //        isX1 = ByteGetBit(horizontalProArray[h, w], k);
-                    //        if (isX1)//出现白色像素了
-                    //        {
-                    //            if (((w -1)* 8 + k - 1) > peakValueLoc)
-                    //            {
-                    //                peakValueLoc = (w - 1) * 8 + k - 1;//(w - 1) * 8 + k - 1 为该像素行最后一个黑色像素位置
-                    //            }
-                    //        }
-                    //    }
-                    //}
+            ////找出每一行的峰值填充到数组里（思路不对，这样找不出原图上的行宽,应该对原图进行处理了，找出原图中每一行横坐标最大的黑像素点）
+            //for (int w = 0; w < imgWidth; w++)
+            //{
+            //    for (int k = 0; k < 8; k++)
+            //    {//按字节处理
+            //        isX1 = ByteGetBit(horizontalProArray[h, w], k);
+            //        if (isX1)//出现白色像素了
+            //        {
+            //            if (((w -1)* 8 + k - 1) > peakValueLoc)
+            //            {
+            //                peakValueLoc = (w - 1) * 8 + k - 1;//(w - 1) * 8 + k - 1 为该像素行最后一个黑色像素位置
+            //            }
+            //        }
+            //    }
+            //}
 
-                    //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-
-                }
+            //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
+            return lineNum;
+        }
+       
 
         /// <summary>
         /// Get the vertical projection of the image
