@@ -507,7 +507,7 @@ namespace ImageProcessing
             {
                 for (var j = 0; j < arr.GetLength(1); j++)
                 {
-                    if (arr[i, j]==0)
+                    if (arr[i, j]!=0)
                     {
                         hasValueRowIndex.Add(i);
                         break;
