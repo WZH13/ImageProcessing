@@ -460,7 +460,7 @@ namespace ImageProcessing
 
         private void btn_projection_Click(object sender, EventArgs e)
         {
-            curBitmap = imageProcessing.HorizontalProjection(curBitmap);
+            curBitmap = imageProcessing.Projection(curBitmap);
 
             Invalidate();
 

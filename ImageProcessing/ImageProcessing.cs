@@ -1269,7 +1269,7 @@ namespace ImageProcessing
         /// 水平投影
         /// </summary>
         /// <param name="imageSrc">Bitmap</param>
-        public Bitmap HorizontalProjection(Bitmap bmp)
+        public Bitmap Projection(Bitmap bmp)
         {
             int imgWidth = bmp.Width;
 
@@ -1542,67 +1542,6 @@ namespace ImageProcessing
 
             return dstBmp;
 
-        }
-        
-
-
-        /// <summary>
-        /// 垂直投影
-        /// </summary>
-        /// <param name="imageSrc">the path of src image</param>
-        public void VerticalProjection(Bitmap bmp)
-        {
-            int imgWidth = bmp.Width;
-
-            int imgHeight = bmp.Height;
-
-            //用于存储当前横坐标垂直方向上的有效像素点数量(组成字符的像素点)
-            int[] verticalPoints = new int[imgWidth];
-            Array.Clear(verticalPoints, 0, imgWidth);
-
-            int threshold = 0;
-
-            //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
-            Byte[,] BinaryArray = ToBinaryArray(bmp, out threshold);
-
-            //用于存储竖直投影后的二值化数组
-            Byte[,] verticalProArray = new Byte[imgHeight, imgWidth];
-            //先将该二值化数组初始化为白色
-            for (int x = 0; x < imgWidth; x++)
-            {
-                for (int y = 0; y < imgHeight; y++)
-                {
-                    verticalProArray[y, x] = 255;
-                }
-            }
-
-            //统计源图像的二值化数组中在每一个横坐标的垂直方向所包含的像素点数
-            for (int x = 0; x < imgWidth; x++)
-            {
-                for (int y = 0; y < imgHeight; y++)
-                {
-                    if (0 == BinaryArray[y, x])
-                    {
-                        verticalPoints[x]++;
-                    }
-                }
-            }
-
-            //将源图像中横坐标垂直方向上所包含的像素点按垂直方向依次从imgWidth开始叠放在竖直投影二值化数组中
-            for (int x = 0; x < imgWidth; x++)
-            {
-                for (int y = (imgHeight - 1); y > (imgHeight - verticalPoints[x] - 1); y--)
-                {
-                    verticalProArray[y, x] = 0;
-                }
-            }
-
-
-            //将竖直投影的二值化数组转换为二值化图像并保存
-            //Bitmap verBmp = BinaryArrayToBinaryBitmap(verticalProArray);
-            //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-            
         }
 
         /// <summary>
