@@ -1269,11 +1269,13 @@ namespace ImageProcessing
         /// 水平投影
         /// </summary>
         /// <param name="imageSrc">Bitmap</param>
-        public int[,] HorizontalProjection(Bitmap bmp)
+        public Bitmap HorizontalProjection(Bitmap bmp)
         {
             int imgWidth = bmp.Width;
 
             int imgHeight = bmp.Height;
+
+            #region 水平投影
 
             //用于存储当前纵坐标垂直方向上的有效像素点数量(组成字符的像素点)
             int[] horizontalProjection = new int[imgHeight];
@@ -1330,8 +1332,8 @@ namespace ImageProcessing
             for (int h = 0; h < imgHeight; h++)
             {
                 //is1 = ByteGetBit(horizontalProArray[h, 0], 0);//调用ByteGetBit判断第一位是否是1
-                //0是黑色,1是白色
-                if (horizontalProArray[h, 0]==0)//出现不是1的位，行开始
+                //0是黑色,255是白色
+                if (horizontalProArray[h, 0]==0)//出现不是1的点，行开始
                 {
                     if (isLineStart)
                     {
@@ -1341,7 +1343,7 @@ namespace ImageProcessing
                     }
 
                 }
-                else//出现是1的位，接着判断是不是行结束位置
+                else//出现是255的位，接着判断是不是行结束位置
                 {
                     if (isLineEnd)//是行结束位置，记录下行结束纵坐标
                     {
@@ -1392,7 +1394,9 @@ namespace ImageProcessing
                 }
             }
 
-            //return lineNum;
+            //lineNum存储水平投影结果，其中：0行开始的纵坐标；1行结束的纵坐标；2这一行的起始字符位置(横坐标)；3这一行结束字符位置(横坐标)
+
+            #endregion
 
             #region 垂直投影
 
@@ -1400,7 +1404,14 @@ namespace ImageProcessing
             int[] verticalPoints = new int[imgWidth];
             //用于存储竖直投影后的二值化数组
             Byte[,] verticalProArray = new Byte[imgHeight, imgWidth];
-            int[,,] characters= new int[row,100,4];     //[行][字][位置信息]      位置信息：0：字开始的横坐标；1：字结束的横坐标；2：字开始的纵坐标；3：字结束的纵坐标
+            int[,,] characters= new int[row,200,4];     //[行][字][位置信息]      位置信息：0：字开始的横坐标；1：字结束的横坐标；2：字开始的纵坐标；3：字结束的纵坐标
+
+            bool isChStart = true;//标识新出现的0是否是字开始位置
+            bool isChEnd = false;//标识新出现的0是否是字结束位置
+            int chNum = 0;//标记第几个字
+
+            bool isChTop = true;//标识是否是一个字开始
+            bool isChBottom = false;//标识是否是一个字结束
 
             for (int r = 0; r < row; r++)
             {
@@ -1440,16 +1451,17 @@ namespace ImageProcessing
                 //verticalPoints = new int[imgWidth];
                 Array.Clear(verticalPoints, 0, imgWidth);
 
-                bool isChStart = true;//标识新出现的0是否是字开始位置
-                bool isChEnd = false;//标识新出现的0是否是字结束位置
-                int chNum = 0;
-                for (int w = 0; w < imgWidth + 1; w++)
+
+                //************************************  填充characters数组characters[row][ch][0]和characters[1]  ******************************************
+
+                chNum = 0;
+                for (int w = 0; w < imgWidth; w++)
                 {
-                    if (verticalProArray[imgHeight - 1, w]==0)
+                    if (verticalProArray[imgHeight - 1, w] == 0)
                     {
                         if (isChStart)
                         {
-                            characters[r,chNum,0] = w;
+                            characters[r, chNum, 0] = w;
                             isChStart = false;
                             isChEnd = true;
                         }
@@ -1458,20 +1470,80 @@ namespace ImageProcessing
                     {
                         if (isChEnd)
                         {
-                            characters[r,chNum,1] = w;
+                            characters[r, chNum, 1] = w;
                             isChStart = true;
                             isChEnd = false;
                             chNum++;
                         }
                     }
                 }
+                //************************************  填充characters数组characters[row][ch][0]和characters[1]  ******************************************
+
+
+                //************************************  填充characters数组characters[row][ch][2]和characters[3]  ******************************************
+
+                for (int ch = 0; ch < chNum; ch++)
+                {
+                    isChTop = true;
+                    isChBottom = false;
+
+                    for (int h = lineNum[r, 0]; h <= lineNum[r, 1]; h++)
+                    {
+                        for (int w = characters[r, ch, 0]; w <= characters[r, ch, 1]; w++)
+                        {
+                            if (BinaryArray[h, w] == 0)
+                            {
+                                if (isChTop)
+                                {
+                                    characters[r, ch, 2] = h;
+                                    isChTop = false;
+                                    isChBottom = true;
+                                }
+                                if (isChBottom)
+                                {
+                                    characters[r, ch, 3] = h;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                //characters储存对每一行进行垂直投影的结果，其中：[行][字][位置信息]      位置信息包括：0：字开始的横坐标；1：字结束的横坐标；2：字开始的纵坐标；3：字结束的纵坐标
+
+                //************************************  填充characters数组characters[row][ch][2]和characters[3]  ******************************************
+
+                #region 画出矩形框
+
+                for (int ch = 0; ch < chNum; ch++)
+                {
+                    for (int h = characters[r, ch, 2] - 1; h <= characters[r, ch, 3] + 1; h++)
+                    {
+                        BinaryArray[h, characters[r, ch, 0] - 1] = 0;
+                        BinaryArray[h, characters[r, ch, 1] + 1] = 0;
+                    }
+                    for (int w = characters[r, ch, 0] - 1; w <= characters[r, ch, 1] + 1; w++)
+                    {
+                        BinaryArray[characters[r, ch, 2] - 1, w] = 0;
+                        BinaryArray[characters[r, ch, 3] + 1, w] = 0;
+                    }
+                }
+
+                #endregion
+
 
             }
+
             #endregion
 
-            return lineNum;
+
+            Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
+
+
+            return dstBmp;
 
         }
+        
 
 
         /// <summary>

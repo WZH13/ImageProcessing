@@ -460,57 +460,32 @@ namespace ImageProcessing
 
         private void btn_projection_Click(object sender, EventArgs e)
         {
-            int[,] lineNum = imageProcessing.HorizontalProjection(curBitmap);
-
-            var arr = GetHasValueRowIndex(lineNum);
-            int row = arr.Count;
-
-
-
-            //Graphics g = Graphics.FromImage(curBitmap);
-            //System.Drawing.Drawing2D.GraphicsPath gp = new System.Drawing.Drawing2D.GraphicsPath();
-            //for (int i = 0; i < row; i++)
-            //{
-
-            //    //lineNum记录行信息：0行开始的纵坐标；1行结束的纵坐标；2这一行的起始字符位置(横坐标)；3这一行结束字符位置(横坐标)
-            //    Rectangle rect = new Rectangle();
-            //    rect.Width = lineNum[i,3] - lineNum[i, 2];
-            //    rect.Height = lineNum[i,1] - lineNum[i,0];
-            //    rect.X = lineNum[i, 0];
-            //    rect.Y = lineNum[i, 2];
-            //    gp.AddRectangle(rect);
-            //}
-            //g.DrawPath(Pens.Red, gp);
-
-            Graphics g = this.CreateGraphics();
-            //出来一个画笔,这只笔画出来的颜色是红的  
-            Pen p = new Pen(Brushes.Red);
-
-            //创建两个点  
-            Point p1 = new Point(50, 50);
-            Point p2 = new Point(100, 100);
-
-            //将两个点连起来  
-            g.DrawLine(p, p1, p2);
+            curBitmap = imageProcessing.HorizontalProjection(curBitmap);
 
             Invalidate();
+
+
         }
 
         /// <summary>
         /// 获取二维数组里面实际存有数据的行数
         /// </summary>
-        public static List<int> GetHasValueRowIndex(int[,] arr)
+        public static List<int> GetHasValueRowIndex(int[,,] arr)
         {
             var hasValueRowIndex = new List<int>();
             for (var i = 0; i < arr.GetLength(0); i++)
             {
                 for (var j = 0; j < arr.GetLength(1); j++)
                 {
-                    if (arr[i, j]!=0)
+                    for (int q = 0; q < arr.GetLength(2); q++)
                     {
-                        hasValueRowIndex.Add(i);
-                        break;
+                        if (arr[i, j,q] != 0)
+                        {
+                            hasValueRowIndex.Add(i);
+                            break;
+                        }
                     }
+                    
                 }
             }
             return hasValueRowIndex;
