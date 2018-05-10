@@ -462,7 +462,6 @@ namespace ImageProcessing
         {
             int[,] lineNum = imageProcessing.HorizontalProjection(curBitmap);
 
-            
             var arr = GetHasValueRowIndex(lineNum);
             int row = arr.Count;
 

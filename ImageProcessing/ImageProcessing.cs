@@ -1276,13 +1276,13 @@ namespace ImageProcessing
             int imgHeight = bmp.Height;
 
             //用于存储当前纵坐标垂直方向上的有效像素点数量(组成字符的像素点)
-            int[] horizontalProjection = new int[imgHeight]; 
+            int[] horizontalProjection = new int[imgHeight];
             Array.Clear(horizontalProjection, 0, imgHeight);
-               
+
             int threshold = 0;
 
             //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
-            Byte[,] BinaryArray = ToBinaryArray(bmp,out threshold);
+            Byte[,] BinaryArray = ToBinaryArray(bmp, out threshold);
 
             //用于存储水平投影后的二值化数组
             Byte[,] horizontalProArray = new Byte[imgHeight, imgWidth];
@@ -1317,19 +1317,21 @@ namespace ImageProcessing
             }
 
             //将水平投影的二值化数组转换为二值化图像并保存
-            Bitmap verBmp = BinaryArrayToBinaryBitmap(horizontalProArray);
-            bool is1 = false;//标识是否是1（白像素）
+            //Bitmap verBmp = BinaryArrayToBinaryBitmap(horizontalProArray);
+            //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+            //bool is1 = false;//标识是否是1（白像素）
             int[,] lineNum = new int[100, 4];//记录行信息：0行开始的纵坐标；1行结束的纵坐标；2这一行的起始字符位置(横坐标)；3这一行结束字符位置(横坐标)
             int row = 0;
             bool isLineStart = true;//标识新出现的0是否是行开始位置
             bool isLineEnd = false;//标识新出现的0是否是行结束位置
 
             //for (int y = 0; y < imgHeight;y++)    作用是找出每一行的起始位置和结束位置的纵坐标
-            for (int h = 0; h < imgHeight;h++)
+            for (int h = 0; h < imgHeight; h++)
             {
-                is1 = ByteGetBit(horizontalProArray[h,0], 0);//调用ByteGetBit判断第一位是否是1
+                //is1 = ByteGetBit(horizontalProArray[h, 0], 0);//调用ByteGetBit判断第一位是否是1
                 //0是黑色,1是白色
-                if (!is1)//出现不是1的位，行开始
+                if (horizontalProArray[h, 0]==0)//出现不是1的位，行开始
                 {
                     if (isLineStart)
                     {
@@ -1337,7 +1339,7 @@ namespace ImageProcessing
                         isLineStart = false;
                         isLineEnd = true;
                     }
-                    
+
                 }
                 else//出现是1的位，接着判断是不是行结束位置
                 {
@@ -1352,71 +1354,128 @@ namespace ImageProcessing
             }
 
             bool isBlackPixel = false;//标识是否是黑色像素
-            int headLine = imgWidth*8;//行首
+            int headLine = imgWidth;//行首
             int tailLine = 0;//行尾
             bool isHeadLine = true;//标识新出现的0是否是行首位置
-            bool isTailLine = false;//标识新出现的0是否是行尾位置
+            bool isTailLine = true;//标识新出现的0是否是行尾位置
 
-            for (int i = 0; i <= row; i++)
+            for (int i = 0; i < row; i++)
             {
                 for (int h = lineNum[i, 0]; h < lineNum[i, 1]; h++)
                 {
                     for (int w = 0; w < imgWidth; w++)
                     {
-                        for (int k = 0; k < 8; k++)
-                        {//按字节处理
-                            is1 = ByteGetBit(BinaryArray[h, w], k);
-                            
-                            if (!is1&& isHeadLine)
-                            {//当前位是0并且是行首位置
-                                    if (h * imgWidth * 8 + k < headLine)
-                                    {//
-                                        headLine = h * imgWidth * 8 + k;
-                                    }
-                                    isHeadLine = false;//判断完行首将标识是否为行首isHeadLine置为false
-                            }
-
-                            if (!is1)
+                        if (BinaryArray[h, w] == 0 && isHeadLine)
+                        {
+                            if (w < headLine)
                             {
-                                if (h * imgWidth * 8 + k > tailLine)
-                                {
-                                    tailLine = h * imgWidth * 8 + k;
-                                }
+                                headLine = w;
                             }
-                            
+                            isHeadLine = false;//判断完行首将标识是否为行首isHeadLine置为false
                         }
                     }
-                    lineNum[row, 2] = headLine;
-                    lineNum[row, 3] = tailLine;
-
+                    isHeadLine = true;
+                    for (int w = imgWidth - 1; w >= 0; w--)
+                    {
+                        if (BinaryArray[h, w] == 0 && isTailLine)
+                        {
+                            if (w > tailLine)
+                            {
+                                tailLine = w;
+                            }
+                            isTailLine = false;//判断完行首将标识是否为行首isHeadLine置为false
+                        }
+                    }
+                    isTailLine = true;
+                    lineNum[i, 2] = headLine;
+                    lineNum[i, 3] = tailLine;
                 }
-
-                
             }
 
-            ////找出每一行的峰值填充到数组里（思路不对，这样找不出原图上的行宽,应该对原图进行处理了，找出原图中每一行横坐标最大的黑像素点）
-            //for (int w = 0; w < imgWidth; w++)
-            //{
-            //    for (int k = 0; k < 8; k++)
-            //    {//按字节处理
-            //        isX1 = ByteGetBit(horizontalProArray[h, w], k);
-            //        if (isX1)//出现白色像素了
-            //        {
-            //            if (((w -1)* 8 + k - 1) > peakValueLoc)
-            //            {
-            //                peakValueLoc = (w - 1) * 8 + k - 1;//(w - 1) * 8 + k - 1 为该像素行最后一个黑色像素位置
-            //            }
-            //        }
-            //    }
-            //}
+            //return lineNum;
 
-            //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
+            #region 垂直投影
+
+            //用于存储当前横坐标垂直方向上的有效像素点数量(组成字符的像素点)
+            int[] verticalPoints = new int[imgWidth];
+            //用于存储竖直投影后的二值化数组
+            Byte[,] verticalProArray = new Byte[imgHeight, imgWidth];
+            int[,,] characters= new int[row,100,4];     //[行][字][位置信息]      位置信息：0：字开始的横坐标；1：字结束的横坐标；2：字开始的纵坐标；3：字结束的纵坐标
+
+            for (int r = 0; r < row; r++)
+            {
+
+                //先将该二值化数组初始化为白色
+                for (int w = 0; w < imgWidth; w++)
+                {
+                    for (int h = 0; h < imgHeight; h++)
+                    {
+                        verticalProArray[h, w] = 255;
+                    }
+                }
+
+                //统计源图像的二值化数组中在每一个横坐标的垂直方向所包含的像素点数
+                for (int w = lineNum[r, 2]; w < lineNum[r, 3] + 1; w++)
+                {
+                    for (int h = lineNum[r, 0]; h < lineNum[r, 1] + 1; h++)
+                    {
+                        if (0 == BinaryArray[h, w])
+                        {
+                            verticalPoints[w]++;
+                        }
+                    }
+                }
+
+                //将源图像中横坐标垂直方向上所包含的像素点按垂直方向依次从imgWidth开始叠放在竖直投影二值化数组中
+                for (int w = 0; w < imgWidth; w++)
+                {
+                    for (int h = (imgHeight - 1); h > (imgHeight - verticalPoints[w] - 1); h--)
+                    {
+                        verticalProArray[h, w] = 0;
+                    }
+                }
+
+                //Bitmap verBmp = BinaryArrayToBinaryBitmap(verticalProArray);
+
+                //verticalPoints = new int[imgWidth];
+                Array.Clear(verticalPoints, 0, imgWidth);
+
+                bool isChStart = true;//标识新出现的0是否是字开始位置
+                bool isChEnd = false;//标识新出现的0是否是字结束位置
+                int chNum = 0;
+                for (int w = 0; w < imgWidth + 1; w++)
+                {
+                    if (verticalProArray[imgHeight - 1, w]==0)
+                    {
+                        if (isChStart)
+                        {
+                            characters[r,chNum,0] = w;
+                            isChStart = false;
+                            isChEnd = true;
+                        }
+                    }
+                    else
+                    {
+                        if (isChEnd)
+                        {
+                            characters[r,chNum,1] = w;
+                            isChStart = true;
+                            isChEnd = false;
+                            chNum++;
+                        }
+                    }
+                }
+
+            }
+            #endregion
+
             return lineNum;
+
         }
-       
+
 
         /// <summary>
-        /// Get the vertical projection of the image
+        /// 垂直投影
         /// </summary>
         /// <param name="imageSrc">the path of src image</param>
         public void VerticalProjection(Bitmap bmp)
@@ -1466,52 +1525,12 @@ namespace ImageProcessing
                 }
             }
 
-            //将竖直投影的二值化数组转换为二值化图像并保存
-            Bitmap verBmp = BinaryArrayToBinaryBitmap(verticalProArray);
 
+            //将竖直投影的二值化数组转换为二值化图像并保存
+            //Bitmap verBmp = BinaryArrayToBinaryBitmap(verticalProArray);
             //verBmp.Save(imageDestPath, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-            //调用SaveFileDialog
-            SaveFileDialog saveDlg = new SaveFileDialog();
-            //设置对话框标题
-            saveDlg.Title = "保存为";
-            //改写已存在文件时提示用户
-            saveDlg.OverwritePrompt = true;
-            //为图像选择一个筛选器
-            saveDlg.Filter = "BMP文件(*.bmp)|*.bmp|" + "Gif文件(*.gif)|*.gif|" + "JPEG文件(*.jpg)|*.jpg|" + "PNG文件(*.png)|*.png";
-            //启用“帮助”按钮
-            saveDlg.ShowHelp = true;
-
-            //如果选择了格式，则保存图像
-            if (saveDlg.ShowDialog() == DialogResult.OK)
-            {
-                //获取用户选择的文件名
-                string filename = saveDlg.FileName;
-                string strFilExtn = filename.Remove(0, filename.Length - 3);
-
-                //保存文件
-                switch (strFilExtn)
-                {
-                    //以指定格式保存
-                    case "bmp":
-                        verBmp.Save(filename, ImageFormat.Bmp);
-                        break;
-                    case "jpg":
-                        verBmp.Save(filename, ImageFormat.Jpeg);
-                        break;
-                    case "gif":
-                        verBmp.Save(filename, ImageFormat.Gif);
-                        break;
-                    case "tif":
-                        verBmp.Save(filename, ImageFormat.Tiff);
-                        break;
-                    case "png":
-                        verBmp.Save(filename, ImageFormat.Png);
-                        break;
-                    default:
-                        break;
-                }
-            }
+            
         }
 
         /// <summary>
