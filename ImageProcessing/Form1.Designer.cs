@@ -49,6 +49,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.xtxb = new System.Windows.Forms.TextBox();
             this.tab_preprocessing = new System.Windows.Forms.TabPage();
+            this.btn_projection = new System.Windows.Forms.Button();
             this.btn_hough = new System.Windows.Forms.Button();
             this.btn_Xjump = new System.Windows.Forms.Button();
             this.btn_histogram = new System.Windows.Forms.Button();
@@ -57,7 +58,7 @@
             this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
             this.btn_exit = new System.Windows.Forms.Button();
             this.btn_save = new System.Windows.Forms.Button();
-            this.btn_projection = new System.Windows.Forms.Button();
+            this.btn_StrokeDensity = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tab_file.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
@@ -273,6 +274,7 @@
             // 
             // tab_preprocessing
             // 
+            this.tab_preprocessing.Controls.Add(this.btn_StrokeDensity);
             this.tab_preprocessing.Controls.Add(this.btn_projection);
             this.tab_preprocessing.Controls.Add(this.btn_hough);
             this.tab_preprocessing.Controls.Add(this.btn_Xjump);
@@ -285,6 +287,21 @@
             this.tab_preprocessing.TabIndex = 2;
             this.tab_preprocessing.Text = "图像预处理";
             this.tab_preprocessing.UseVisualStyleBackColor = true;
+            // 
+            // btn_projection
+            // 
+            this.btn_projection.FlatAppearance.BorderSize = 0;
+            this.btn_projection.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_projection.Image = ((System.Drawing.Image)(resources.GetObject("btn_projection.Image")));
+            this.btn_projection.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_projection.Location = new System.Drawing.Point(494, 14);
+            this.btn_projection.Name = "btn_projection";
+            this.btn_projection.Size = new System.Drawing.Size(71, 23);
+            this.btn_projection.TabIndex = 13;
+            this.btn_projection.Text = "投影法";
+            this.btn_projection.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_projection.UseVisualStyleBackColor = true;
+            this.btn_projection.Click += new System.EventHandler(this.btn_projection_Click);
             // 
             // btn_hough
             // 
@@ -400,15 +417,20 @@
             this.btn_save.UseVisualStyleBackColor = true;
             this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
-            // btn_projection
+            // btn_StrokeDensity
             // 
-            this.btn_projection.Location = new System.Drawing.Point(494, 14);
-            this.btn_projection.Name = "btn_projection";
-            this.btn_projection.Size = new System.Drawing.Size(75, 23);
-            this.btn_projection.TabIndex = 13;
-            this.btn_projection.Text = "投影法";
-            this.btn_projection.UseVisualStyleBackColor = true;
-            this.btn_projection.Click += new System.EventHandler(this.btn_projection_Click);
+            this.btn_StrokeDensity.FlatAppearance.BorderSize = 0;
+            this.btn_StrokeDensity.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_StrokeDensity.Image = ((System.Drawing.Image)(resources.GetObject("btn_StrokeDensity.Image")));
+            this.btn_StrokeDensity.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_StrokeDensity.Location = new System.Drawing.Point(590, 16);
+            this.btn_StrokeDensity.Name = "btn_StrokeDensity";
+            this.btn_StrokeDensity.Size = new System.Drawing.Size(128, 23);
+            this.btn_StrokeDensity.TabIndex = 14;
+            this.btn_StrokeDensity.Text = "笔画密度特征提取";
+            this.btn_StrokeDensity.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_StrokeDensity.UseVisualStyleBackColor = true;
+            this.btn_StrokeDensity.Click += new System.EventHandler(this.btn_StrokeDensity_Click);
             // 
             // Form1
             // 
@@ -468,6 +490,7 @@
         private System.Windows.Forms.Button btn_hough;
         private System.Windows.Forms.Button btn_Xjump;
         private System.Windows.Forms.Button btn_projection;
+        private System.Windows.Forms.Button btn_StrokeDensity;
     }
 }
 

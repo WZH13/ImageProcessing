@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "histogram", "histogram\histogram.csproj", "{AB997035-327F-4887-8244-106148DE54F6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordRecognition", "WordRecognition\WordRecognition.csproj", "{28B40CA8-C9B3-4B5F-97B8-46EEEA2AB88A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{AB997035-327F-4887-8244-106148DE54F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB997035-327F-4887-8244-106148DE54F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB997035-327F-4887-8244-106148DE54F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28B40CA8-C9B3-4B5F-97B8-46EEEA2AB88A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28B40CA8-C9B3-4B5F-97B8-46EEEA2AB88A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28B40CA8-C9B3-4B5F-97B8-46EEEA2AB88A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28B40CA8-C9B3-4B5F-97B8-46EEEA2AB88A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

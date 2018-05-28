@@ -1711,5 +1711,114 @@ namespace ImageProcessing
         }
 
         #endregion
+
+        #region 笔画密度特征提取
+
+        /// <summary>
+        /// 笔画密度特征提取
+        /// </summary>
+        /// <param name="bmp">源图像</param>
+        /// <param name="m">//每个方向被分成大小相等的m个区间</param>
+        public void StrokeDensity(Bitmap bmp,int m)
+        {
+            int imgWidth = bmp.Width;
+            int imgHeight = bmp.Height;
+
+            int threshold = 0;
+
+            //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
+            Byte[,] BinaryArray = ToBinaryArray(bmp, out threshold);
+
+            //最终结果是m*4维的特征空间向量,用数组features存储
+            int[,] features = new int[m,4];
+
+            //设水平方向，垂直方向，＋45°方向和－45°方向每个区间内的包含扫面线数分别为n1,n2,n3,n4(也就是每个区间的宽度)
+            int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
+            n1 = 128 / m;
+            n2 = n1;
+            n3 = 128 * 2 / m;
+            n4 = n3;
+
+            //设水平方向和垂直方向每个区间内每条扫面线上穿透的笔划数目分别为s1,s2
+            //＋45°方向和－45°方向每个区间内每条扫面线上穿透的笔划数目分别为s3,s4
+            int s1 = 0, s2 = 0, s3 = 0, s4 = 0;
+
+            //水平方向
+            int section = 1;//标识第几个区间
+            bool isStart = true;//标识是否是穿过的笔画的开始
+            for (int h = 0; h < imgHeight; h++)
+            {
+                while (h < imgHeight)
+                {
+                    for (int w = 0; w < imgWidth; w++)
+                    {
+                        if (BinaryArray[h, w] == 0)
+                        {
+                            if (isStart)
+                            {
+                                s1++;       //对穿过的笔画数进行累加
+                                isStart = false;
+                            }
+                        }
+                        if (BinaryArray[h, w] == 255 && isStart == false)
+                        {
+                            isStart = true;
+                        }
+                    }
+
+                    if (h == n1 * section-1)
+                    {
+                        features[section, 0] = s1 / n1;
+                        s1 = 0;
+                        section++;//进入下一区间
+                    }
+                }
+            }
+
+            //垂直方向
+            section = 1;//标识第几个区间
+            isStart = true;//标识是否是穿过的笔画的开始
+            for (int w = 0; w < imgWidth; w++)
+            {
+                while (w < imgWidth)
+                {
+                    for (int h = 0; h <imgHeight; h++)
+                    {
+                        if (BinaryArray[h, w] == 0)
+                        {
+                            if (isStart)
+                            {
+                                s1++;       //对穿过的笔画数进行累加
+                                isStart = false;
+                            }
+                        }
+                        if (BinaryArray[h, w] == 255 && isStart == false)
+                        {
+                            isStart = true;
+                        }
+                    }
+
+                    if (w == n1 * section - 1)
+                    {
+                        features[section, 0] = s1 / n1;
+                        s1 = 0;
+                        section++;//进入下一区间
+                    }
+                }
+            }
+
+
+
+
+            //水平方向，垂直方向，＋45°方向和－45°方向每个区间所得到的笔划特征平均数分别表示为arg1,arg2,arg3,arg4
+            int arg1, arg2, arg3, arg4 = 0;
+            arg1 = s1 / n1;
+            arg2 = s2 / n2;
+            arg3 = s3 / n3;
+            arg4 = s4 / n4;
+
+        }
+
+        #endregion
     }
 }

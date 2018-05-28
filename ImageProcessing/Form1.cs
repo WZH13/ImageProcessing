@@ -490,5 +490,10 @@ namespace ImageProcessing
             }
             return hasValueRowIndex;
         }
+
+        private void btn_StrokeDensity_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
