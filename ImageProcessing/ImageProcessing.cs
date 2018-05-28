@@ -1266,7 +1266,7 @@ namespace ImageProcessing
         #region 行字切分_投影法
 
         /// <summary>
-        /// 水平投影
+        /// 投影法
         /// </summary>
         /// <param name="imageSrc">Bitmap</param>
         public Bitmap Projection(Bitmap bmp)
@@ -1538,7 +1538,6 @@ namespace ImageProcessing
 
 
             Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
-
 
             return dstBmp;
 
