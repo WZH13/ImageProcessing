@@ -1739,24 +1739,24 @@ namespace ImageProcessing
             n3 = 128 * 2 / m;
             n4 = n3;
 
-            //设水平方向和垂直方向每个区间内每条扫面线上穿透的笔划数目分别为s1,s2
+            //设水平方向和垂直方向每个区间内每条扫面线上穿透的笔划数目分别为strokeNumber,s2
             //＋45°方向和－45°方向每个区间内每条扫面线上穿透的笔划数目分别为s3,s4
-            int s1 = 0, s2 = 0, s3 = 0, s4 = 0;
+            int strokeNumber = 0;
 
             //水平方向
             int section = 1;//标识第几个区间
             bool isStart = true;//标识是否是穿过的笔画的开始
             for (int h = 0; h < imgHeight; h++)
             {
-                while (h < imgHeight)
-                {
+                //while (h < imgHeight)
+                //{
                     for (int w = 0; w < imgWidth; w++)
                     {
                         if (BinaryArray[h, w] == 0)
                         {
                             if (isStart)
                             {
-                                s1++;       //对穿过的笔画数进行累加
+                                strokeNumber++;       //对穿过的笔画数进行累加
                                 isStart = false;
                             }
                         }
@@ -1768,27 +1768,28 @@ namespace ImageProcessing
 
                     if (h == n1 * section-1)
                     {
-                        features[section, 0] = s1 / n1;
-                        s1 = 0;
+                        features[section, 0] = strokeNumber / n1;
+                        strokeNumber = 0;
                         section++;//进入下一区间
                     }
-                }
+                //}
             }
 
             //垂直方向
             section = 1;//标识第几个区间
             isStart = true;//标识是否是穿过的笔画的开始
+            strokeNumber = 0;
             for (int w = 0; w < imgWidth; w++)
             {
-                while (w < imgWidth)
-                {
+                //while (w < imgWidth)
+                //{
                     for (int h = 0; h <imgHeight; h++)
                     {
                         if (BinaryArray[h, w] == 0)
                         {
                             if (isStart)
                             {
-                                s1++;       //对穿过的笔画数进行累加
+                                strokeNumber++;       //对穿过的笔画数进行累加
                                 isStart = false;
                             }
                         }
@@ -1798,24 +1799,151 @@ namespace ImageProcessing
                         }
                     }
 
-                    if (w == n1 * section - 1)
+                    if (w == n2 * section - 1)
                     {
-                        features[section, 0] = s1 / n1;
-                        s1 = 0;
+                        features[section, 1] = strokeNumber / n2;
+                        strokeNumber = 0;
                         section++;//进入下一区间
+                    }
+                //}
+            }
+
+            //＋45°方向
+            isStart = true;//标识是否是穿过的笔画的开始
+            strokeNumber = 0;
+            int h1 = 0;
+            //第一部分（对角线上方的m/2个区间）
+            for (int sec = 1; sec <= m / 2; sec++)
+            {
+                for (int a = n3 * (sec - 1); a < n3 * sec; a++)
+                {
+                    for (int w1 = 0; w1 < n3 * sec; w1++)
+                    {
+                        h1 = a - w1;//坐标计算
+                        if (BinaryArray[h1, w1] == 0)
+                        {
+                            if (isStart)
+                            {
+                                strokeNumber++;       //对穿过的笔画数进行累加
+                                isStart = false;
+                            }
+                        }
+                        if (BinaryArray[h1, w1] == 255 && isStart == false)
+                        {
+                            isStart = true;
+                        }
+                    }
+                    if (a == n3 * sec - 1)
+                    {
+                        features[sec, 2] = strokeNumber / n3;
+                        strokeNumber = 0;
+                        sec++;//进入下一区间
                     }
                 }
             }
 
 
+            //第二部分（对角线下方的m/2个区间）
+            isStart = true;//标识是否是穿过的笔画的开始
+            strokeNumber = 0;
+            int h2 = 0;
+            for (int sec = 1; sec <= m / 2; sec++)
+            {
+                for (int a = n3 * (sec - 1); a < n3 * sec; a++)
+                {
+                    for (int w2 = n3 * (sec - 1); w2 < imgWidth; w2++)
+                    {
+                        h2 = imgHeight + a - w2;//坐标计算
+                        if (BinaryArray[h2, w2] == 0)
+                        {
+                            if (isStart)
+                            {
+                                strokeNumber++;       //对穿过的笔画数进行累加
+                                isStart = false;
+                            }
+                        }
+                        if (BinaryArray[h2, w2] == 255 && isStart == false)
+                        {
+                            isStart = true;
+                        }
+                    }
+                    if (a == n3 * sec - 1)
+                    {
+                        features[sec, 2] = strokeNumber / n3;
+                        strokeNumber = 0;
+                        sec++;//进入下一区间
+                    }
+                }
+            }
+
+            //－45°方向
+            isStart = true;//标识是否是穿过的笔画的开始
+            strokeNumber = 0;
+            int w3 = 0;
+            //第一部分（对角线下方的m/2个区间）
+            for (int sec = 1; sec <= m / 2; sec++)
+            {
+                for (int a = n4 * (sec - 1); a < n4 * sec; a++)
+                {
+                    for (int h3 = n4 * (sec - 1); h3 < imgHeight; h3++)
+                    {
+                        w3 = h3 - a;//坐标计算
+                        if (BinaryArray[h3, w3] == 0)
+                        {
+                            if (isStart)
+                            {
+                                strokeNumber++;       //对穿过的笔画数进行累加
+                                isStart = false;
+                            }
+                        }
+                        if (BinaryArray[h3, w3] == 255 && isStart == false)
+                        {
+                            isStart = true;
+                        }
+                    }
+                    if (a == n4 * sec - 1)
+                    {
+                        features[sec, 3] = strokeNumber / n4;
+                        strokeNumber = 0;
+                        sec++;//进入下一区间
+                    }
+                }
+            }
 
 
-            //水平方向，垂直方向，＋45°方向和－45°方向每个区间所得到的笔划特征平均数分别表示为arg1,arg2,arg3,arg4
-            int arg1, arg2, arg3, arg4 = 0;
-            arg1 = s1 / n1;
-            arg2 = s2 / n2;
-            arg3 = s3 / n3;
-            arg4 = s4 / n4;
+            //第二部分（对角线下方的m/2个区间）
+            isStart = true;//标识是否是穿过的笔画的开始
+            strokeNumber = 0;
+            int h4 = 0;
+            for (int sec = 1; sec <= m / 2; sec++)
+            {
+                for (int a = n4 * (sec - 1); a < n4 * sec; a++)
+                {
+                    for (int w2 = n4 * (sec - 1); w2 < imgWidth; w2++)
+                    {
+                        h4 = w2-a;//坐标计算
+                        if (BinaryArray[h4, w2] == 0)
+                        {
+                            if (isStart)
+                            {
+                                strokeNumber++;       //对穿过的笔画数进行累加
+                                isStart = false;
+                            }
+                        }
+                        if (BinaryArray[h4, w2] == 255 && isStart == false)
+                        {
+                            isStart = true;
+                        }
+                    }
+                    if (a == n4 * sec - 1)
+                    {
+                        features[sec, 3] = strokeNumber / n4;
+                        strokeNumber = 0;
+                        sec++;//进入下一区间
+                    }
+                }
+            }
+            
 
         }
 
