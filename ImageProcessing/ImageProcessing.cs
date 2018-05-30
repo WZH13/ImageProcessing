@@ -1768,7 +1768,7 @@ namespace ImageProcessing
 
                     if (h == n1 * section-1)
                     {
-                        features[section, 0] = strokeNumber / n1;
+                        features[section-1, 0] = strokeNumber / n1;
                         strokeNumber = 0;
                         section++;//进入下一区间
                     }
@@ -1801,7 +1801,7 @@ namespace ImageProcessing
 
                     if (w == n2 * section - 1)
                     {
-                        features[section, 1] = strokeNumber / n2;
+                        features[section-1, 1] = strokeNumber / n2;
                         strokeNumber = 0;
                         section++;//进入下一区间
                     }
@@ -1813,17 +1813,17 @@ namespace ImageProcessing
             strokeNumber = 0;
             int h1 = 0;
             //第一部分（对角线上方的m/2个区间）
-            for (int sec = 1; sec <= m / 2; sec++)
+            for (int sec = 0; sec < m / 2; sec++)
             {
-                for (int a = n3 * (sec - 1); a < n3 * sec; a++)
+                for (int a = n3 * sec; a < n3 * (sec+1); a++)
                 {
-                    for (int w1 = 0; w1 < n3 * sec; w1++)
+                    for (int w1 = 0; w1 < a; w1++)
                     {
                         h1 = a - w1;//坐标计算
-                        if (BinaryArray[h1, w1] == 0)
+                         if (BinaryArray[h1, w1] == 0)
                         {
                             if (isStart)
-                            {
+                             {
                                 strokeNumber++;       //对穿过的笔画数进行累加
                                 isStart = false;
                             }
@@ -1833,13 +1833,10 @@ namespace ImageProcessing
                             isStart = true;
                         }
                     }
-                    if (a == n3 * sec - 1)
-                    {
-                        features[sec, 2] = strokeNumber / n3;
-                        strokeNumber = 0;
-                        sec++;//进入下一区间
-                    }
+                        
                 }
+                features[sec, 2] = strokeNumber / n3;
+                strokeNumber = 0;
             }
 
 
@@ -1847,13 +1844,13 @@ namespace ImageProcessing
             isStart = true;//标识是否是穿过的笔画的开始
             strokeNumber = 0;
             int h2 = 0;
-            for (int sec = 1; sec <= m / 2; sec++)
+            for (int sec = m / 2; sec < m; sec++)
             {
-                for (int a = n3 * (sec - 1); a < n3 * sec; a++)
+                for (int a = n3 * sec; a < n3 * (sec+1); a++)
                 {
-                    for (int w2 = n3 * (sec - 1); w2 < imgWidth; w2++)
+                    for (int w2 = a- imgHeight; w2 < imgWidth; w2++)
                     {
-                        h2 = imgHeight + a - w2;//坐标计算
+                        h2 = a-1 - w2;//坐标计算
                         if (BinaryArray[h2, w2] == 0)
                         {
                             if (isStart)
@@ -1867,13 +1864,9 @@ namespace ImageProcessing
                             isStart = true;
                         }
                     }
-                    if (a == n3 * sec - 1)
-                    {
-                        features[sec, 2] = strokeNumber / n3;
-                        strokeNumber = 0;
-                        sec++;//进入下一区间
-                    }
                 }
+                features[sec, 2] = strokeNumber / n3;
+                        strokeNumber = 0;
             }
 
             //－45°方向
@@ -1881,11 +1874,11 @@ namespace ImageProcessing
             strokeNumber = 0;
             int w3 = 0;
             //第一部分（对角线下方的m/2个区间）
-            for (int sec = 1; sec <= m / 2; sec++)
+            for (int sec = 0; sec < m / 2; sec++)
             {
-                for (int a = n4 * (sec - 1); a < n4 * sec; a++)
+                for (int a = n4 * sec; a < n4 * (sec + 1); a++)
                 {
-                    for (int h3 = n4 * (sec - 1); h3 < imgHeight; h3++)
+                    for (int h3 = a; h3 < imgHeight; h3++)
                     {
                         w3 = h3 - a;//坐标计算
                         if (BinaryArray[h3, w3] == 0)
@@ -1901,13 +1894,10 @@ namespace ImageProcessing
                             isStart = true;
                         }
                     }
-                    if (a == n4 * sec - 1)
-                    {
-                        features[sec, 3] = strokeNumber / n4;
-                        strokeNumber = 0;
-                        sec++;//进入下一区间
-                    }
+                    
                 }
+                features[sec, 3] = strokeNumber / n4;
+                strokeNumber = 0;
             }
 
 
@@ -1915,14 +1905,14 @@ namespace ImageProcessing
             isStart = true;//标识是否是穿过的笔画的开始
             strokeNumber = 0;
             int h4 = 0;
-            for (int sec = 1; sec <= m / 2; sec++)
+            for (int sec = m / 2; sec < m; sec++)
             {
-                for (int a = n4 * (sec - 1); a < n4 * sec; a++)
+                for (int a = n4 * (sec-8); a < n4 * (sec-8+1); a++)
                 {
-                    for (int w2 = n4 * (sec - 1); w2 < imgWidth; w2++)
+                    for (int w4 = a; w4 < imgWidth; w4++)
                     {
-                        h4 = w2-a;//坐标计算
-                        if (BinaryArray[h4, w2] == 0)
+                        h4 = w4-a;//坐标计算
+                        if (BinaryArray[h4, w4] == 0)
                         {
                             if (isStart)
                             {
@@ -1930,18 +1920,14 @@ namespace ImageProcessing
                                 isStart = false;
                             }
                         }
-                        if (BinaryArray[h4, w2] == 255 && isStart == false)
+                        if (BinaryArray[h4, w4] == 255 && isStart == false)
                         {
                             isStart = true;
                         }
                     }
-                    if (a == n4 * sec - 1)
-                    {
-                        features[sec, 3] = strokeNumber / n4;
-                        strokeNumber = 0;
-                        sec++;//进入下一区间
-                    }
                 }
+                features[sec, 3] = strokeNumber / n4;
+                strokeNumber = 0;
             }
             
 

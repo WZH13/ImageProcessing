@@ -493,7 +493,7 @@ namespace ImageProcessing
 
         private void btn_StrokeDensity_Click(object sender, EventArgs e)
         {
-
+            imageProcessing.StrokeDensity(curBitmap,16);
         }
     }
 }
