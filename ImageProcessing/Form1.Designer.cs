@@ -30,8 +30,6 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.btn_restore = new System.Windows.Forms.Button();
-            this.btn_open = new System.Windows.Forms.Button();
             this.tab_changepixel = new System.Windows.Forms.TabPage();
             this.btn_change = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -55,6 +53,8 @@
             this.btn_histogram = new System.Windows.Forms.Button();
             this.btn_binaryzation = new System.Windows.Forms.Button();
             this.btn_gray = new System.Windows.Forms.Button();
+            this.btn_restore = new System.Windows.Forms.Button();
+            this.btn_open = new System.Windows.Forms.Button();
             this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
             this.btn_exit = new System.Windows.Forms.Button();
             this.btn_save = new System.Windows.Forms.Button();
@@ -74,36 +74,6 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1318, 79);
             this.tabControl1.TabIndex = 0;
-            // 
-            // btn_restore
-            // 
-            this.btn_restore.FlatAppearance.BorderSize = 0;
-            this.btn_restore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_restore.Image = ((System.Drawing.Image)(resources.GetObject("btn_restore.Image")));
-            this.btn_restore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_restore.Location = new System.Drawing.Point(1038, 693);
-            this.btn_restore.Name = "btn_restore";
-            this.btn_restore.Size = new System.Drawing.Size(84, 26);
-            this.btn_restore.TabIndex = 3;
-            this.btn_restore.Text = "还原图像";
-            this.btn_restore.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_restore.UseVisualStyleBackColor = true;
-            this.btn_restore.Click += new System.EventHandler(this.btn_restore_Click);
-            // 
-            // btn_open
-            // 
-            this.btn_open.FlatAppearance.BorderSize = 0;
-            this.btn_open.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_open.Image = ((System.Drawing.Image)(resources.GetObject("btn_open.Image")));
-            this.btn_open.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_open.Location = new System.Drawing.Point(938, 693);
-            this.btn_open.Name = "btn_open";
-            this.btn_open.Size = new System.Drawing.Size(84, 26);
-            this.btn_open.TabIndex = 2;
-            this.btn_open.Text = "打开文件";
-            this.btn_open.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_open.UseVisualStyleBackColor = true;
-            this.btn_open.Click += new System.EventHandler(this.btn_open_Click);
             // 
             // tab_changepixel
             // 
@@ -317,6 +287,7 @@
             this.btn_hough.Text = "Hough变换";
             this.btn_hough.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btn_hough.UseVisualStyleBackColor = true;
+            this.btn_hough.Visible = false;
             this.btn_hough.Click += new System.EventHandler(this.btn_hough_Click);
             // 
             // btn_Xjump
@@ -378,6 +349,36 @@
             this.btn_gray.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btn_gray.UseVisualStyleBackColor = true;
             this.btn_gray.Click += new System.EventHandler(this.btn_gray_Click);
+            // 
+            // btn_restore
+            // 
+            this.btn_restore.FlatAppearance.BorderSize = 0;
+            this.btn_restore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_restore.Image = ((System.Drawing.Image)(resources.GetObject("btn_restore.Image")));
+            this.btn_restore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_restore.Location = new System.Drawing.Point(1038, 693);
+            this.btn_restore.Name = "btn_restore";
+            this.btn_restore.Size = new System.Drawing.Size(84, 26);
+            this.btn_restore.TabIndex = 3;
+            this.btn_restore.Text = "还原图像";
+            this.btn_restore.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_restore.UseVisualStyleBackColor = true;
+            this.btn_restore.Click += new System.EventHandler(this.btn_restore_Click);
+            // 
+            // btn_open
+            // 
+            this.btn_open.FlatAppearance.BorderSize = 0;
+            this.btn_open.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_open.Image = ((System.Drawing.Image)(resources.GetObject("btn_open.Image")));
+            this.btn_open.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_open.Location = new System.Drawing.Point(938, 693);
+            this.btn_open.Name = "btn_open";
+            this.btn_open.Size = new System.Drawing.Size(84, 26);
+            this.btn_open.TabIndex = 2;
+            this.btn_open.Text = "打开文件";
+            this.btn_open.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_open.UseVisualStyleBackColor = true;
+            this.btn_open.Click += new System.EventHandler(this.btn_open_Click);
             // 
             // skinEngine1
             // 

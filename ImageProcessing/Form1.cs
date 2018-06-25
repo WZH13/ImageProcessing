@@ -324,7 +324,7 @@ namespace ImageProcessing
 
             try
             {
-                curBitmap = imageProcessing.OtsuThreshold();
+                curBitmap = imageProcessing.binaryzation(curBitmap,curBitmap);
                 Invalidate();
             }
             catch (NullReferenceException)
