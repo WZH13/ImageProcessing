@@ -30,7 +30,6 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tab_file = new System.Windows.Forms.TabPage();
             this.btn_restore = new System.Windows.Forms.Button();
             this.btn_open = new System.Windows.Forms.Button();
             this.tab_changepixel = new System.Windows.Forms.TabPage();
@@ -49,6 +48,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.xtxb = new System.Windows.Forms.TextBox();
             this.tab_preprocessing = new System.Windows.Forms.TabPage();
+            this.btn_StrokeDensity = new System.Windows.Forms.Button();
             this.btn_projection = new System.Windows.Forms.Button();
             this.btn_hough = new System.Windows.Forms.Button();
             this.btn_Xjump = new System.Windows.Forms.Button();
@@ -58,9 +58,7 @@
             this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
             this.btn_exit = new System.Windows.Forms.Button();
             this.btn_save = new System.Windows.Forms.Button();
-            this.btn_StrokeDensity = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
-            this.tab_file.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -69,7 +67,6 @@
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tab_file);
             this.tabControl1.Controls.Add(this.tab_changepixel);
             this.tabControl1.Controls.Add(this.tab_preprocessing);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
@@ -78,24 +75,13 @@
             this.tabControl1.Size = new System.Drawing.Size(1318, 79);
             this.tabControl1.TabIndex = 0;
             // 
-            // tab_file
-            // 
-            this.tab_file.Controls.Add(this.btn_restore);
-            this.tab_file.Controls.Add(this.btn_open);
-            this.tab_file.Location = new System.Drawing.Point(4, 22);
-            this.tab_file.Name = "tab_file";
-            this.tab_file.Size = new System.Drawing.Size(1310, 53);
-            this.tab_file.TabIndex = 3;
-            this.tab_file.Text = "文件";
-            this.tab_file.UseVisualStyleBackColor = true;
-            // 
             // btn_restore
             // 
             this.btn_restore.FlatAppearance.BorderSize = 0;
             this.btn_restore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_restore.Image = ((System.Drawing.Image)(resources.GetObject("btn_restore.Image")));
             this.btn_restore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_restore.Location = new System.Drawing.Point(127, 12);
+            this.btn_restore.Location = new System.Drawing.Point(1038, 693);
             this.btn_restore.Name = "btn_restore";
             this.btn_restore.Size = new System.Drawing.Size(84, 26);
             this.btn_restore.TabIndex = 3;
@@ -110,7 +96,7 @@
             this.btn_open.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_open.Image = ((System.Drawing.Image)(resources.GetObject("btn_open.Image")));
             this.btn_open.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_open.Location = new System.Drawing.Point(21, 12);
+            this.btn_open.Location = new System.Drawing.Point(938, 693);
             this.btn_open.Name = "btn_open";
             this.btn_open.Size = new System.Drawing.Size(84, 26);
             this.btn_open.TabIndex = 2;
@@ -288,6 +274,21 @@
             this.tab_preprocessing.Text = "图像预处理";
             this.tab_preprocessing.UseVisualStyleBackColor = true;
             // 
+            // btn_StrokeDensity
+            // 
+            this.btn_StrokeDensity.FlatAppearance.BorderSize = 0;
+            this.btn_StrokeDensity.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_StrokeDensity.Image = ((System.Drawing.Image)(resources.GetObject("btn_StrokeDensity.Image")));
+            this.btn_StrokeDensity.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_StrokeDensity.Location = new System.Drawing.Point(590, 16);
+            this.btn_StrokeDensity.Name = "btn_StrokeDensity";
+            this.btn_StrokeDensity.Size = new System.Drawing.Size(128, 23);
+            this.btn_StrokeDensity.TabIndex = 14;
+            this.btn_StrokeDensity.Text = "笔画密度特征提取";
+            this.btn_StrokeDensity.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_StrokeDensity.UseVisualStyleBackColor = true;
+            this.btn_StrokeDensity.Click += new System.EventHandler(this.btn_StrokeDensity_Click);
+            // 
             // btn_projection
             // 
             this.btn_projection.FlatAppearance.BorderSize = 0;
@@ -393,7 +394,7 @@
             this.btn_exit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_exit.Image = ((System.Drawing.Image)(resources.GetObject("btn_exit.Image")));
             this.btn_exit.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_exit.Location = new System.Drawing.Point(1217, 683);
+            this.btn_exit.Location = new System.Drawing.Point(1222, 693);
             this.btn_exit.Name = "btn_exit";
             this.btn_exit.Size = new System.Drawing.Size(84, 26);
             this.btn_exit.TabIndex = 2;
@@ -408,7 +409,7 @@
             this.btn_save.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_save.Image = ((System.Drawing.Image)(resources.GetObject("btn_save.Image")));
             this.btn_save.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_save.Location = new System.Drawing.Point(1111, 683);
+            this.btn_save.Location = new System.Drawing.Point(1128, 693);
             this.btn_save.Name = "btn_save";
             this.btn_save.Size = new System.Drawing.Size(88, 26);
             this.btn_save.TabIndex = 1;
@@ -417,26 +418,13 @@
             this.btn_save.UseVisualStyleBackColor = true;
             this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
-            // btn_StrokeDensity
-            // 
-            this.btn_StrokeDensity.FlatAppearance.BorderSize = 0;
-            this.btn_StrokeDensity.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_StrokeDensity.Image = ((System.Drawing.Image)(resources.GetObject("btn_StrokeDensity.Image")));
-            this.btn_StrokeDensity.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_StrokeDensity.Location = new System.Drawing.Point(590, 16);
-            this.btn_StrokeDensity.Name = "btn_StrokeDensity";
-            this.btn_StrokeDensity.Size = new System.Drawing.Size(128, 23);
-            this.btn_StrokeDensity.TabIndex = 14;
-            this.btn_StrokeDensity.Text = "笔画密度特征提取";
-            this.btn_StrokeDensity.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_StrokeDensity.UseVisualStyleBackColor = true;
-            this.btn_StrokeDensity.Click += new System.EventHandler(this.btn_StrokeDensity_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1318, 725);
+            this.ClientSize = new System.Drawing.Size(1325, 739);
+            this.Controls.Add(this.btn_restore);
+            this.Controls.Add(this.btn_open);
             this.Controls.Add(this.btn_exit);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.btn_save);
@@ -448,7 +436,6 @@
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDoubleClick);
             this.tabControl1.ResumeLayout(false);
-            this.tab_file.ResumeLayout(false);
             this.tab_changepixel.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -486,7 +473,6 @@
         private System.Windows.Forms.Button btn_binaryzation;
         private System.Windows.Forms.Button btn_histogram;
         private System.Windows.Forms.Button btn_exit;
-        private System.Windows.Forms.TabPage tab_file;
         private System.Windows.Forms.Button btn_hough;
         private System.Windows.Forms.Button btn_Xjump;
         private System.Windows.Forms.Button btn_projection;

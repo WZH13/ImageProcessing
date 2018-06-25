@@ -1205,7 +1205,7 @@ namespace ImageProcessing
                             //将ρ值与ρ最大值的和的一半作为ρ的坐标值（数组坐标），这样做是为了防止ρ值出现负数
                             rho_int = (int)Math.Round(rho / 2 + rho_max / 2);
                             //在ρθ坐标（数组）中标识点，即计数累加
-                            accarray[rho_int, k] = accarray[rho_int, k] + 1;
+                            accarray[rho_int, k]++;
                         }
                     }
                 }
@@ -1255,7 +1255,6 @@ namespace ImageProcessing
                             }
                         }
                     }
-
                 }
             }
             return I_out;

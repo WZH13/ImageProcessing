@@ -454,7 +454,7 @@ namespace ImageProcessing
 
         private void btn_hough_Click(object sender, EventArgs e)
         {
-            curBitmap = imageProcessing.hough_line(curBitmap, 10);
+            curBitmap = imageProcessing.hough_line(curBitmap, 2);
             Invalidate();
         }
 
