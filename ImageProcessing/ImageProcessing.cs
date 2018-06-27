@@ -1203,7 +1203,6 @@ namespace ImageProcessing
             {
                 for (int j = 0; j < srcBitmap.Width; j++)
                 {
-                    
                         //is1 = ByteGetBit();//调用ByteGetBit判断当前位是否是1
                         if (BinaryArray[i,j]==0)
                         {//当前位是1
@@ -1441,7 +1440,7 @@ namespace ImageProcessing
                         for (int k = 0; k < 180; k++)
                         {
                             //将θ值代入hough变换方程，求ρ值
-                            rho = (m * Math.Cos(Theta[k])) + (n * Math.Sin(Theta[k]));
+                            rho = (m * Math.Sin(Theta[k])) + (n * Math.Cos(Theta[k]));
                             //将ρ值与ρ最大值的和的一半作为ρ的坐标值（数组坐标），这样做是为了防止ρ值出现负数
                             rho_int = (int)Math.Round(rho / 2 + rho_max / 2);
                             //在ρθ坐标（数组）中标识点，即计数累加
@@ -1452,16 +1451,15 @@ namespace ImageProcessing
             }
 
             //=======利用hough变换提取直线======
-            //寻找100个像素以上的直线在hough变换后形成的点
-            const int max_line = 100;
-            int[] case_accarray_n = new int[max_line];
-            int[] case_accarray_m = new int[max_line];
+            
+            int[] case_accarray_n = new int[rho_max];
+            int[] case_accarray_m = new int[rho_max];
             int K = 0; //存储数组计数器
             for (int rho_n = 0; rho_n < rho_max; rho_n++) //在hough变换后的数组中搜索
             {
                 for (int theta_m = 0; theta_m < 180; theta_m++)
                 {
-                    if (accarray[rho_n, theta_m] >= cross_num && K < max_line) //设定直线的最小值
+                    if (accarray[rho_n, theta_m] >= cross_num && K < rho_max) //cross_num直线的最小长度
                     {
                         case_accarray_n[K] = rho_n; //存储搜索出的数组下标
                         case_accarray_m[K] = theta_m;
@@ -1484,20 +1482,22 @@ namespace ImageProcessing
                     {
                         for (int k = 0; k < 180; k++)
                         {
-                            rho = (m * Math.Cos(Theta[k])) + (n * Math.Sin(Theta[k]));
+                            rho = (m * Math.Sin(Theta[k])) + (n * Math.Cos(Theta[k]));
                             rho_int = (int)Math.Round(rho / 2 + rho_max / 2);
                             //如果正在计算的点属于100像素以上点，则把它提取出来
                             for (int a = 0; a < K - 1; a++)
                             {
                                 //if rho_int==case_accarray_n(a) && k==case_accarray_m(a)%%%==gai==%%% k==case_accarray_m(a)&rho_int==case_accarray_n(a)
                                 if (rho_int == case_accarray_n[a] && k == case_accarray_m[a])
-                                    I_out.SetPixel(n, m, Color.Black);
+                                    //I_out.SetPixel(n, m, Color.Red);
+                                    bmpobj.SetPixel(n, m, Color.Red);
                             }
                         }
                     }
                 }
             }
-            return I_out;
+            //return I_out;
+            return bmpobj;
         }
 
         #endregion

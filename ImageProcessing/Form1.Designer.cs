@@ -67,8 +67,8 @@
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tab_changepixel);
             this.tabControl1.Controls.Add(this.tab_preprocessing);
+            this.tabControl1.Controls.Add(this.tab_changepixel);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -287,7 +287,6 @@
             this.btn_hough.Text = "Hough变换";
             this.btn_hough.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btn_hough.UseVisualStyleBackColor = true;
-            this.btn_hough.Visible = false;
             this.btn_hough.Click += new System.EventHandler(this.btn_hough_Click);
             // 
             // btn_Xjump
