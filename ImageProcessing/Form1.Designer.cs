@@ -30,6 +30,14 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tab_preprocessing = new System.Windows.Forms.TabPage();
+            this.btn_StrokeDensity = new System.Windows.Forms.Button();
+            this.btn_projection = new System.Windows.Forms.Button();
+            this.btn_hough = new System.Windows.Forms.Button();
+            this.btn_Xjump = new System.Windows.Forms.Button();
+            this.btn_histogram = new System.Windows.Forms.Button();
+            this.btn_binaryzation = new System.Windows.Forms.Button();
+            this.btn_gray = new System.Windows.Forms.Button();
             this.tab_changepixel = new System.Windows.Forms.TabPage();
             this.btn_change = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -45,24 +53,17 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.xtxb = new System.Windows.Forms.TextBox();
-            this.tab_preprocessing = new System.Windows.Forms.TabPage();
-            this.btn_StrokeDensity = new System.Windows.Forms.Button();
-            this.btn_projection = new System.Windows.Forms.Button();
-            this.btn_hough = new System.Windows.Forms.Button();
-            this.btn_Xjump = new System.Windows.Forms.Button();
-            this.btn_histogram = new System.Windows.Forms.Button();
-            this.btn_binaryzation = new System.Windows.Forms.Button();
-            this.btn_gray = new System.Windows.Forms.Button();
             this.btn_restore = new System.Windows.Forms.Button();
             this.btn_open = new System.Windows.Forms.Button();
-            this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
+            //this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
             this.btn_exit = new System.Windows.Forms.Button();
             this.btn_save = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
+            this.tab_preprocessing.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.tab_preprocessing.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -74,6 +75,128 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1318, 79);
             this.tabControl1.TabIndex = 0;
+            // 
+            // tab_preprocessing
+            // 
+            this.tab_preprocessing.Controls.Add(this.button1);
+            this.tab_preprocessing.Controls.Add(this.btn_StrokeDensity);
+            this.tab_preprocessing.Controls.Add(this.btn_projection);
+            this.tab_preprocessing.Controls.Add(this.btn_hough);
+            this.tab_preprocessing.Controls.Add(this.btn_Xjump);
+            this.tab_preprocessing.Controls.Add(this.btn_histogram);
+            this.tab_preprocessing.Controls.Add(this.btn_binaryzation);
+            this.tab_preprocessing.Controls.Add(this.btn_gray);
+            this.tab_preprocessing.Location = new System.Drawing.Point(4, 22);
+            this.tab_preprocessing.Name = "tab_preprocessing";
+            this.tab_preprocessing.Size = new System.Drawing.Size(1310, 53);
+            this.tab_preprocessing.TabIndex = 2;
+            this.tab_preprocessing.Text = "图像预处理";
+            this.tab_preprocessing.UseVisualStyleBackColor = true;
+            // 
+            // btn_StrokeDensity
+            // 
+            this.btn_StrokeDensity.FlatAppearance.BorderSize = 0;
+            this.btn_StrokeDensity.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_StrokeDensity.Image = ((System.Drawing.Image)(resources.GetObject("btn_StrokeDensity.Image")));
+            this.btn_StrokeDensity.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_StrokeDensity.Location = new System.Drawing.Point(590, 16);
+            this.btn_StrokeDensity.Name = "btn_StrokeDensity";
+            this.btn_StrokeDensity.Size = new System.Drawing.Size(128, 23);
+            this.btn_StrokeDensity.TabIndex = 14;
+            this.btn_StrokeDensity.Text = "笔画密度特征提取";
+            this.btn_StrokeDensity.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_StrokeDensity.UseVisualStyleBackColor = true;
+            this.btn_StrokeDensity.Click += new System.EventHandler(this.btn_StrokeDensity_Click);
+            // 
+            // btn_projection
+            // 
+            this.btn_projection.FlatAppearance.BorderSize = 0;
+            this.btn_projection.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_projection.Image = ((System.Drawing.Image)(resources.GetObject("btn_projection.Image")));
+            this.btn_projection.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_projection.Location = new System.Drawing.Point(494, 14);
+            this.btn_projection.Name = "btn_projection";
+            this.btn_projection.Size = new System.Drawing.Size(71, 23);
+            this.btn_projection.TabIndex = 13;
+            this.btn_projection.Text = "投影法";
+            this.btn_projection.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_projection.UseVisualStyleBackColor = true;
+            this.btn_projection.Click += new System.EventHandler(this.btn_projection_Click);
+            // 
+            // btn_hough
+            // 
+            this.btn_hough.FlatAppearance.BorderSize = 0;
+            this.btn_hough.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btn_hough.Image = ((System.Drawing.Image)(resources.GetObject("btn_hough.Image")));
+            this.btn_hough.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_hough.Location = new System.Drawing.Point(370, 15);
+            this.btn_hough.Name = "btn_hough";
+            this.btn_hough.Size = new System.Drawing.Size(85, 23);
+            this.btn_hough.TabIndex = 12;
+            this.btn_hough.Text = "Hough变换";
+            this.btn_hough.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_hough.UseVisualStyleBackColor = true;
+            this.btn_hough.Click += new System.EventHandler(this.btn_hough_Click);
+            // 
+            // btn_Xjump
+            // 
+            this.btn_Xjump.FlatAppearance.BorderSize = 0;
+            this.btn_Xjump.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_Xjump.Image = ((System.Drawing.Image)(resources.GetObject("btn_Xjump.Image")));
+            this.btn_Xjump.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_Xjump.Location = new System.Drawing.Point(281, 15);
+            this.btn_Xjump.Name = "btn_Xjump";
+            this.btn_Xjump.Size = new System.Drawing.Size(65, 23);
+            this.btn_Xjump.TabIndex = 11;
+            this.btn_Xjump.Text = "X跳转";
+            this.btn_Xjump.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_Xjump.UseVisualStyleBackColor = true;
+            this.btn_Xjump.Click += new System.EventHandler(this.btn_Xjump_Click);
+            // 
+            // btn_histogram
+            // 
+            this.btn_histogram.FlatAppearance.BorderSize = 0;
+            this.btn_histogram.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_histogram.Image = ((System.Drawing.Image)(resources.GetObject("btn_histogram.Image")));
+            this.btn_histogram.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_histogram.Location = new System.Drawing.Point(88, 14);
+            this.btn_histogram.Name = "btn_histogram";
+            this.btn_histogram.Size = new System.Drawing.Size(95, 26);
+            this.btn_histogram.TabIndex = 6;
+            this.btn_histogram.Text = "绘制直方图";
+            this.btn_histogram.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_histogram.UseVisualStyleBackColor = true;
+            this.btn_histogram.Click += new System.EventHandler(this.btn_histogram_Click);
+            // 
+            // btn_binaryzation
+            // 
+            this.btn_binaryzation.FlatAppearance.BorderSize = 0;
+            this.btn_binaryzation.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_binaryzation.Image = ((System.Drawing.Image)(resources.GetObject("btn_binaryzation.Image")));
+            this.btn_binaryzation.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_binaryzation.Location = new System.Drawing.Point(193, 14);
+            this.btn_binaryzation.Name = "btn_binaryzation";
+            this.btn_binaryzation.Size = new System.Drawing.Size(70, 26);
+            this.btn_binaryzation.TabIndex = 5;
+            this.btn_binaryzation.Text = "二值化";
+            this.btn_binaryzation.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_binaryzation.UseVisualStyleBackColor = true;
+            this.btn_binaryzation.Click += new System.EventHandler(this.btn_binaryzation_Click);
+            // 
+            // btn_gray
+            // 
+            this.btn_gray.FlatAppearance.BorderSize = 0;
+            this.btn_gray.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_gray.Image = ((System.Drawing.Image)(resources.GetObject("btn_gray.Image")));
+            this.btn_gray.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_gray.Location = new System.Drawing.Point(8, 14);
+            this.btn_gray.Name = "btn_gray";
+            this.btn_gray.Size = new System.Drawing.Size(70, 26);
+            this.btn_gray.TabIndex = 4;
+            this.btn_gray.Text = "灰度化";
+            this.btn_gray.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_gray.UseVisualStyleBackColor = true;
+            this.btn_gray.Click += new System.EventHandler(this.btn_gray_Click);
             // 
             // tab_changepixel
             // 
@@ -228,127 +351,6 @@
             this.xtxb.TabIndex = 6;
             this.xtxb.Text = "0";
             // 
-            // tab_preprocessing
-            // 
-            this.tab_preprocessing.Controls.Add(this.btn_StrokeDensity);
-            this.tab_preprocessing.Controls.Add(this.btn_projection);
-            this.tab_preprocessing.Controls.Add(this.btn_hough);
-            this.tab_preprocessing.Controls.Add(this.btn_Xjump);
-            this.tab_preprocessing.Controls.Add(this.btn_histogram);
-            this.tab_preprocessing.Controls.Add(this.btn_binaryzation);
-            this.tab_preprocessing.Controls.Add(this.btn_gray);
-            this.tab_preprocessing.Location = new System.Drawing.Point(4, 22);
-            this.tab_preprocessing.Name = "tab_preprocessing";
-            this.tab_preprocessing.Size = new System.Drawing.Size(1310, 53);
-            this.tab_preprocessing.TabIndex = 2;
-            this.tab_preprocessing.Text = "图像预处理";
-            this.tab_preprocessing.UseVisualStyleBackColor = true;
-            // 
-            // btn_StrokeDensity
-            // 
-            this.btn_StrokeDensity.FlatAppearance.BorderSize = 0;
-            this.btn_StrokeDensity.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_StrokeDensity.Image = ((System.Drawing.Image)(resources.GetObject("btn_StrokeDensity.Image")));
-            this.btn_StrokeDensity.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_StrokeDensity.Location = new System.Drawing.Point(590, 16);
-            this.btn_StrokeDensity.Name = "btn_StrokeDensity";
-            this.btn_StrokeDensity.Size = new System.Drawing.Size(128, 23);
-            this.btn_StrokeDensity.TabIndex = 14;
-            this.btn_StrokeDensity.Text = "笔画密度特征提取";
-            this.btn_StrokeDensity.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_StrokeDensity.UseVisualStyleBackColor = true;
-            this.btn_StrokeDensity.Click += new System.EventHandler(this.btn_StrokeDensity_Click);
-            // 
-            // btn_projection
-            // 
-            this.btn_projection.FlatAppearance.BorderSize = 0;
-            this.btn_projection.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_projection.Image = ((System.Drawing.Image)(resources.GetObject("btn_projection.Image")));
-            this.btn_projection.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_projection.Location = new System.Drawing.Point(494, 14);
-            this.btn_projection.Name = "btn_projection";
-            this.btn_projection.Size = new System.Drawing.Size(71, 23);
-            this.btn_projection.TabIndex = 13;
-            this.btn_projection.Text = "投影法";
-            this.btn_projection.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_projection.UseVisualStyleBackColor = true;
-            this.btn_projection.Click += new System.EventHandler(this.btn_projection_Click);
-            // 
-            // btn_hough
-            // 
-            this.btn_hough.FlatAppearance.BorderSize = 0;
-            this.btn_hough.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btn_hough.Image = ((System.Drawing.Image)(resources.GetObject("btn_hough.Image")));
-            this.btn_hough.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_hough.Location = new System.Drawing.Point(370, 15);
-            this.btn_hough.Name = "btn_hough";
-            this.btn_hough.Size = new System.Drawing.Size(85, 23);
-            this.btn_hough.TabIndex = 12;
-            this.btn_hough.Text = "Hough变换";
-            this.btn_hough.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_hough.UseVisualStyleBackColor = true;
-            this.btn_hough.Click += new System.EventHandler(this.btn_hough_Click);
-            // 
-            // btn_Xjump
-            // 
-            this.btn_Xjump.FlatAppearance.BorderSize = 0;
-            this.btn_Xjump.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_Xjump.Image = ((System.Drawing.Image)(resources.GetObject("btn_Xjump.Image")));
-            this.btn_Xjump.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_Xjump.Location = new System.Drawing.Point(281, 15);
-            this.btn_Xjump.Name = "btn_Xjump";
-            this.btn_Xjump.Size = new System.Drawing.Size(65, 23);
-            this.btn_Xjump.TabIndex = 11;
-            this.btn_Xjump.Text = "X跳转";
-            this.btn_Xjump.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_Xjump.UseVisualStyleBackColor = true;
-            this.btn_Xjump.Click += new System.EventHandler(this.btn_Xjump_Click);
-            // 
-            // btn_histogram
-            // 
-            this.btn_histogram.FlatAppearance.BorderSize = 0;
-            this.btn_histogram.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_histogram.Image = ((System.Drawing.Image)(resources.GetObject("btn_histogram.Image")));
-            this.btn_histogram.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_histogram.Location = new System.Drawing.Point(88, 14);
-            this.btn_histogram.Name = "btn_histogram";
-            this.btn_histogram.Size = new System.Drawing.Size(95, 26);
-            this.btn_histogram.TabIndex = 6;
-            this.btn_histogram.Text = "绘制直方图";
-            this.btn_histogram.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_histogram.UseVisualStyleBackColor = true;
-            this.btn_histogram.Click += new System.EventHandler(this.btn_histogram_Click);
-            // 
-            // btn_binaryzation
-            // 
-            this.btn_binaryzation.FlatAppearance.BorderSize = 0;
-            this.btn_binaryzation.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_binaryzation.Image = ((System.Drawing.Image)(resources.GetObject("btn_binaryzation.Image")));
-            this.btn_binaryzation.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_binaryzation.Location = new System.Drawing.Point(193, 14);
-            this.btn_binaryzation.Name = "btn_binaryzation";
-            this.btn_binaryzation.Size = new System.Drawing.Size(70, 26);
-            this.btn_binaryzation.TabIndex = 5;
-            this.btn_binaryzation.Text = "二值化";
-            this.btn_binaryzation.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_binaryzation.UseVisualStyleBackColor = true;
-            this.btn_binaryzation.Click += new System.EventHandler(this.btn_binaryzation_Click);
-            // 
-            // btn_gray
-            // 
-            this.btn_gray.FlatAppearance.BorderSize = 0;
-            this.btn_gray.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_gray.Image = ((System.Drawing.Image)(resources.GetObject("btn_gray.Image")));
-            this.btn_gray.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_gray.Location = new System.Drawing.Point(8, 14);
-            this.btn_gray.Name = "btn_gray";
-            this.btn_gray.Size = new System.Drawing.Size(70, 26);
-            this.btn_gray.TabIndex = 4;
-            this.btn_gray.Text = "灰度化";
-            this.btn_gray.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btn_gray.UseVisualStyleBackColor = true;
-            this.btn_gray.Click += new System.EventHandler(this.btn_gray_Click);
-            // 
             // btn_restore
             // 
             this.btn_restore.FlatAppearance.BorderSize = 0;
@@ -381,12 +383,12 @@
             // 
             // skinEngine1
             // 
-            this.skinEngine1.@__DrawButtonFocusRectangle = true;
-            this.skinEngine1.DisabledButtonTextColor = System.Drawing.Color.Gray;
-            this.skinEngine1.DisabledMenuFontColor = System.Drawing.SystemColors.GrayText;
-            this.skinEngine1.InactiveCaptionColor = System.Drawing.SystemColors.InactiveCaptionText;
-            this.skinEngine1.SerialNumber = "";
-            this.skinEngine1.SkinFile = null;
+            //this.skinEngine1.@__DrawButtonFocusRectangle = true;
+            //this.skinEngine1.DisabledButtonTextColor = System.Drawing.Color.Gray;
+            //this.skinEngine1.DisabledMenuFontColor = System.Drawing.SystemColors.GrayText;
+            //this.skinEngine1.InactiveCaptionColor = System.Drawing.SystemColors.InactiveCaptionText;
+            //this.skinEngine1.SerialNumber = "";
+            //this.skinEngine1.SkinFile = null;
             // 
             // btn_exit
             // 
@@ -418,6 +420,16 @@
             this.btn_save.UseVisualStyleBackColor = true;
             this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(749, 15);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 15;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -436,12 +448,12 @@
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDoubleClick);
             this.tabControl1.ResumeLayout(false);
+            this.tab_preprocessing.ResumeLayout(false);
             this.tab_changepixel.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.tab_preprocessing.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -451,7 +463,7 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tab_changepixel;
         private System.Windows.Forms.TabPage tab_preprocessing;
-        private Sunisoft.IrisSkin.SkinEngine skinEngine1;
+        //private Sunisoft.IrisSkin.SkinEngine skinEngine1;
         private System.Windows.Forms.Button btn_save;
         private System.Windows.Forms.Button btn_open;
         private System.Windows.Forms.Button btn_restore;
@@ -477,6 +489,7 @@
         private System.Windows.Forms.Button btn_Xjump;
         private System.Windows.Forms.Button btn_projection;
         private System.Windows.Forms.Button btn_StrokeDensity;
+        private System.Windows.Forms.Button button1;
     }
 }
 

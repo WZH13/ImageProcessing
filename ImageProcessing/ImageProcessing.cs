@@ -19,11 +19,11 @@ namespace ImageProcessing
         {
             bitmap = sourceBitmap;
         }
-                
+
         #region 灰度直方图
 
         //灰度等级
-        private int[] countPixel= new int[256];
+        private int[] countPixel = new int[256];
         //记录最大的灰度级个数
         private int maxPixel;
 
@@ -94,8 +94,8 @@ namespace ImageProcessing
                 {
                     for (int j = 0; j < bmpData.Width; j++)
                     {
-                        color = GetPixel(i, j,srcBitmap);
-                        if (color.R!= color.G ||color.G != color.B||color.R!=color.B)
+                        color = GetPixel(i, j, srcBitmap);
+                        if (color.R != color.G || color.G != color.B || color.R != color.B)
                         {
                             srcBitmap.UnlockBits(bmpData);
                             return false;
@@ -206,7 +206,7 @@ namespace ImageProcessing
         /// </summary>
         /// <param name="scaling">斜率</param>
         /// <param name="offset">偏移量</param>
-        public void linearPO(double scaling,double offset)
+        public void linearPO(double scaling, double offset)
         {
             if (bitmap != null)
             {
@@ -1127,19 +1127,19 @@ namespace ImageProcessing
             byte[] bmpValues = new byte[bytes];
             Marshal.Copy(ptr, bmpValues, 0, bytes);
 
-            int[,]  Xbmp = new int[bmpData.Height,200];//X跳数组
+            int[,] Xbmp = new int[bmpData.Height, 200];//X跳数组
             bool is1 = false;//记录当前位是否是1
             int t = 0;//记录总跳数
             bool isFirst1 = true;//是否是上跳的第一个1,isFirst1=true：是上跳；isFirst1=false:不是第一个1
             bool isFirst0 = false;//是否是下跳的第一个0,isFirst0=true：是上跳；isFirst0=false:不是第一个1
             int k1 = 0;
             int j1 = 0;
-            
+
             for (int i = 0; i < bmpData.Height; i++)
             {
                 for (int j = 0; j < bmpData.Stride; j++)
                 {
-                    for (int k = 0;k<8; k++)
+                    for (int k = 0; k < 8; k++)
                     {//按字节处理
                         is1 = ByteGetBit(bmpValues[j + i * bmpData.Stride], k);//调用ByteGetBit判断当前位是否是1
                         if (is1)
@@ -1157,7 +1157,7 @@ namespace ImageProcessing
                             if (isFirst0)
                             {
                                 t++;
-                                Xbmp[i,t] = j * 8 + k;
+                                Xbmp[i, t] = j * 8 + k;
                                 isFirst0 = false;
                                 isFirst1 = true;
                             }
@@ -1166,12 +1166,12 @@ namespace ImageProcessing
                     }
                     j1 = j;
                 }
-                if (isFirst0==true)     //如果有上跳没有下跳则行尾增加下跳
+                if (isFirst0 == true)     //如果有上跳没有下跳则行尾增加下跳
                 {
                     t++;
-                    Xbmp[i, t] = j1 * 8 + k1;   
+                    Xbmp[i, t] = j1 * 8 + k1;
                 }
-                Xbmp[i,0] = t;      //总跳数赋值
+                Xbmp[i, 0] = t;      //总跳数赋值
                 t = 0;
 
                 isFirst1 = true;    //下一行恢复默认值
@@ -1192,38 +1192,38 @@ namespace ImageProcessing
             Byte[,] BinaryArray = ToBinaryArray(srcBitmap, out threshold);
 
             int[,] Xbmp = new int[srcBitmap.Height, 200];//X跳数组
-            
+
             int t = 0;//记录总跳数
             bool isFirst1 = true;//是否是上跳的第一个1,isFirst1=true：是上跳；isFirst1=false:不是第一个1
             bool isFirst0 = false;//是否是下跳的第一个0,isFirst0=true：是上跳；isFirst0=false:不是第一个1
-            
+
             int j1 = 0;
 
             for (int i = 0; i < srcBitmap.Height; i++)
             {
                 for (int j = 0; j < srcBitmap.Width; j++)
                 {
-                        //is1 = ByteGetBit();//调用ByteGetBit判断当前位是否是1
-                        if (BinaryArray[i,j]==0)
-                        {//当前位是1
-                            if (isFirst1)
-                            {//是否是上跳位置
-                                t++;
-                                Xbmp[i, t] = j;
-                                isFirst1 = false;
-                                isFirst0 = true;
-                            }
+                    //is1 = ByteGetBit();//调用ByteGetBit判断当前位是否是1
+                    if (BinaryArray[i, j] == 0)
+                    {//当前位是1
+                        if (isFirst1)
+                        {//是否是上跳位置
+                            t++;
+                            Xbmp[i, t] = j;
+                            isFirst1 = false;
+                            isFirst0 = true;
                         }
-                        else
+                    }
+                    else
+                    {
+                        if (isFirst0)
                         {
-                            if (isFirst0)
-                            {
-                                t++;
-                                Xbmp[i, t] = j;
-                                isFirst0 = false;
-                                isFirst1 = true;
-                            }
+                            t++;
+                            Xbmp[i, t] = j;
+                            isFirst0 = false;
+                            isFirst1 = true;
                         }
+                    }
                     j1 = j;
                 }
                 if (isFirst0 == true)     //如果有上跳没有下跳则行尾增加下跳
@@ -1237,7 +1237,7 @@ namespace ImageProcessing
                 isFirst1 = true;    //下一行恢复默认值
                 isFirst0 = false;
             }
-            
+
             return Xbmp;
         }
 
@@ -1451,7 +1451,7 @@ namespace ImageProcessing
             }
 
             //=======利用hough变换提取直线======
-            
+
             int[] case_accarray_n = new int[rho_max];
             int[] case_accarray_m = new int[rho_max];
             int K = 0; //存储数组计数器
@@ -1572,7 +1572,7 @@ namespace ImageProcessing
             {
                 //is1 = ByteGetBit(horizontalProArray[h, 0], 0);//调用ByteGetBit判断第一位是否是1
                 //0是黑色,255是白色
-                if (horizontalProArray[h, 0]==0)//出现不是1的点，行开始
+                if (horizontalProArray[h, 0] == 0)//出现不是1的点，行开始
                 {
                     if (isLineStart)
                     {
@@ -1643,7 +1643,7 @@ namespace ImageProcessing
             int[] verticalPoints = new int[imgWidth];
             //用于存储竖直投影后的二值化数组
             Byte[,] verticalProArray = new Byte[imgHeight, imgWidth];
-            int[,,] characters= new int[row,200,4];     //[行][字][位置信息]      位置信息：0：字开始的横坐标；1：字结束的横坐标；2：字开始的纵坐标；3：字结束的纵坐标
+            int[,,] characters = new int[row, 200, 4];     //[行][字][位置信息]      位置信息：0：字开始的横坐标；1：字结束的横坐标；2：字开始的纵坐标；3：字结束的纵坐标
 
             bool isChStart = true;//标识新出现的0是否是字开始位置
             bool isChEnd = false;//标识新出现的0是否是字结束位置
@@ -1951,6 +1951,270 @@ namespace ImageProcessing
 
         #endregion
 
+        #region 连通域
+
+        public Bitmap CalConnections(Bitmap bmp)
+        {
+            int imgWidth = bmp.Width;
+
+            int imgHeight = bmp.Height;
+
+            int threshold = 0;
+
+            //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
+            byte[,] BinaryArray = ToBinaryArray(bmp, out threshold);
+            byte[,] data = (byte[,])BinaryArray.Clone();        //开辟新内存复制
+            //Array.Copy(BinaryArray, data, BinaryArray.Length);  //复制的是引用
+
+            #region
+            //一种标记的点的个数
+            Dictionary<int, List<Point>> dic_label_p = new Dictionary<int, List<Point>>();
+            //标记
+            byte label = 1;
+            for (int y = 0; y < data.GetLength(0); y++)
+            {
+                for (int x = 0; x < data.GetLength(1); x++)
+                {
+                    //如果该数据不为0
+                    if (data[y, x] != 255)
+                    {
+                        List<int> ContainsLabel = new List<int>();
+                        #region 第一行
+                        if (y == 0)//第一行只看左边
+                        {
+                            //第一行第一列，如果不为0，那么填入标记
+                            if (x == 0)
+                            {
+                                data[y, x] = label;
+                                label++;
+                            }
+                            //第一行，非第一列
+                            else
+                            {
+                                //如果该列的左侧数据不为0，那么该数据标记填充为左侧的标记
+                                if (data[y, x - 1] != 255)
+                                {
+                                    data[y, x] = data[y, x - 1];
+                                }
+                                //否则，填充自增标记
+                                else
+                                {
+                                    data[y, x] = label;
+                                    label++;
+                                }
+                            }
+                        }
+                        #endregion
+                        #region 非第一行
+                        else
+                        {
+                            if (x == 0)//最左边  --->不可能出现衔接情况
+                            {
+                                /*分析上和右上*/
+                                //如果上方数据不为0，则该数据填充上方数据的标记
+                                if (data[y - 1, x] != 255)
+                                {
+                                    data[y, x] = data[y - 1, x];
+                                }
+                                //上方数据为0，右上方数据不为0，则该数据填充右上方数据的标记
+                                else if (data[y - 1, x + 1] != 255)
+                                {
+                                    data[y, x] = data[y - 1, x + 1];
+                                }
+                                //都为0，则填充自增标记
+                                else
+                                {
+                                    data[y, x] = label;
+                                    label++;
+                                }
+                            }
+                            else if (x == data.GetLength(1) - 1)//最右边   --->不可能出现衔接情况
+                            {
+                                /*分析左上和上*/
+                                //如果左上数据不为0，则则该数据填充左上方数据的标记
+                                if (data[y - 1, x - 1] != 255)
+                                {
+                                    data[y, x] = data[y - 1, x - 1];
+                                }
+                                //左上方数据为0，上方数据不为0，则该数据填充上方数据的标记
+                                else if (data[y - 1, x] != 255)
+                                {
+                                    data[y, x] = data[y - 1, x];
+                                }
+                                //左上和上都为0
+                                else
+                                {
+                                    //如果左侧数据不为0，则该数据填充左侧数据的标记
+                                    if (data[y, x - 1] != 255)
+                                    {
+                                        data[y, x] = data[y, x - 1];
+                                    }
+                                    //否则填充自增标记
+                                    else
+                                    {
+                                        data[y, x] = label;
+                                        label++;
+                                    }
+                                }
+                            }
+                            else//中间    --->可能出现衔接情况
+                            {
+                                //重新实例化需要改变的标记
+                                ContainsLabel = new List<int>();
+                                /*分析左上、上和右上*/
+                                //上方数据不为0（中间数据），直接填充上方标记
+                                if (data[y - 1, x] != 255)
+                                {
+                                    data[y, x] = data[y - 1, x];
+                                }
+                                //上方数据为0
+                                else
+                                {
+                                    //左上和右上都不为0，填充左上标记
+                                    if (data[y - 1, x - 1] != 255 && data[y - 1, x + 1] != 255)
+                                    {
+                                        data[y, x] = data[y - 1, x - 1];
+                                        //如果右上和左上数据标记不同，则右上标记需要更改
+                                        if (data[y - 1, x + 1] != data[y - 1, x - 1])
+                                        {
+                                            ContainsLabel.Add(data[y - 1, x + 1]);
+                                        }
+                                    }
+                                    //左上为0，右上不为0
+                                    else if (data[y - 1, x - 1] == 255 && data[y - 1, x + 1] != 255)
+                                    {
+                                        //左侧不为0，则填充左侧标记
+                                        if (data[y, x - 1] != 255)
+                                        {
+                                            data[y, x] = data[y, x - 1];
+                                            //如果左侧和右上标记不同，，则右上标记需要更改
+                                            if (data[y - 1, x + 1] != data[y, x - 1])
+                                            {
+                                                ContainsLabel.Add(data[y - 1, x + 1]);
+                                            }
+                                        }
+                                        //左侧为0，则直接填充右上标记
+                                        else
+                                        {
+                                            data[y, x] = data[y - 1, x + 1];
+                                        }
+                                    }
+                                    //左上不为0，右上为0，填充左上标记
+                                    else if (data[y - 1, x - 1] != 255 && data[y - 1, x + 1] == 255)
+                                    {
+                                        data[y, x] = data[y - 1, x - 1];
+                                    }
+                                    //左上和右上都为0
+                                    else if (data[y - 1, x - 1] == 255 && data[y - 1, x + 1] == 255)
+                                    {
+                                        //如果左侧不为0，则填充左侧标记
+                                        if (data[y, x - 1] != 255)
+                                        {
+                                            data[y, x] = data[y, x - 1];
+                                        }
+                                        //否则填充自增标记
+                                        else
+                                        {
+                                            data[y, x] = label;
+                                            label++;
+                                        }
+
+                                    }
+                                }
+
+                            }
+                        }
+                        #endregion
+
+                        //如果当前字典不存在该标记，那么创建该标记的Key
+                        if (!dic_label_p.ContainsKey(data[y, x]))
+                        {
+                            dic_label_p.Add(data[y, x], new List<Point>());
+                        }
+                        //添加当前标记的点位
+                        dic_label_p[data[y, x]].Add(new Point(x, y));
+
+                        //备份需要更改标记的位置
+                        List<Point> NeedChangedPoints = new List<Point>();
+                        //如果有需要更改的标记
+                        for (int i = 0; i < ContainsLabel.Count; i++)
+                        {
+                            for (int pcount = 0; pcount < dic_label_p[ContainsLabel[i]].Count;)
+                            {
+                                Point p = dic_label_p[ContainsLabel[i]][pcount];
+                                NeedChangedPoints.Add(p);
+                                data[p.Y, p.X] = data[y, x];
+                                dic_label_p[ContainsLabel[i]].Remove(p);
+                                dic_label_p[data[y, x]].Add(p);
+                            }
+                            dic_label_p.Remove(ContainsLabel[i]);
+                        }
+                        
+                    }
+                }
+            }
+            #endregion
+
+            int up = imgHeight;
+            int down = 0;
+            int left = imgWidth;
+            int right = 0;
+
+            int count = 0;
+            //矩形框坐标
+            //Dictionary<int, List<Point>> rect_Poingts = new Dictionary<int, List<Point>>();
+            //一个连通域
+            foreach (var lines in dic_label_p.Values)
+            {
+                up = imgHeight;
+                down = 0;
+                left = imgWidth;
+                right = 0;
+                foreach (var points in lines)
+                {
+                    if (points.X < left)
+                    {
+                        left = points.X;
+                    }
+                    if (points.X > right)
+                    {
+                        right = points.X;
+                    }
+                    if (points.Y < up)
+                    {
+                        up = points.Y;
+                    }
+                    if (points.Y > down)
+                    {
+                        down = points.Y;
+                    }
+                }
+
+                //rect_Poingts.Add(count, new List<Point>());
+                //rect_Poingts[count].Add(new Point(up, left));//左上
+                //rect_Poingts[count].Add(new Point(up, right));//右上
+                //rect_Poingts[count].Add(new Point(down, left));//左下
+                //rect_Poingts[count].Add(new Point(down, right));//右下
+                //count++;
+                for (int rectW = left; rectW <= right; rectW++)
+                {
+                    BinaryArray[up, rectW] = 0;
+                    BinaryArray[down, rectW] = 0;
+                }
+                for (int rectH = up; rectH <= down; rectH++)
+                {
+                    BinaryArray[rectH, left] = 0;
+                    BinaryArray[rectH, right] = 0;
+                }
+            }
+            Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
+
+            return dstBmp;
+        }
+
+
+        #endregion
+
         #region 笔画密度特征提取
 
         /// <summary>
@@ -1958,7 +2222,7 @@ namespace ImageProcessing
         /// </summary>
         /// <param name="bmp">源图像</param>
         /// <param name="m">//每个方向被分成大小相等的m个区间</param>
-        public void StrokeDensity(Bitmap bmp,int m)
+        public void StrokeDensity(Bitmap bmp, int m)
         {
             int imgWidth = bmp.Width;
             int imgHeight = bmp.Height;
@@ -1969,7 +2233,7 @@ namespace ImageProcessing
             Byte[,] BinaryArray = ToBinaryArray(bmp, out threshold);
 
             //最终结果是m*4维的特征空间向量,用数组features存储
-            int[,] features = new int[m,4];
+            int[,] features = new int[m, 4];
 
             //设水平方向，垂直方向，＋45°方向和－45°方向每个区间内的包含扫面线数分别为n1,n2,n3,n4(也就是每个区间的宽度)
             int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
@@ -1989,28 +2253,28 @@ namespace ImageProcessing
             {
                 //while (h < imgHeight)
                 //{
-                    for (int w = 0; w < imgWidth; w++)
+                for (int w = 0; w < imgWidth; w++)
+                {
+                    if (BinaryArray[h, w] == 0)
                     {
-                        if (BinaryArray[h, w] == 0)
+                        if (isStart)
                         {
-                            if (isStart)
-                            {
-                                strokeNumber++;       //对穿过的笔画数进行累加
-                                isStart = false;
-                            }
-                        }
-                        if (BinaryArray[h, w] == 255 && isStart == false)
-                        {
-                            isStart = true;
+                            strokeNumber++;       //对穿过的笔画数进行累加
+                            isStart = false;
                         }
                     }
+                    if (BinaryArray[h, w] == 255 && isStart == false)
+                    {
+                        isStart = true;
+                    }
+                }
 
-                    if (h == n1 * section-1)
-                    {
-                        features[section-1, 0] = strokeNumber / n1;
-                        strokeNumber = 0;
-                        section++;//进入下一区间
-                    }
+                if (h == n1 * section - 1)
+                {
+                    features[section - 1, 0] = strokeNumber / n1;
+                    strokeNumber = 0;
+                    section++;//进入下一区间
+                }
                 //}
             }
 
@@ -2022,28 +2286,28 @@ namespace ImageProcessing
             {
                 //while (w < imgWidth)
                 //{
-                    for (int h = 0; h <imgHeight; h++)
+                for (int h = 0; h < imgHeight; h++)
+                {
+                    if (BinaryArray[h, w] == 0)
                     {
-                        if (BinaryArray[h, w] == 0)
+                        if (isStart)
                         {
-                            if (isStart)
-                            {
-                                strokeNumber++;       //对穿过的笔画数进行累加
-                                isStart = false;
-                            }
-                        }
-                        if (BinaryArray[h, w] == 255 && isStart == false)
-                        {
-                            isStart = true;
+                            strokeNumber++;       //对穿过的笔画数进行累加
+                            isStart = false;
                         }
                     }
+                    if (BinaryArray[h, w] == 255 && isStart == false)
+                    {
+                        isStart = true;
+                    }
+                }
 
-                    if (w == n2 * section - 1)
-                    {
-                        features[section-1, 1] = strokeNumber / n2;
-                        strokeNumber = 0;
-                        section++;//进入下一区间
-                    }
+                if (w == n2 * section - 1)
+                {
+                    features[section - 1, 1] = strokeNumber / n2;
+                    strokeNumber = 0;
+                    section++;//进入下一区间
+                }
                 //}
             }
 
@@ -2054,15 +2318,15 @@ namespace ImageProcessing
             //第一部分（对角线上方的m/2个区间）
             for (int sec = 0; sec < m / 2; sec++)
             {
-                for (int a = n3 * sec; a < n3 * (sec+1); a++)
+                for (int a = n3 * sec; a < n3 * (sec + 1); a++)
                 {
                     for (int w1 = 0; w1 < a; w1++)
                     {
                         h1 = a - w1;//坐标计算
-                         if (BinaryArray[h1, w1] == 0)
+                        if (BinaryArray[h1, w1] == 0)
                         {
                             if (isStart)
-                             {
+                            {
                                 strokeNumber++;       //对穿过的笔画数进行累加
                                 isStart = false;
                             }
@@ -2072,7 +2336,7 @@ namespace ImageProcessing
                             isStart = true;
                         }
                     }
-                        
+
                 }
                 features[sec, 2] = strokeNumber / n3;
                 strokeNumber = 0;
@@ -2085,11 +2349,11 @@ namespace ImageProcessing
             int h2 = 0;
             for (int sec = m / 2; sec < m; sec++)
             {
-                for (int a = n3 * sec; a < n3 * (sec+1); a++)
+                for (int a = n3 * sec; a < n3 * (sec + 1); a++)
                 {
-                    for (int w2 = a- imgHeight; w2 < imgWidth; w2++)
+                    for (int w2 = a - imgHeight; w2 < imgWidth; w2++)
                     {
-                        h2 = a-1 - w2;//坐标计算
+                        h2 = a - 1 - w2;//坐标计算
                         if (BinaryArray[h2, w2] == 0)
                         {
                             if (isStart)
@@ -2105,7 +2369,7 @@ namespace ImageProcessing
                     }
                 }
                 features[sec, 2] = strokeNumber / n3;
-                        strokeNumber = 0;
+                strokeNumber = 0;
             }
 
             //－45°方向
@@ -2133,7 +2397,7 @@ namespace ImageProcessing
                             isStart = true;
                         }
                     }
-                    
+
                 }
                 features[sec, 3] = strokeNumber / n4;
                 strokeNumber = 0;
@@ -2146,11 +2410,11 @@ namespace ImageProcessing
             int h4 = 0;
             for (int sec = m / 2; sec < m; sec++)
             {
-                for (int a = n4 * (sec-8); a < n4 * (sec-8+1); a++)
+                for (int a = n4 * (sec - 8); a < n4 * (sec - 8 + 1); a++)
                 {
                     for (int w4 = a; w4 < imgWidth; w4++)
                     {
-                        h4 = w4-a;//坐标计算
+                        h4 = w4 - a;//坐标计算
                         if (BinaryArray[h4, w4] == 0)
                         {
                             if (isStart)
@@ -2168,7 +2432,7 @@ namespace ImageProcessing
                 features[sec, 3] = strokeNumber / n4;
                 strokeNumber = 0;
             }
-            
+
 
         }
 

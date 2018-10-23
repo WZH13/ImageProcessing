@@ -19,7 +19,7 @@ namespace ImageProcessing
             InitializeComponent();
             //this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine(this);
             //this.skinEngine1.SkinFile = Application.StartupPath + "\\Skins\\MSN.ssk";
-            skinEngine1.SkinFile = Environment.CurrentDirectory + "\\Skins\\MSN.ssk";  //选择皮肤文件MidsummerColor1  MSN   
+            //skinEngine1.SkinFile = Environment.CurrentDirectory + "\\Skins\\MSN.ssk";  //选择皮肤文件MidsummerColor1  MSN   
             //btn_open.Tag = 9999;//设置不需要被渲染的控件Tag值为9999
         }
         //1.声明自适应类实例  
@@ -454,7 +454,7 @@ namespace ImageProcessing
 
         private void btn_hough_Click(object sender, EventArgs e)
         {
-            curBitmap = imageProcessing.hough_line(curBitmap, 400);
+            curBitmap = imageProcessing.hough_line(curBitmap, 40);
             Invalidate();
         }
 
@@ -494,6 +494,13 @@ namespace ImageProcessing
         private void btn_StrokeDensity_Click(object sender, EventArgs e)
         {
             imageProcessing.StrokeDensity(curBitmap,16);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            curBitmap = imageProcessing.CalConnections(curBitmap);
+
+            Invalidate();
         }
     }
 }
