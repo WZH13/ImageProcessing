@@ -495,8 +495,8 @@ namespace ImageProcessing
         {
             imageProcessing.StrokeDensity(curBitmap,16);
         }
-
-        private void button1_Click(object sender, EventArgs e)
+        
+        private void btn_Connected_Click(object sender, EventArgs e)
         {
             curBitmap = imageProcessing.CalConnections(curBitmap);
 

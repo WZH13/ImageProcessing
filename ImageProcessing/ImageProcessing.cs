@@ -1963,22 +1963,24 @@ namespace ImageProcessing
 
             //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
             byte[,] BinaryArray = ToBinaryArray(bmp, out threshold);
-            byte[,] data = (byte[,])BinaryArray.Clone();        //开辟新内存复制
+            //byte[,] data = (byte[,])BinaryArray.Clone();        //开辟新内存复制
+            int[,] data = new int[imgHeight, imgWidth];
             //Array.Copy(BinaryArray, data, BinaryArray.Length);  //复制的是引用
 
-            #region
             //一种标记的点的个数
             Dictionary<int, List<Point>> dic_label_p = new Dictionary<int, List<Point>>();
             //标记
-            byte label = 1;
-            for (int y = 0; y < data.GetLength(0); y++)
+            int label = 1;
+            int ContainsLabel = 0;
+            for (int y = 0; y < imgHeight; y++)
             {
-                for (int x = 0; x < data.GetLength(1); x++)
+                for (int x = 0; x < imgWidth; x++)
                 {
-                    //如果该数据不为0
-                    if (data[y, x] != 255)
+                    ContainsLabel = 0;
+                    //如果该数据为黑像素
+                    if (BinaryArray[y, x] == 0)
                     {
-                        List<int> ContainsLabel = new List<int>();
+                        //List<int> ContainsLabel = new List<int>();
                         #region 第一行
                         if (y == 0)//第一行只看左边
                         {
@@ -1992,7 +1994,7 @@ namespace ImageProcessing
                             else
                             {
                                 //如果该列的左侧数据不为0，那么该数据标记填充为左侧的标记
-                                if (data[y, x - 1] != 255)
+                                if (BinaryArray[y, x - 1] == 0)
                                 {
                                     data[y, x] = data[y, x - 1];
                                 }
@@ -2012,12 +2014,12 @@ namespace ImageProcessing
                             {
                                 /*分析上和右上*/
                                 //如果上方数据不为0，则该数据填充上方数据的标记
-                                if (data[y - 1, x] != 255)
+                                if (BinaryArray[y - 1, x] == 0)
                                 {
                                     data[y, x] = data[y - 1, x];
                                 }
                                 //上方数据为0，右上方数据不为0，则该数据填充右上方数据的标记
-                                else if (data[y - 1, x + 1] != 255)
+                                else if (BinaryArray[y - 1, x + 1] == 0)
                                 {
                                     data[y, x] = data[y - 1, x + 1];
                                 }
@@ -2028,16 +2030,16 @@ namespace ImageProcessing
                                     label++;
                                 }
                             }
-                            else if (x == data.GetLength(1) - 1)//最右边   --->不可能出现衔接情况
+                            else if (x == BinaryArray.GetLength(1) - 1)//最右边   --->不可能出现衔接情况
                             {
                                 /*分析左上和上*/
-                                //如果左上数据不为0，则则该数据填充左上方数据的标记
-                                if (data[y - 1, x - 1] != 255)
+                                //如果左上数据不为0，则该数据填充左上方数据的标记
+                                if (BinaryArray[y - 1, x - 1] == 0)
                                 {
                                     data[y, x] = data[y - 1, x - 1];
                                 }
                                 //左上方数据为0，上方数据不为0，则该数据填充上方数据的标记
-                                else if (data[y - 1, x] != 255)
+                                else if (BinaryArray[y - 1, x] == 0)
                                 {
                                     data[y, x] = data[y - 1, x];
                                 }
@@ -2045,7 +2047,7 @@ namespace ImageProcessing
                                 else
                                 {
                                     //如果左侧数据不为0，则该数据填充左侧数据的标记
-                                    if (data[y, x - 1] != 255)
+                                    if (BinaryArray[y, x - 1] == 0)
                                     {
                                         data[y, x] = data[y, x - 1];
                                     }
@@ -2060,10 +2062,11 @@ namespace ImageProcessing
                             else//中间    --->可能出现衔接情况
                             {
                                 //重新实例化需要改变的标记
-                                ContainsLabel = new List<int>();
+                                //ContainsLabel = new List<int>();
+                                
                                 /*分析左上、上和右上*/
                                 //上方数据不为0（中间数据），直接填充上方标记
-                                if (data[y - 1, x] != 255)
+                                if (BinaryArray[y - 1, x] == 0)
                                 {
                                     data[y, x] = data[y - 1, x];
                                 }
@@ -2071,26 +2074,26 @@ namespace ImageProcessing
                                 else
                                 {
                                     //左上和右上都不为0，填充左上标记
-                                    if (data[y - 1, x - 1] != 255 && data[y - 1, x + 1] != 255)
+                                    if (BinaryArray[y - 1, x - 1] == 0 && BinaryArray[y - 1, x + 1] == 0)
                                     {
                                         data[y, x] = data[y - 1, x - 1];
                                         //如果右上和左上数据标记不同，则右上标记需要更改
                                         if (data[y - 1, x + 1] != data[y - 1, x - 1])
                                         {
-                                            ContainsLabel.Add(data[y - 1, x + 1]);
+                                            ContainsLabel=data[y - 1, x + 1];
                                         }
                                     }
                                     //左上为0，右上不为0
-                                    else if (data[y - 1, x - 1] == 255 && data[y - 1, x + 1] != 255)
+                                    else if (BinaryArray[y - 1, x - 1] == 255 && BinaryArray[y - 1, x + 1] == 0)
                                     {
                                         //左侧不为0，则填充左侧标记
-                                        if (data[y, x - 1] != 255)
+                                        if (BinaryArray[y, x - 1] == 0)
                                         {
                                             data[y, x] = data[y, x - 1];
                                             //如果左侧和右上标记不同，，则右上标记需要更改
                                             if (data[y - 1, x + 1] != data[y, x - 1])
                                             {
-                                                ContainsLabel.Add(data[y - 1, x + 1]);
+                                                ContainsLabel=data[y - 1, x + 1];
                                             }
                                         }
                                         //左侧为0，则直接填充右上标记
@@ -2100,15 +2103,15 @@ namespace ImageProcessing
                                         }
                                     }
                                     //左上不为0，右上为0，填充左上标记
-                                    else if (data[y - 1, x - 1] != 255 && data[y - 1, x + 1] == 255)
+                                    else if (BinaryArray[y - 1, x - 1] == 0 && BinaryArray[y - 1, x + 1] == 255)
                                     {
                                         data[y, x] = data[y - 1, x - 1];
                                     }
                                     //左上和右上都为0
-                                    else if (data[y - 1, x - 1] == 255 && data[y - 1, x + 1] == 255)
+                                    else if (BinaryArray[y - 1, x - 1] == 255 && BinaryArray[y - 1, x + 1] == 255)
                                     {
                                         //如果左侧不为0，则填充左侧标记
-                                        if (data[y, x - 1] != 255)
+                                        if (BinaryArray[y, x - 1] == 0)
                                         {
                                             data[y, x] = data[y, x - 1];
                                         }
@@ -2137,30 +2140,32 @@ namespace ImageProcessing
                         //备份需要更改标记的位置
                         List<Point> NeedChangedPoints = new List<Point>();
                         //如果有需要更改的标记
-                        for (int i = 0; i < ContainsLabel.Count; i++)
+                        //for (int i = 0; i < ContainsLabel.Count; i++)
+                        //{
+                        if (ContainsLabel!=0)
                         {
-                            for (int pcount = 0; pcount < dic_label_p[ContainsLabel[i]].Count;)
+                            for (int pcount = 0; pcount < dic_label_p[ContainsLabel].Count;)
                             {
-                                Point p = dic_label_p[ContainsLabel[i]][pcount];
+                                Point p = dic_label_p[ContainsLabel][pcount];
                                 NeedChangedPoints.Add(p);
                                 data[p.Y, p.X] = data[y, x];
-                                dic_label_p[ContainsLabel[i]].Remove(p);
+                                dic_label_p[ContainsLabel].Remove(p);
                                 dic_label_p[data[y, x]].Add(p);
                             }
-                            dic_label_p.Remove(ContainsLabel[i]);
+                            dic_label_p.Remove(ContainsLabel);
                         }
+                            
+                        //}
                         
                     }
                 }
             }
-            #endregion
 
             int up = imgHeight;
             int down = 0;
             int left = imgWidth;
             int right = 0;
 
-            int count = 0;
             //矩形框坐标
             //Dictionary<int, List<Point>> rect_Poingts = new Dictionary<int, List<Point>>();
             //一个连通域
@@ -2172,6 +2177,7 @@ namespace ImageProcessing
                 right = 0;
                 foreach (var points in lines)
                 {
+                    //BinaryArray[points.Y, points.X] = 0;
                     if (points.X < left)
                     {
                         left = points.X;
@@ -2212,6 +2218,30 @@ namespace ImageProcessing
             return dstBmp;
         }
 
+        //struct Point
+        //{
+        //    private int x;
+
+        //    public int X
+        //    {
+        //        get { return x; }
+        //        set { x = value; }
+        //    }
+        //    private int y;
+
+        //    public int Y
+        //    {
+        //        get { return y; }
+        //        set { y = value; }
+        //    }
+
+
+        //    public Point(int x, int y)
+        //    {
+        //        this.x = x;
+        //        this.y = y;
+        //    }
+        //}
 
         #endregion
 

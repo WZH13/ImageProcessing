@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tab_preprocessing = new System.Windows.Forms.TabPage();
+            this.btn_Connected = new System.Windows.Forms.Button();
             this.btn_StrokeDensity = new System.Windows.Forms.Button();
             this.btn_projection = new System.Windows.Forms.Button();
             this.btn_hough = new System.Windows.Forms.Button();
@@ -55,10 +56,8 @@
             this.xtxb = new System.Windows.Forms.TextBox();
             this.btn_restore = new System.Windows.Forms.Button();
             this.btn_open = new System.Windows.Forms.Button();
-            //this.skinEngine1 = new Sunisoft.IrisSkin.SkinEngine();
             this.btn_exit = new System.Windows.Forms.Button();
             this.btn_save = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tab_preprocessing.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
@@ -78,7 +77,7 @@
             // 
             // tab_preprocessing
             // 
-            this.tab_preprocessing.Controls.Add(this.button1);
+            this.tab_preprocessing.Controls.Add(this.btn_Connected);
             this.tab_preprocessing.Controls.Add(this.btn_StrokeDensity);
             this.tab_preprocessing.Controls.Add(this.btn_projection);
             this.tab_preprocessing.Controls.Add(this.btn_hough);
@@ -92,6 +91,21 @@
             this.tab_preprocessing.TabIndex = 2;
             this.tab_preprocessing.Text = "图像预处理";
             this.tab_preprocessing.UseVisualStyleBackColor = true;
+            // 
+            // btn_Connected
+            // 
+            this.btn_Connected.FlatAppearance.BorderSize = 0;
+            this.btn_Connected.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_Connected.Image = ((System.Drawing.Image)(resources.GetObject("btn_Connected.Image")));
+            this.btn_Connected.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btn_Connected.Location = new System.Drawing.Point(733, 15);
+            this.btn_Connected.Name = "btn_Connected";
+            this.btn_Connected.Size = new System.Drawing.Size(94, 23);
+            this.btn_Connected.TabIndex = 15;
+            this.btn_Connected.Text = "连通域搜索";
+            this.btn_Connected.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btn_Connected.UseVisualStyleBackColor = true;
+            this.btn_Connected.Click += new System.EventHandler(this.btn_Connected_Click);
             // 
             // btn_StrokeDensity
             // 
@@ -381,15 +395,6 @@
             this.btn_open.UseVisualStyleBackColor = true;
             this.btn_open.Click += new System.EventHandler(this.btn_open_Click);
             // 
-            // skinEngine1
-            // 
-            //this.skinEngine1.@__DrawButtonFocusRectangle = true;
-            //this.skinEngine1.DisabledButtonTextColor = System.Drawing.Color.Gray;
-            //this.skinEngine1.DisabledMenuFontColor = System.Drawing.SystemColors.GrayText;
-            //this.skinEngine1.InactiveCaptionColor = System.Drawing.SystemColors.InactiveCaptionText;
-            //this.skinEngine1.SerialNumber = "";
-            //this.skinEngine1.SkinFile = null;
-            // 
             // btn_exit
             // 
             this.btn_exit.FlatAppearance.BorderSize = 0;
@@ -419,16 +424,6 @@
             this.btn_save.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btn_save.UseVisualStyleBackColor = true;
             this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(749, 15);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 15;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
@@ -489,7 +484,7 @@
         private System.Windows.Forms.Button btn_Xjump;
         private System.Windows.Forms.Button btn_projection;
         private System.Windows.Forms.Button btn_StrokeDensity;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btn_Connected;
     }
 }
 
