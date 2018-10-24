@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.IO;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace ImageProcessing
 {
@@ -1955,6 +1956,9 @@ namespace ImageProcessing
 
         public Bitmap CalConnections(Bitmap bmp)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             int imgWidth = bmp.Width;
 
             int imgHeight = bmp.Height;
@@ -2215,6 +2219,9 @@ namespace ImageProcessing
             }
             Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
 
+            sw.Stop();
+            TimeSpan ts2 = sw.Elapsed;
+            MessageBox.Show(ts2.TotalMilliseconds.ToString());
             return dstBmp;
         }
 

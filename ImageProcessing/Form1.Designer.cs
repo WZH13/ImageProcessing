@@ -429,6 +429,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(1325, 739);
             this.Controls.Add(this.btn_restore);
             this.Controls.Add(this.btn_open);
