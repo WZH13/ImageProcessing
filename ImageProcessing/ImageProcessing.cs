@@ -950,6 +950,7 @@ namespace ImageProcessing
             int PixelHeight = binaryArray.GetLength(0);
             int PixelWidth = binaryArray.GetLength(1);
             int Stride = ((PixelWidth + 31) >> 5) << 2;
+            //int Stride = PixelWidth/8+(4- (PixelWidth / 8)%4);
             Byte[] Pixels = new Byte[PixelHeight * Stride];
             for (int i = 0; i < PixelHeight; i++)
             {
@@ -1245,12 +1246,12 @@ namespace ImageProcessing
         /// <summary>
         /// 判断某个byte的某个位是否为1
         /// </summary>
-        /// <param name="pos">第几位，大于等于1</param>
+        /// <param name="pos">当前位是1，则返回true</param>
         public static bool ByteGetBit(byte b, int pos)
         {
             byte[] BITS = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
             int temp = BITS[pos];
-            return (b & temp) != 0;
+            return (b & temp) != 0;//当前位是1，则返回true
         }
 
         #endregion
@@ -1952,6 +1953,63 @@ namespace ImageProcessing
 
         #endregion
 
+        #region 读取二值图像存入二值数组
+
+        public byte[,] BinaryBitmapToBinaryArray(Bitmap bmp)
+        {
+            int imgWidth = bmp.Width;
+            int imgHeight = bmp.Height;
+
+            byte[,] BinaryArray = new byte[imgHeight, imgWidth];
+            for (int i = 0; i < BinaryArray.GetLength(0); i++)
+            {
+                for (int j = 0; j < BinaryArray.GetLength(1); j++)
+                {
+                    BinaryArray[i, j] = 1;
+                }
+            }
+            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat);
+            if (depth == 1)
+            {
+                Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
+                BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
+                int imgStride = bmpData.Stride;
+                //得到首地址
+                IntPtr ptr = bmpData.Scan0;
+
+                //定义被锁定的数组大小，由位图数据与未用空间组成的
+                int bytes = imgStride * imgHeight;
+                //定义位图数组
+                byte[] bmpValues = new byte[bytes];
+                //复制被锁定的位图像素值到该数组内
+                Marshal.Copy(ptr, bmpValues, 0, bytes);
+
+                int basePos = 0;
+                bool isOne = false;
+                for (int y = 0; y < imgHeight; y++)
+                {
+                    basePos = y * imgStride;
+                    for (int x = 0; x < imgWidth; x ++)
+                    {
+                        isOne = ByteGetBit(bmpValues[basePos + (x >> 3)], (7-x & 0x7));
+                        //ByteGetBit判断一个字节第几位是否是1，该函数是从后往前数的，而这里是从高位向低位数的。所以要用7减去x & 0x7
+                        if (isOne)
+                        {
+                            BinaryArray[y, x] = 255;
+                        }
+                        else
+                        {
+                            BinaryArray[y, x] = 0;
+                        }
+                    }
+                }
+                        bmp.UnlockBits(bmpData);
+            }
+            return BinaryArray;
+        } 
+
+        #endregion
+
         #region 连通域
 
         public Bitmap CalConnections(Bitmap bmp)
@@ -1960,13 +2018,27 @@ namespace ImageProcessing
             sw.Start();
 
             int imgWidth = bmp.Width;
-
             int imgHeight = bmp.Height;
 
-            int threshold = 0;
+            byte[,] BinaryArray = new byte[imgHeight, imgWidth];
+            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat);
+            //位深度不为1
+            if (depth != 1)
+            {
+                int threshold = 0;
+
+                //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
+                BinaryArray = ToBinaryArray(bmp, out threshold);
+            }
+            else
+            {
+                BinaryArray = BinaryBitmapToBinaryArray(bmp);
+            }
+
+            //int threshold = 0;
 
             //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
-            byte[,] BinaryArray = ToBinaryArray(bmp, out threshold);
+            //byte[,] BinaryArray = ToBinaryArray(bmp, out threshold);
             //byte[,] data = (byte[,])BinaryArray.Clone();        //开辟新内存复制
             int[,] data = new int[imgHeight, imgWidth];
             //Array.Copy(BinaryArray, data, BinaryArray.Length);  //复制的是引用
@@ -2067,7 +2139,7 @@ namespace ImageProcessing
                             {
                                 //重新实例化需要改变的标记
                                 //ContainsLabel = new List<int>();
-                                
+
                                 /*分析左上、上和右上*/
                                 //上方数据不为0（中间数据），直接填充上方标记
                                 if (BinaryArray[y - 1, x] == 0)
@@ -2084,7 +2156,7 @@ namespace ImageProcessing
                                         //如果右上和左上数据标记不同，则右上标记需要更改
                                         if (data[y - 1, x + 1] != data[y - 1, x - 1])
                                         {
-                                            ContainsLabel=data[y - 1, x + 1];
+                                            ContainsLabel = data[y - 1, x + 1];
                                         }
                                     }
                                     //左上为0，右上不为0
@@ -2097,7 +2169,7 @@ namespace ImageProcessing
                                             //如果左侧和右上标记不同，，则右上标记需要更改
                                             if (data[y - 1, x + 1] != data[y, x - 1])
                                             {
-                                                ContainsLabel=data[y - 1, x + 1];
+                                                ContainsLabel = data[y - 1, x + 1];
                                             }
                                         }
                                         //左侧为0，则直接填充右上标记
@@ -2146,7 +2218,7 @@ namespace ImageProcessing
                         //如果有需要更改的标记
                         //for (int i = 0; i < ContainsLabel.Count; i++)
                         //{
-                        if (ContainsLabel!=0)
+                        if (ContainsLabel != 0)
                         {
                             for (int pcount = 0; pcount < dic_label_p[ContainsLabel].Count;)
                             {
@@ -2158,9 +2230,9 @@ namespace ImageProcessing
                             }
                             dic_label_p.Remove(ContainsLabel);
                         }
-                            
+
                         //}
-                        
+
                     }
                 }
             }
@@ -2219,9 +2291,9 @@ namespace ImageProcessing
             }
             Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
 
-            sw.Stop();
-            TimeSpan ts2 = sw.Elapsed;
-            MessageBox.Show(ts2.TotalMilliseconds.ToString());
+            //sw.Stop();
+            //TimeSpan ts2 = sw.Elapsed;
+            //MessageBox.Show(ts2.TotalMilliseconds.ToString());
             return dstBmp;
         }
 
@@ -2249,6 +2321,63 @@ namespace ImageProcessing
         //        this.y = y;
         //    }
         //}
+
+        #endregion
+
+        #region 快速非递归连通域生成及合并算法研究
+
+        /// <summary>
+        /// 存储一个像素点所属连通域等信息的结构体arrimgElement
+        /// </summary>
+        public struct arrimgElement
+        {
+            /// <summary>
+            /// 所属连通域的编号
+            /// </summary>
+            public int blockid;
+            /// <summary>
+            /// 对应像素点是否是黑色，黑色为0，白色为1
+            /// </summary>
+            public int pi;
+        }
+
+        public void a(Bitmap bmp)
+        {
+            int imgWidth = bmp.Width;
+            int imgHeight = bmp.Height;
+
+            arrimgElement[,] arrimg = new arrimgElement[imgWidth, imgHeight];
+            byte[,] BinaryArray = new byte[imgHeight, imgWidth];
+            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat);
+            //位深度不为1，返回
+            if (depth != 1)
+            {
+                int threshold = 0;
+
+                //为增强本函数的通用性，先将原图像进行二值化，得到其二值化的数组
+                BinaryArray = ToBinaryArray(bmp, out threshold);
+            }
+            else
+            {
+                Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
+                BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
+                unsafe
+                {
+                    byte* imgptr = (byte*)bmpData.Scan0.ToPointer();
+                    for (int y = 0; y < imgHeight; y++)
+                    {
+                        for (int x = 0; x < imgWidth; x++)
+                        {
+                            BinaryArray[y, x] = imgptr[0];
+                        }
+                        imgptr++;
+                    }
+                }
+                bmp.UnlockBits(bmpData);
+            }
+
+            
+        } 
 
         #endregion
 
