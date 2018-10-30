@@ -467,29 +467,6 @@ namespace ImageProcessing
 
         }
 
-        /// <summary>
-        /// 获取二维数组里面实际存有数据的行数
-        /// </summary>
-        public static List<int> GetHasValueRowIndex(int[,,] arr)
-        {
-            var hasValueRowIndex = new List<int>();
-            for (var i = 0; i < arr.GetLength(0); i++)
-            {
-                for (var j = 0; j < arr.GetLength(1); j++)
-                {
-                    for (int q = 0; q < arr.GetLength(2); q++)
-                    {
-                        if (arr[i, j,q] != 0)
-                        {
-                            hasValueRowIndex.Add(i);
-                            break;
-                        }
-                    }
-                    
-                }
-            }
-            return hasValueRowIndex;
-        }
 
         private void btn_StrokeDensity_Click(object sender, EventArgs e)
         {
@@ -498,7 +475,8 @@ namespace ImageProcessing
         
         private void btn_Connected_Click(object sender, EventArgs e)
         {
-            curBitmap = imageProcessing.CalConnections(curBitmap);
+            //curBitmap = imageProcessing.CalConnections(curBitmap);
+            curBitmap = imageProcessing.FCDGAM(curBitmap);
 
             Invalidate();
         }

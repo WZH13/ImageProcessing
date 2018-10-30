@@ -2230,6 +2230,10 @@ namespace ImageProcessing
                 }
             }
 
+            sw.Stop();
+            TimeSpan ts2 = sw.Elapsed;
+            MessageBox.Show(ts2.TotalMilliseconds.ToString());
+
             int up = imgHeight;
             int down = 0;
             int left = imgWidth;
@@ -2284,9 +2288,7 @@ namespace ImageProcessing
             }
             Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
 
-            sw.Stop();
-            TimeSpan ts2 = sw.Elapsed;
-            MessageBox.Show(ts2.TotalMilliseconds.ToString());
+            
             return dstBmp;
         }
 
@@ -2365,12 +2367,15 @@ namespace ImageProcessing
             public int bottom;
         }
 
-        public void FastConnectedDomainGenerationAndMerging(Bitmap bmp)
+        public Bitmap FCDGAM(Bitmap bmp)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             int imgWidth = bmp.Width;
             int imgHeight = bmp.Height;
 
-            arrimgElement[,] arrimg = new arrimgElement[imgWidth, imgHeight];
+            arrimgElement[,] arrimg = new arrimgElement[imgHeight,imgWidth ];
 
             block[] allblock = new block[imgWidth * imgHeight / 4];
 
@@ -2385,26 +2390,19 @@ namespace ImageProcessing
             {
                 BinaryArray = BinaryBitmapToBinaryArray(bmp);
             }
-
-            //存放像素点对应的标记
-            int[,] data = new int[imgHeight, imgWidth];
-
-            //一种标记的点的个数
-            Dictionary<int, List<Point>> dic_label_p = new Dictionary<int, List<Point>>();
+            
             //标记
             int label = 0;
             int tempBlockid = -1;
-            int ContainsLabel = 0;
             for (int y = 0; y < imgHeight; y++)
             {
                 for (int x = 0; x < imgWidth; x++)
                 {
+                    arrimg[y, x].pi = 1;
                     tempBlockid = -1;
-                    ContainsLabel = 0;
                     //如果该数据为黑像素
                     if (BinaryArray[y, x] == 0)
                     {
-                        //List<int> ContainsLabel = new List<int>();
                         #region 第一行
                         if (y == 0)//第一行只看左边
                         {
@@ -2412,7 +2410,7 @@ namespace ImageProcessing
                             if (x == 0)
                             {
                                 arrimg[y, x].blockid = label;
-                                arrimg[y, x].pi = 1;
+                                arrimg[y, x].pi = 0;
                                 
                                 allblock[label].blockid = label;
                                 allblock[label].length = 1;
@@ -2431,7 +2429,7 @@ namespace ImageProcessing
                                 {
                                     tempBlockid = arrimg[y, x - 1].blockid;
                                     arrimg[y, x].blockid = tempBlockid;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     allblock[tempBlockid].right = x;
@@ -2440,7 +2438,7 @@ namespace ImageProcessing
                                 else
                                 {
                                     arrimg[y, x].blockid = label;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[label].blockid = label;
                                     allblock[label].length = 1;
@@ -2457,40 +2455,40 @@ namespace ImageProcessing
                         #region 非第一行
                         else
                         {
-                            if (x == 0)//最左边  --->不可能出现衔接情况
+                            if (x == 0)//最左边
                             {
                                 //如果上方数据为0，则该数据填充上方数据的标记
                                 if (BinaryArray[y - 1, x] == 0)
                                 {
-                                    data[y, x] = data[y - 1, x];
+                                    //data[y, x] = data[y - 1, x];
 
                                     tempBlockid = arrimg[y - 1, x].blockid;
                                     arrimg[y, x].blockid = tempBlockid;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     allblock[tempBlockid].bottom = y;
                                 }
-                                //上方数据为0，右上方数据不为0，则该数据填充右上方数据的标记
+                                //上方数据不为0，右上方数据为0，则该数据填充右上方数据的标记
                                 else if (BinaryArray[y - 1, x + 1] == 0)
                                 {
-                                    data[y, x] = data[y - 1, x + 1];
+                                    //data[y, x] = data[y - 1, x + 1];
 
                                     tempBlockid = arrimg[y - 1, x + 1].blockid;
                                     arrimg[y, x].blockid = tempBlockid;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     allblock[tempBlockid].left = x;//x是最左边，直接赋值就行
                                     allblock[tempBlockid].bottom = y;
                                 }
-                                //都为0，则填充自增标记
+                                //都不为0，则填充自增标记
                                 else
                                 {
-                                    data[y, x] = label;
+                                    //data[y, x] = label;
 
                                     arrimg[y, x].blockid = label;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[label].blockid = label;
                                     allblock[label].length = 1;
@@ -2502,52 +2500,52 @@ namespace ImageProcessing
                                     label++;
                                 }
                             }
-                            else if (x == BinaryArray.GetLength(1) - 1)//最右边   --->不可能出现衔接情况
+                            else if (x == BinaryArray.GetLength(1) - 1)//最右边
                             {
-                                //如果左数据不为0，则该数据填充左方数据的标记
+                                //如果左数据为0，则该数据填充左方数据的标记
                                 if (BinaryArray[y, x - 1] == 0)
                                 {
-                                    data[y, x] = data[y, x - 1];
+                                    //data[y, x] = data[y, x - 1];
 
                                     tempBlockid = arrimg[y, x - 1].blockid;
                                     arrimg[y, x].blockid = tempBlockid;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     allblock[tempBlockid].right = x;//x是最右边，直接赋值就行
                                 }
-                                //如果左上数据不为0，则该数据填充左上方数据的标记
+                                //如果左上数据为0，则该数据填充左上方数据的标记
                                 else if (BinaryArray[y - 1, x - 1] == 0)
                                 {
-                                    data[y, x] = data[y - 1, x - 1];
+                                    //data[y, x] = data[y - 1, x - 1];
 
                                     tempBlockid = arrimg[y - 1, x - 1].blockid;
                                     arrimg[y, x].blockid = tempBlockid;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     allblock[tempBlockid].bottom = y;
                                     allblock[tempBlockid].right = x;//x是最右边，直接赋值就行
                                 }
-                                //上方数据不为0，则该数据填充上方数据的标记
+                                //上方数据为0，则该数据填充上方数据的标记
                                 else if (BinaryArray[y - 1, x] == 0)
                                 {
-                                    data[y, x] = data[y - 1, x];
+                                    //data[y, x] = data[y - 1, x];
 
                                     tempBlockid = arrimg[y - 1, x].blockid;
                                     arrimg[y, x].blockid = tempBlockid;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     allblock[tempBlockid].bottom = y;
                                 }
-                                //都为0
+                                //都不为0
                                 else
                                 {
-                                    data[y, x] = label;
+                                    //data[y, x] = label;
 
                                     arrimg[y, x].blockid = label;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[label].blockid = label;
                                     allblock[label].length = 1;
@@ -2559,19 +2557,16 @@ namespace ImageProcessing
                                     label++;
                                 }
                             }
-                            else//中间    --->可能出现衔接情况
+                            else//中间
                             {
-                                //重新实例化需要改变的标记
-                                //ContainsLabel = new List<int>();
-
                                 //左
                                 if (BinaryArray[y, x - 1] == 0)
                                 {
-                                    data[y, x] = data[y, x - 1];
+                                    //data[y, x] = data[y, x - 1];
 
                                     tempBlockid = arrimg[y, x - 1].blockid;
                                     arrimg[y, x].blockid = tempBlockid;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     if (x > allblock[tempBlockid].right)
@@ -2600,11 +2595,11 @@ namespace ImageProcessing
                                 //左上
                                 else if (BinaryArray[y - 1, x - 1] == 0)
                                 {
-                                    data[y, x] = data[y - 1, x - 1];
+                                    //data[y, x] = data[y - 1, x - 1];
 
                                     tempBlockid = arrimg[y - 1, x - 1].blockid;
                                     arrimg[y, x].blockid = tempBlockid;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     if (x > allblock[tempBlockid].right)
@@ -2613,8 +2608,8 @@ namespace ImageProcessing
                                     }
                                     allblock[tempBlockid].bottom = y;
 
-                                    //f:上为空，右上不空（左上不空）
-                                    if (true)
+                                    //f:左空，上为空，右上不空（左上不空）
+                                    if (BinaryArray[y - 1, x + 1] == 0)
                                     {
                                         //将A(y-1, x+1)点所属的连通域的blockid指向A(y,x)点所属的连通域
                                         allblock[arrimg[y - 1, x + 1].blockid].blockid = allblock[arrimg[y, x].blockid].blockid;
@@ -2633,40 +2628,23 @@ namespace ImageProcessing
                                 //上
                                 else if (BinaryArray[y - 1, x] == 0)
                                 {
-                                    data[y, x] = data[y - 1, x];
+                                    //data[y, x] = data[y - 1, x];
 
                                     tempBlockid = arrimg[y - 1, x].blockid;
                                     arrimg[y, x].blockid = tempBlockid;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     allblock[tempBlockid].bottom = y;
-
-                                    //左空，左上不空，上空，右上不空，需要更改标号，左上和右上需要统一
-                                    if (BinaryArray[y - 1, x ] != 0 && BinaryArray[y - 1, x-1] == 0)
-                                    {
-                                        //将A(y-1, x+1)点所属的连通域的blockid指向A(y,x)点所属的连通域
-                                        allblock[arrimg[y - 1, x + 1].blockid].blockid = allblock[arrimg[y, x].blockid].blockid;
-                                        //长度合并
-                                        allblock[arrimg[y, x].blockid].length += allblock[arrimg[y - 1, x + 1].blockid].length;
-                                        //左边界
-                                        allblock[arrimg[y, x].blockid].left = allblock[arrimg[y, x].blockid].left < allblock[arrimg[y - 1, x + 1].blockid].left ? allblock[arrimg[y, x].blockid].left : allblock[arrimg[y - 1, x + 1].blockid].left;
-                                        //右边界
-                                        allblock[arrimg[y, x].blockid].right = allblock[arrimg[y, x].blockid].right > allblock[arrimg[y - 1, x + 1].blockid].right ? allblock[arrimg[y, x].blockid].right : allblock[arrimg[y - 1, x + 1].blockid].right;
-                                        //上边界
-                                        allblock[arrimg[y, x].blockid].top = allblock[arrimg[y, x].blockid].top < allblock[arrimg[y - 1, x + 1].blockid].top ? allblock[arrimg[y, x].blockid].top : allblock[arrimg[y - 1, x + 1].blockid].top;
-                                        //下边界
-                                        allblock[arrimg[y, x].blockid].bottom = allblock[arrimg[y, x].blockid].bottom > allblock[arrimg[y - 1, x + 1].blockid].bottom ? allblock[arrimg[y, x].blockid].bottom : allblock[arrimg[y - 1, x + 1].blockid].bottom;
-                                    }
                                 }
                                 //右上
                                 else if (BinaryArray[y - 1, x + 1] == 0)
                                 {
-                                    data[y, x] = data[y - 1, x + 1];
+                                    //data[y, x] = data[y - 1, x + 1];
 
                                     tempBlockid = arrimg[y - 1, x + 1].blockid;
                                     arrimg[y, x].blockid = tempBlockid;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     allblock[tempBlockid].bottom = y;
@@ -2678,10 +2656,10 @@ namespace ImageProcessing
                                 //新增标记
                                 else
                                 {
-                                    data[y, x] = label;
+                                    //data[y, x] = label;
 
                                     arrimg[y, x].blockid = label;
-                                    arrimg[y, x].pi = 1;
+                                    arrimg[y, x].pi = 0;
 
                                     allblock[label].blockid = label;
                                     allblock[label].length = 1;
@@ -2697,95 +2675,73 @@ namespace ImageProcessing
                         }
                     }
                     #endregion
-
-                    //如果当前字典不存在该标记，那么创建该标记的Key
-                    if (!dic_label_p.ContainsKey(data[y, x]))
-                    {
-                        dic_label_p.Add(data[y, x], new List<Point>());
-                    }
-                    //添加当前标记的点位
-                    dic_label_p[data[y, x]].Add(new Point(x, y));
-
-                    //备份需要更改标记的位置
-                    List<Point> NeedChangedPoints = new List<Point>();
-                    //如果有需要更改的标记
-                    //for (int i = 0; i < ContainsLabel.Count; i++)
-                    //{
-                    if (ContainsLabel != 0)
-                    {
-                        for (int pcount = 0; pcount < dic_label_p[ContainsLabel].Count;)
-                        {
-                            Point p = dic_label_p[ContainsLabel][pcount];
-                            NeedChangedPoints.Add(p);
-                            data[p.Y, p.X] = data[y, x];
-                            dic_label_p[ContainsLabel].Remove(p);
-                            dic_label_p[data[y, x]].Add(p);
-                        }
-                        dic_label_p.Remove(ContainsLabel);
-                    }
                 }
             }
 
-            int up = imgHeight;
-            int down = 0;
-            int left = imgWidth;
-            int right = 0;
-
-            //矩形框坐标
-            //Dictionary<int, List<Point>> rect_Poingts = new Dictionary<int, List<Point>>();
-            //一个连通域
-            foreach (var lines in dic_label_p.Values)
-            {
-                up = imgHeight;
-                down = 0;
-                left = imgWidth;
-                right = 0;
-                foreach (var points in lines)
-                {
-                    //BinaryArray[points.Y, points.X] = 0;
-                    if (points.X < left)
-                    {
-                        left = points.X;
-                    }
-                    if (points.X > right)
-                    {
-                        right = points.X;
-                    }
-                    if (points.Y < up)
-                    {
-                        up = points.Y;
-                    }
-                    if (points.Y > down)
-                    {
-                        down = points.Y;
-                    }
-                }
-
-                //rect_Poingts.Add(count, new List<Point>());
-                //rect_Poingts[count].Add(new Point(up, left));//左上
-                //rect_Poingts[count].Add(new Point(up, right));//右上
-                //rect_Poingts[count].Add(new Point(down, left));//左下
-                //rect_Poingts[count].Add(new Point(down, right));//右下
-                //count++;
-                for (int rectW = left; rectW <= right; rectW++)
-                {
-                    BinaryArray[up, rectW] = 0;
-                    BinaryArray[down, rectW] = 0;
-                }
-                for (int rectH = up; rectH <= down; rectH++)
-                {
-                    BinaryArray[rectH, left] = 0;
-                    BinaryArray[rectH, right] = 0;
-                }
-            }
-            Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
 
             sw.Stop();
             TimeSpan ts2 = sw.Elapsed;
             MessageBox.Show(ts2.TotalMilliseconds.ToString());
-            return dstBmp;
-        } 
 
+            for (int i = 0; i < allblock.Length; i++)
+            {
+                if (i==allblock[i].blockid)
+                {
+                    for (int rectW = allblock[i].left; rectW <= allblock[i].right; rectW++)
+                    {
+                        BinaryArray[allblock[i].top, rectW] = 0;
+                        BinaryArray[allblock[i].bottom, rectW] = 0;
+                    }
+                    for (int rectH = allblock[i].top; rectH <= allblock[i].bottom; rectH++)
+                    {
+                        BinaryArray[rectH, allblock[i].left] = 0;
+                        BinaryArray[rectH, allblock[i].right] = 0;
+                    }
+                }
+            }
+
+            Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
+
+            return dstBmp;
+        }
+
+        #endregion
+
+        #region 在图片上画线
+
+        /// <summary>
+                /// 在图片上画线
+                /// </summary>
+                /// <param name="bmp">原始图</param>
+                /// <param name="p0">起始点</param>
+                /// <param name="p1">终止点</param>
+                /// <param name="RectColor">线的颜色</param>
+                /// <param name="LineWidth">线宽</param>
+                /// <param name="ds">线条样式</param>
+                /// <returns>输出图</returns>
+        public Bitmap DrawLineInPicture(Bitmap bmp, Point p0, Point p1)
+        {
+            if (bmp == null) return null;
+
+            if (p0.X == p1.X || p0.Y == p1.Y) return bmp;
+
+            Graphics g = Graphics.FromImage(bmp);
+
+            Brush brush = new SolidBrush(Color.Black);
+
+            Pen pen = new Pen(brush, 2);
+            //pen.Alignment = PenAlignment.Inset;
+
+            //pen.DashStyle = ds;
+
+            g.DrawLine(pen, p0, p1);
+
+            g.Dispose();
+
+            return bmp;
+        }
+
+       
         #endregion
 
         #region 笔画密度特征提取
@@ -3007,6 +2963,34 @@ namespace ImageProcessing
             }
 
 
+        }
+
+        #endregion
+
+        #region 获取二维数组里面实际存有数据的行数
+
+        /// <summary>
+        /// 获取二维数组里面实际存有数据的行数
+        /// </summary>
+        public static List<int> GetHasValueRowIndex(int[,,] arr)
+        {
+            var hasValueRowIndex = new List<int>();
+            for (var i = 0; i < arr.GetLength(0); i++)
+            {
+                for (var j = 0; j < arr.GetLength(1); j++)
+                {
+                    for (int q = 0; q < arr.GetLength(2); q++)
+                    {
+                        if (arr[i, j, q] != 0)
+                        {
+                            hasValueRowIndex.Add(i);
+                            break;
+                        }
+                    }
+
+                }
+            }
+            return hasValueRowIndex;
         }
 
         #endregion
