@@ -2128,6 +2128,10 @@ namespace ImageProcessing
                                     }
                                 }
                             }
+                            #endregion
+
+                            #region 中间像素
+                            
                             else//中间    --->可能出现衔接情况
                             {
                                 //重新实例化需要改变的标记
@@ -2275,12 +2279,12 @@ namespace ImageProcessing
                 //rect_Poingts[count].Add(new Point(down, left));//左下
                 //rect_Poingts[count].Add(new Point(down, right));//右下
                 //count++;
-                for (int rectW = left; rectW <= right; rectW++)
+                for (int rectW = left; rectW <= right; rectW += 2)
                 {
                     BinaryArray[up, rectW] = 0;
                     BinaryArray[down, rectW] = 0;
                 }
-                for (int rectH = up; rectH <= down; rectH++)
+                for (int rectH = up; rectH <= down; rectH+=2)
                 {
                     BinaryArray[rectH, left] = 0;
                     BinaryArray[rectH, right] = 0;
@@ -2319,28 +2323,19 @@ namespace ImageProcessing
 
         #endregion
 
-        #region 快速非递归连通域生成及合并算法研究
+        #region 快速非递归连通域生成及合并算法
 
-        /// <summary>
-        /// 存储一个像素点所属连通域等信息的结构体arrimgElement
-        /// </summary>
-        public struct arrimgElement
-        {
-            /// <summary>
-            /// 所属连通域的编号
-            /// </summary>
-            public int blockid;
-            /// <summary>
-            /// 对应像素点是否是黑色，黑色为0，白色为1
-            /// </summary>
-            public int pi;
-        }
+
 
         /// <summary>
         /// 开始域（连通域的一个分支）
         /// </summary>
         public struct block
         {
+            /// <summary>
+            /// 连通域唯一标识
+            /// </summary>
+            public int id;
             /// <summary>
             /// 所属连通域的编号
             /// </summary>
@@ -2367,10 +2362,25 @@ namespace ImageProcessing
             public int bottom;
         }
 
+        /// <summary>
+        /// 存储一个像素点所属连通域等信息的结构体arrimgElement
+        /// </summary>
+        public struct arrimgElement
+        {
+            /// <summary>
+            /// 所属连通域的编号
+            /// </summary>
+            public int id;
+            /// <summary>
+            /// 对应像素点是否是黑色，黑色为0，白色为1
+            /// </summary>
+            public int pi;
+        }
+
         public Bitmap FCDGAM(Bitmap bmp)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
 
             int imgWidth = bmp.Width;
             int imgHeight = bmp.Height;
@@ -2380,8 +2390,8 @@ namespace ImageProcessing
             block[] allblock = new block[imgWidth * imgHeight / 4];
 
             byte[,] BinaryArray = new byte[imgHeight, imgWidth];
-            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat); 
-            if (depth != 1)//判断位深度
+            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat) ; 
+            if (depth != 1)//判断位深度 
             {
                 int threshold = 0;
                 BinaryArray = ToBinaryArray(bmp, out threshold);
@@ -2394,6 +2404,7 @@ namespace ImageProcessing
             //标记
             int label = 0;
             int tempBlockid = -1;
+            int dstID = -1;
             for (int y = 0; y < imgHeight; y++)
             {
                 for (int x = 0; x < imgWidth; x++)
@@ -2409,9 +2420,10 @@ namespace ImageProcessing
                             //第一行第一列，如果为0，那么填入标记
                             if (x == 0)
                             {
-                                arrimg[y, x].blockid = label;
+                                arrimg[y, x].id = label;
                                 arrimg[y, x].pi = 0;
-                                
+
+                                allblock[label].id = label;
                                 allblock[label].blockid = label;
                                 allblock[label].length = 1;
                                 allblock[label].left = x;
@@ -2427,8 +2439,13 @@ namespace ImageProcessing
                                 //如果该列的左侧数据为0，那么该数据标记填充为左侧的标记
                                 if (BinaryArray[y, x - 1] == 0)
                                 {
-                                    tempBlockid = arrimg[y, x - 1].blockid;
-                                    arrimg[y, x].blockid = tempBlockid;
+                                    tempBlockid = arrimg[y, x - 1].id;
+                                    while (tempBlockid != allblock[tempBlockid].blockid)
+                                    {
+                                        tempBlockid = allblock[tempBlockid].blockid;
+                                    }
+
+                                    arrimg[y, x].id = tempBlockid;
                                     arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
@@ -2437,9 +2454,10 @@ namespace ImageProcessing
                                 //否则，填充自增标记
                                 else
                                 {
-                                    arrimg[y, x].blockid = label;
+                                    arrimg[y, x].id = label;
                                     arrimg[y, x].pi = 0;
 
+                                    allblock[label].id = label;
                                     allblock[label].blockid = label;
                                     allblock[label].length = 1;
                                     allblock[label].left = x;
@@ -2462,8 +2480,13 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = data[y - 1, x];
 
-                                    tempBlockid = arrimg[y - 1, x].blockid;
-                                    arrimg[y, x].blockid = tempBlockid;
+                                    tempBlockid = arrimg[y - 1, x].id;
+                                    while (tempBlockid != allblock[tempBlockid].blockid)
+                                    {
+                                        tempBlockid = allblock[tempBlockid].blockid;
+                                    }
+
+                                    arrimg[y, x].id = tempBlockid;
                                     arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
@@ -2474,8 +2497,13 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = data[y - 1, x + 1];
 
-                                    tempBlockid = arrimg[y - 1, x + 1].blockid;
-                                    arrimg[y, x].blockid = tempBlockid;
+                                    tempBlockid = arrimg[y - 1, x + 1].id;
+                                    while (tempBlockid != allblock[tempBlockid].blockid)
+                                    {
+                                        tempBlockid = allblock[tempBlockid].blockid;
+                                    }
+
+                                    arrimg[y, x].id = tempBlockid;
                                     arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
@@ -2487,9 +2515,10 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = label;
 
-                                    arrimg[y, x].blockid = label;
+                                    arrimg[y, x].id = label;
                                     arrimg[y, x].pi = 0;
 
+                                    allblock[label].id = label;
                                     allblock[label].blockid = label;
                                     allblock[label].length = 1;
                                     allblock[label].left = x;
@@ -2507,8 +2536,13 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = data[y, x - 1];
 
-                                    tempBlockid = arrimg[y, x - 1].blockid;
-                                    arrimg[y, x].blockid = tempBlockid;
+                                    tempBlockid = arrimg[y, x - 1].id;
+                                    while (tempBlockid != allblock[tempBlockid].blockid)
+                                    {
+                                        tempBlockid = allblock[tempBlockid].blockid;
+                                    }
+
+                                    arrimg[y, x].id = tempBlockid;
                                     arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
@@ -2519,8 +2553,13 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = data[y - 1, x - 1];
 
-                                    tempBlockid = arrimg[y - 1, x - 1].blockid;
-                                    arrimg[y, x].blockid = tempBlockid;
+                                    tempBlockid = arrimg[y - 1, x - 1].id;
+                                    while (tempBlockid != allblock[tempBlockid].blockid)
+                                    {
+                                        tempBlockid = allblock[tempBlockid].blockid;
+                                    }
+
+                                    arrimg[y, x].id = tempBlockid;
                                     arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
@@ -2532,8 +2571,9 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = data[y - 1, x];
 
-                                    tempBlockid = arrimg[y - 1, x].blockid;
-                                    arrimg[y, x].blockid = tempBlockid;
+                                    tempBlockid = arrimg[y - 1, x].id;
+
+                                    arrimg[y, x].id = tempBlockid;
                                     arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
@@ -2544,9 +2584,10 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = label;
 
-                                    arrimg[y, x].blockid = label;
+                                    arrimg[y, x].id = label;
                                     arrimg[y, x].pi = 0;
 
+                                    allblock[label].id = label;
                                     allblock[label].blockid = label;
                                     allblock[label].length = 1;
                                     allblock[label].left = x;
@@ -2557,6 +2598,9 @@ namespace ImageProcessing
                                     label++;
                                 }
                             }
+
+                            #endregion
+                            #region 中间
                             else//中间
                             {
                                 //左
@@ -2564,32 +2608,42 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = data[y, x - 1];
 
-                                    tempBlockid = arrimg[y, x - 1].blockid;
-                                    arrimg[y, x].blockid = tempBlockid;
+                                    tempBlockid = arrimg[y, x - 1].id;
+                                    while (tempBlockid != allblock[tempBlockid].blockid)
+                                    {
+                                        tempBlockid = allblock[tempBlockid].blockid;
+                                    }
+
+                                    arrimg[y, x].id = tempBlockid;
                                     arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
-                                    if (x > allblock[tempBlockid].right)
-                                    {
-                                        allblock[tempBlockid].right = x;
-                                    }
+                                    allblock[tempBlockid].right = x > allblock[tempBlockid].right ? x : allblock[tempBlockid].right;
 
                                     //e:左不空，左上是空，上是空，右上不空，需要更改标号，左和右上需要统一
                                     //i:左不空，左上不空，上是空，右上不空，需要更改标号，左和右上需要统一
                                     if (BinaryArray[y - 1, x] != 0 && BinaryArray[y - 1, x + 1] == 0)
-                                    {
-                                        //将A(y-1, x+1)点所属的连通域的blockid指向A(y,x)点所属的连通域
-                                        allblock[arrimg[y - 1, x + 1].blockid].blockid = allblock[arrimg[y, x].blockid].blockid;
+                                    {//BinaryArray[y - 1, x] != 0 && BinaryArray[y - 1, x + 1] == 0
+                                        dstID = arrimg[y - 1, x + 1].id;
+                                        tempBlockid = arrimg[y, x].id;
+
+                                        while (dstID!= allblock[dstID].blockid)
+                                        {
+                                            dstID = allblock[dstID].blockid;
+                                        }
+
+                                        //将A(y,x)点所属的连通域的blockid指向A(y-1, x+1)点所属的连通域
+                                        allblock[tempBlockid].blockid = allblock[dstID].blockid;
                                         //长度合并
-                                        allblock[arrimg[y, x].blockid].length += allblock[arrimg[y - 1, x + 1].blockid].length;
+                                        allblock[dstID].length += allblock[tempBlockid].length;
                                         //左边界
-                                        allblock[arrimg[y, x].blockid].left = allblock[arrimg[y, x].blockid].left < allblock[arrimg[y - 1, x + 1].blockid].left ? allblock[arrimg[y, x].blockid].left : allblock[arrimg[y - 1, x + 1].blockid].left;
+                                        allblock[dstID].left = allblock[dstID].left < allblock[tempBlockid].left ? allblock[dstID].left : allblock[tempBlockid].left;
                                         //右边界
-                                        allblock[arrimg[y, x].blockid].right = allblock[arrimg[y, x].blockid].right > allblock[arrimg[y - 1, x + 1].blockid].right ? allblock[arrimg[y, x].blockid].right : allblock[arrimg[y - 1, x + 1].blockid].right;
+                                        allblock[dstID].right = allblock[dstID].right > allblock[tempBlockid].right ? allblock[dstID].right : allblock[tempBlockid].right;
                                         //上边界
-                                        allblock[arrimg[y, x].blockid].top = allblock[arrimg[y, x].blockid].top < allblock[arrimg[y - 1, x + 1].blockid].top ? allblock[arrimg[y, x].blockid].top : allblock[arrimg[y - 1, x + 1].blockid].top;
+                                        allblock[dstID].top = allblock[dstID].top < allblock[tempBlockid].top ? allblock[dstID].top : allblock[tempBlockid].top;
                                         //下边界
-                                        allblock[arrimg[y, x].blockid].bottom = allblock[arrimg[y, x].blockid].bottom > allblock[arrimg[y - 1, x + 1].blockid].bottom ? allblock[arrimg[y, x].blockid].bottom : allblock[arrimg[y - 1, x + 1].blockid].bottom;
+                                        allblock[dstID].bottom = allblock[dstID].bottom > allblock[tempBlockid].bottom ? allblock[dstID].bottom : allblock[tempBlockid].bottom;
                                     }
                                 }
                                 //左上
@@ -2597,32 +2651,43 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = data[y - 1, x - 1];
 
-                                    tempBlockid = arrimg[y - 1, x - 1].blockid;
-                                    arrimg[y, x].blockid = tempBlockid;
+                                    tempBlockid = arrimg[y - 1, x - 1].id;
+
+                                    while (tempBlockid != allblock[tempBlockid].blockid)
+                                    {
+                                        tempBlockid = allblock[tempBlockid].blockid;
+                                    }
+
+                                    arrimg[y, x].id = tempBlockid;
                                     arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
-                                    if (x > allblock[tempBlockid].right)
-                                    {
-                                        allblock[tempBlockid].right = x;
-                                    }
+                                    allblock[tempBlockid].right=x > allblock[tempBlockid].right?x: allblock[tempBlockid].right;
                                     allblock[tempBlockid].bottom = y;
 
-                                    //f:左空，上为空，右上不空（左上不空）
+                                    //f:左空，左上不空，上为空，右上不空
                                     if (BinaryArray[y - 1, x + 1] == 0)
-                                    {
+                                    {//BinaryArray[y - 1, x] != 0&&BinaryArray[y - 1, x + 1] == 0
+                                        dstID = arrimg[y - 1, x + 1].id;
+                                        tempBlockid = arrimg[y, x].id;
+
+                                        while (dstID != allblock[dstID].blockid)
+                                        {
+                                            dstID = allblock[dstID].blockid;
+                                        }
+
                                         //将A(y-1, x+1)点所属的连通域的blockid指向A(y,x)点所属的连通域
-                                        allblock[arrimg[y - 1, x + 1].blockid].blockid = allblock[arrimg[y, x].blockid].blockid;
+                                        allblock[tempBlockid].blockid = allblock[dstID].blockid;
                                         //长度合并
-                                        allblock[arrimg[y, x].blockid].length += allblock[arrimg[y - 1, x + 1].blockid].length;
+                                        allblock[dstID].length += allblock[tempBlockid].length;
                                         //左边界
-                                        allblock[arrimg[y, x].blockid].left = allblock[arrimg[y, x].blockid].left < allblock[arrimg[y - 1, x + 1].blockid].left ? allblock[arrimg[y, x].blockid].left : allblock[arrimg[y - 1, x + 1].blockid].left;
+                                        allblock[dstID].left = allblock[dstID].left < allblock[tempBlockid].left ? allblock[dstID].left : allblock[tempBlockid].left;
                                         //右边界
-                                        allblock[arrimg[y, x].blockid].right = allblock[arrimg[y, x].blockid].right > allblock[arrimg[y - 1, x + 1].blockid].right ? allblock[arrimg[y, x].blockid].right : allblock[arrimg[y - 1, x + 1].blockid].right;
+                                        allblock[dstID].right = allblock[dstID].right > allblock[tempBlockid].right ? allblock[dstID].right : allblock[tempBlockid].right;
                                         //上边界
-                                        allblock[arrimg[y, x].blockid].top = allblock[arrimg[y, x].blockid].top < allblock[arrimg[y - 1, x + 1].blockid].top ? allblock[arrimg[y, x].blockid].top : allblock[arrimg[y - 1, x + 1].blockid].top;
+                                        allblock[dstID].top = allblock[dstID].top < allblock[tempBlockid].top ? allblock[dstID].top : allblock[tempBlockid].top;
                                         //下边界
-                                        allblock[arrimg[y, x].blockid].bottom = allblock[arrimg[y, x].blockid].bottom > allblock[arrimg[y - 1, x + 1].blockid].bottom ? allblock[arrimg[y, x].blockid].bottom : allblock[arrimg[y - 1, x + 1].blockid].bottom;
+                                        allblock[dstID].bottom = allblock[dstID].bottom > allblock[tempBlockid].bottom ? allblock[dstID].bottom : allblock[tempBlockid].bottom;
                                     }
                                 }
                                 //上
@@ -2630,8 +2695,13 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = data[y - 1, x];
 
-                                    tempBlockid = arrimg[y - 1, x].blockid;
-                                    arrimg[y, x].blockid = tempBlockid;
+                                    tempBlockid = arrimg[y - 1, x].id;
+                                    while (tempBlockid != allblock[tempBlockid].blockid)
+                                    {
+                                        tempBlockid = allblock[tempBlockid].blockid;
+                                    }
+
+                                    arrimg[y, x].id = tempBlockid;
                                     arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
@@ -2642,25 +2712,28 @@ namespace ImageProcessing
                                 {
                                     //data[y, x] = data[y - 1, x + 1];
 
-                                    tempBlockid = arrimg[y - 1, x + 1].blockid;
-                                    arrimg[y, x].blockid = tempBlockid;
+                                    tempBlockid = arrimg[y - 1, x + 1].id;
+                                    while (tempBlockid != allblock[tempBlockid].blockid)
+                                    {
+                                        tempBlockid = allblock[tempBlockid].blockid;
+                                    }
+
+                                    arrimg[y, x].id = tempBlockid;
                                     arrimg[y, x].pi = 0;
 
                                     allblock[tempBlockid].length++;
                                     allblock[tempBlockid].bottom = y;
-                                    if (x < allblock[tempBlockid].left)
-                                    {
-                                        allblock[tempBlockid].left = x;
-                                    }
+                                    allblock[tempBlockid].left = x < allblock[tempBlockid].left ? x : allblock[tempBlockid].left;
                                 }
                                 //新增标记
                                 else
                                 {
                                     //data[y, x] = label;
 
-                                    arrimg[y, x].blockid = label;
+                                    arrimg[y, x].id = label;
                                     arrimg[y, x].pi = 0;
 
+                                    allblock[label].id = label;
                                     allblock[label].blockid = label;
                                     allblock[label].length = 1;
                                     allblock[label].left = x;
@@ -2679,26 +2752,51 @@ namespace ImageProcessing
             }
 
 
-            sw.Stop();
-            TimeSpan ts2 = sw.Elapsed;
-            MessageBox.Show(ts2.TotalMilliseconds.ToString());
+            //sw.Stop();
+            //TimeSpan ts2 = sw.Elapsed;
+            //MessageBox.Show(ts2.TotalMilliseconds.ToString());
+
+            #region 去边框，去噪
+
+            ////求连通域平均长度
+            //int avgLength = 0;
+            //int conNum = 0;
+            //for (int i = 0; i < allblock.Length; i++)
+            //{
+            //    if (i == allblock[i].blockid)
+            //    {
+            //        conNum++;
+            //        avgLength += allblock[i].length;
+            //    }
+            //}
+            //avgLength /= conNum;
+
+            ////如果连通域长度远大于平均长度，则认为是边框
+
+            #endregion
+
+
+            #region 画出连通域外接矩形
 
             for (int i = 0; i < allblock.Length; i++)
             {
-                if (i==allblock[i].blockid)
+                if (i == allblock[i].blockid)
                 {
-                    for (int rectW = allblock[i].left; rectW <= allblock[i].right; rectW++)
+                    for (int rectW = allblock[i].left; rectW <= allblock[i].right; rectW+=2)
                     {
                         BinaryArray[allblock[i].top, rectW] = 0;
                         BinaryArray[allblock[i].bottom, rectW] = 0;
                     }
-                    for (int rectH = allblock[i].top; rectH <= allblock[i].bottom; rectH++)
+                    for (int rectH = allblock[i].top; rectH <= allblock[i].bottom; rectH+=2)
                     {
                         BinaryArray[rectH, allblock[i].left] = 0;
                         BinaryArray[rectH, allblock[i].right] = 0;
                     }
                 }
             }
+
+            #endregion
+
 
             Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
 

@@ -55,9 +55,15 @@ namespace ImageProcessing
             {
                 //读取当前选中的文件名
                 curFileName = opnDlg.FileName;
+                
                 //使用Image.FromFile创建图像对象
                 try
                 {
+                    //防止连续打开文件造成内存不足，每次赋值之前把上次的值清空
+                    if (curBitmap!=null)
+                    {
+                        curBitmap.Dispose();
+                    }
                     curBitmap = (Bitmap)Image.FromFile(curFileName);
                     //实例化类
                     pointbmp = new PointBitmap(curBitmap);
@@ -466,7 +472,6 @@ namespace ImageProcessing
 
 
         }
-
 
         private void btn_StrokeDensity_Click(object sender, EventArgs e)
         {
