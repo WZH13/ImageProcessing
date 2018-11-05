@@ -2751,6 +2751,94 @@ namespace ImageProcessing
                 }
             }
 
+            #region 获取真实连通域
+
+            int realBlockNum = 0;
+
+            int halfLen = allblock.Length - 1;
+            while (allblock[halfLen / 2].id == 0 && allblock[halfLen / 2].blockid == 0 && allblock[halfLen / 2].left == 0 && allblock[halfLen / 2].right == 0 && allblock[halfLen / 2].top == 0 && allblock[halfLen / 2].bottom == 0 && allblock[halfLen / 2].length == 0)
+            {
+                halfLen = halfLen / 2;
+            }//提高查找效率
+            int asl = 100;
+            while (allblock[halfLen - asl].id == 0 && allblock[halfLen - asl].blockid == 0 && allblock[halfLen - asl].left == 0 && allblock[halfLen - asl].right == 0 && allblock[halfLen - asl].top == 0 && allblock[halfLen - asl].bottom == 0 && allblock[halfLen - asl].length == 0)
+            {
+                halfLen = halfLen - asl;
+            }
+            for (int i = 0; i < halfLen; i++)
+            {
+                if (allblock[i].id == allblock[i].blockid && allblock[i].left != 0 && allblock[i].right != 0 && allblock[i].top != 0 && allblock[i].bottom != 0 && allblock[i].length != 0)
+                {
+                    realBlockNum++;
+                }
+            }
+            //实际连通域
+            block[] dstBlock = new block[realBlockNum];
+            int dstBlockNum = 0;
+            for (int i = 0; i < halfLen; i++)
+            {
+                if (allblock[i].id == allblock[i].blockid && allblock[i].left != 0 && allblock[i].right != 0 && allblock[i].top != 0 && allblock[i].bottom != 0 && allblock[i].length != 0)
+                {
+                    dstBlock[dstBlockNum].id = allblock[i].id;
+                    dstBlock[dstBlockNum].blockid = allblock[i].blockid;
+                    dstBlock[dstBlockNum].length = allblock[i].length;
+                    dstBlock[dstBlockNum].left = allblock[i].left;
+                    dstBlock[dstBlockNum].right = allblock[i].right;
+                    dstBlock[dstBlockNum].top = allblock[i].top;
+                    dstBlock[dstBlockNum].bottom = allblock[i].bottom;
+                    dstBlockNum++;
+                }
+            }
+
+            #endregion
+
+            #region 合并交叉，包含连通域
+
+            for (int i = 0; i < dstBlock.Length; i++)
+            {
+                for (int j = 0; j < dstBlock.Length; j++)
+                {
+                    if (i != j)
+                    {
+                        //判断i是否包含j,包含边界
+                        if (dstBlock[i].left <= dstBlock[j].left && dstBlock[i].right >= dstBlock[j].right && dstBlock[i].top >= dstBlock[j].top && dstBlock[i].bottom <= dstBlock[j].bottom)
+                        {
+                            //合并到i
+                            dstBlock[i].length += dstBlock[j].length;
+                            //dstBlock[j].id = 0;
+                            dstBlock[j].blockid = -1; 
+                            //dstBlock[j].length = 0;
+                            //dstBlock[j].left = 0;
+                            //dstBlock[j].right = 0;
+                            //dstBlock[j].top = 0;
+                            //dstBlock[j].bottom = 0;
+                        }
+                        //判断交叉
+                        if (((dstBlock[i].left< dstBlock[j].left&& dstBlock[j].left< dstBlock[i].right)|| (dstBlock[i].left < dstBlock[j].right && dstBlock[j].right < dstBlock[i].right))&& ((dstBlock[i].top < dstBlock[j].top && dstBlock[j].top < dstBlock[i].bottom) || (dstBlock[i].top < dstBlock[j].bottom && dstBlock[j].bottom < dstBlock[i].top)))
+                        {
+                            //合并到i
+                            dstBlock[i].length += dstBlock[j].length;
+                            dstBlock[i].left = dstBlock[i].left < dstBlock[j].left ? dstBlock[i].left : dstBlock[j].left;
+                            dstBlock[i].right = dstBlock[i].right > dstBlock[j].right ? dstBlock[i].right : dstBlock[j].right;
+                            dstBlock[i].top = dstBlock[i].top < dstBlock[j].top ? dstBlock[i].top : dstBlock[j].top;
+                            dstBlock[i].bottom = dstBlock[i].bottom > dstBlock[j].bottom ? dstBlock[i].bottom : dstBlock[j].bottom;
+
+                            dstBlock[j].blockid = -1;
+
+                            //dstBlock[j].id = 0;
+                            //dstBlock[j].blockid = 0;
+                            //dstBlock[j].length = 0;
+                            //dstBlock[j].left = 0;
+                            //dstBlock[j].right = 0;
+                            //dstBlock[j].top = 0;
+                            //dstBlock[j].bottom = 0;
+                        }
+
+                    }
+                }
+            }
+
+            #endregion
 
             //sw.Stop();
             //TimeSpan ts2 = sw.Elapsed;
@@ -2758,41 +2846,53 @@ namespace ImageProcessing
 
             #region 去边框，去噪
 
-            ////求连通域平均长度
-            //int avgLength = 0;
+            //求连通域平均长度
+            //int avgArea = 0;
             //int conNum = 0;
             //for (int i = 0; i < allblock.Length; i++)
             //{
             //    if (i == allblock[i].blockid)
             //    {
             //        conNum++;
-            //        avgLength += allblock[i].length;
+            //        avgArea = avgArea+(allblock[i].bottom-allblock[i].top)*(allblock[i].right - allblock[i].left);
             //    }
             //}
-            //avgLength /= conNum;
+            //avgArea /= conNum;
+            //for (int i = 0; i < allblock.Length; i++)
+            //{
+            //    if (i == allblock[i].blockid)
+            //    {
+            //        if ((allblock[i].bottom - allblock[i].top) * (allblock[i].right - allblock[i].left) > avgArea|| (allblock[i].bottom - allblock[i].top) * (allblock[i].right - allblock[i].left)<avgArea*0.015)
+            //        {
+            //            allblock[i].blockid = -1;
+            //        }
+            //    }
+            //}
 
-            ////如果连通域长度远大于平均长度，则认为是边框
+            //如果连通域长度远大于平均长度，则认为是边框
 
             #endregion
 
 
             #region 画出连通域外接矩形
 
-            for (int i = 0; i < allblock.Length; i++)
+            for (int i = 0; i < dstBlock.Length; i++)
             {
-                if (i == allblock[i].blockid)
+                //if (dstBlock[i].id != 0&&dstBlock[i].blockid != 0 &&dstBlock[i].length != 0 && dstBlock[i].left != 0 && dstBlock[i].right != 0 && dstBlock[i].top != 0 && dstBlock[i].bottom != 0)
+                if (dstBlock[i].blockid !=-1)
                 {
-                    for (int rectW = allblock[i].left; rectW <= allblock[i].right; rectW+=2)
+                    for (int rectW = dstBlock[i].left; rectW <= dstBlock[i].right; rectW += 2)
                     {
-                        BinaryArray[allblock[i].top, rectW] = 0;
-                        BinaryArray[allblock[i].bottom, rectW] = 0;
+                        BinaryArray[dstBlock[i].top, rectW] = 0;
+                        BinaryArray[dstBlock[i].bottom, rectW] = 0;
                     }
-                    for (int rectH = allblock[i].top; rectH <= allblock[i].bottom; rectH+=2)
+                    for (int rectH = dstBlock[i].top; rectH <= dstBlock[i].bottom; rectH += 2)
                     {
-                        BinaryArray[rectH, allblock[i].left] = 0;
-                        BinaryArray[rectH, allblock[i].right] = 0;
+                        BinaryArray[rectH, dstBlock[i].left] = 0;
+                        BinaryArray[rectH, dstBlock[i].right] = 0;
                     }
                 }
+                
             }
 
             #endregion
@@ -2802,6 +2902,17 @@ namespace ImageProcessing
 
             return dstBmp;
         }
+
+        #endregion
+
+        #region 获取连通域个数
+
+        //public block[] getRealBlockNum(block[] allblock)
+        //{
+            
+
+        //    return dstBlock;
+        //}
 
         #endregion
 
@@ -3064,6 +3175,7 @@ namespace ImageProcessing
         }
 
         #endregion
+
 
         #region 获取二维数组里面实际存有数据的行数
 
