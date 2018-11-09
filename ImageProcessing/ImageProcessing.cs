@@ -2324,9 +2324,7 @@ namespace ImageProcessing
         #endregion
 
         #region 快速非递归连通域生成及合并算法
-
-
-
+            
         /// <summary>
         /// 开始域（连通域的一个分支）
         /// </summary>
@@ -2752,16 +2750,19 @@ namespace ImageProcessing
             }
 
             //获取实际连通域
-            block[] dstBlock= getRealConDomain(allblock,100);
+            block[] dstBlock= getRealConDomain(allblock,1);
 
             //合并交叉，包含连通域
-            dstBlock = MergeConDomain(dstBlock,5);
+            dstBlock = MergeConDomain(dstBlock, 2);
+            dstBlock = MergeConDomain(dstBlock, 2);
+            //dstBlock = MergeConDomain2(dstBlock, 63);
+
 
             //sw.Stop();
             //TimeSpan ts2 = sw.Elapsed;
             //MessageBox.Show(ts2.TotalMilliseconds.ToString());
 
-            
+
             #region 去边框，去噪
 
             //求连通域平均长度
@@ -2820,8 +2821,7 @@ namespace ImageProcessing
         }
 
         #endregion
-
-
+        
         #region ①获取真实连通域
 
         /// <summary>
@@ -2893,37 +2893,100 @@ namespace ImageProcessing
         {
             for (int i = 0; i < dstBlock.Length; i++)
             {
-                for (int j = 0; j < dstBlock.Length; j++)
+                if (dstBlock[i].blockid != -1)
                 {
-                    if (i != j)
+                    for (int j = 0; j < dstBlock.Length; j++)
                     {
-                        //判断i是否包含j,包含边界
-                        if (dstBlock[i].left - expand <= dstBlock[j].left - expand && dstBlock[i].right + expand >= dstBlock[j].right + expand && dstBlock[i].top - expand >= dstBlock[j].top - expand && dstBlock[i].bottom + expand <= dstBlock[j].bottom + expand)
+                        if (i != j)
                         {
-                            //合并到i
-                            dstBlock[i].length += dstBlock[j].length;
-                            dstBlock[j].blockid = -1;
-                        }
-                        //判断交叉
-                        if (((dstBlock[i].left - expand <= dstBlock[j].left - expand && dstBlock[j].left - expand <= dstBlock[i].right + expand) ||
-                            (dstBlock[i].left - expand <= dstBlock[j].right + expand && dstBlock[j].right + expand <= dstBlock[i].right + expand)) &&
-                            ((dstBlock[i].top - expand <= dstBlock[j].top - expand && dstBlock[j].top - expand <= dstBlock[i].bottom + expand) ||
-                            (dstBlock[i].top - expand <= dstBlock[j].bottom + expand && dstBlock[j].bottom + expand <= dstBlock[i].bottom - expand)))
-                        {
-                            //合并到i
-                            dstBlock[i].length += dstBlock[j].length;
-                            dstBlock[i].left = dstBlock[i].left < dstBlock[j].left ? dstBlock[i].left : dstBlock[j].left;
-                            dstBlock[i].right = dstBlock[i].right > dstBlock[j].right ? dstBlock[i].right : dstBlock[j].right;
-                            dstBlock[i].top = dstBlock[i].top < dstBlock[j].top ? dstBlock[i].top : dstBlock[j].top;
-                            dstBlock[i].bottom = dstBlock[i].bottom > dstBlock[j].bottom ? dstBlock[i].bottom : dstBlock[j].bottom;
+                            if (dstBlock[j].blockid != -1)
+                            {
+                                //判断i是否包含j,包含边界
+                                if (dstBlock[i].left <= dstBlock[j].left && dstBlock[i].right >= dstBlock[j].right && dstBlock[i].top >= dstBlock[j].top && dstBlock[i].bottom <= dstBlock[j].bottom)
+                                {
+                                    //合并到i
+                                    dstBlock[i].length += dstBlock[j].length;
+                                    dstBlock[j].blockid = -1;//标记为-1表示已经被合并到另一连通域
+                                }
+                                //判断交叉
+                                if (((dstBlock[i].left - expand <= dstBlock[j].left - expand && dstBlock[j].left - expand <= dstBlock[i].right + expand) ||
+                                    (dstBlock[i].left - expand <= dstBlock[j].right + expand && dstBlock[j].right + expand <= dstBlock[i].right + expand)) &&
+                                    ((dstBlock[i].top - expand <= dstBlock[j].top - expand && dstBlock[j].top - expand <= dstBlock[i].bottom + expand) ||
+                                    (dstBlock[i].top - expand <= dstBlock[j].bottom + expand && dstBlock[j].bottom + expand <= dstBlock[i].bottom - expand)))
+                                {
+                                    //合并到i
+                                    dstBlock[i].length += dstBlock[j].length;
+                                    dstBlock[i].left = dstBlock[i].left < dstBlock[j].left ? dstBlock[i].left : dstBlock[j].left;
+                                    dstBlock[i].right = dstBlock[i].right > dstBlock[j].right ? dstBlock[i].right : dstBlock[j].right;
+                                    dstBlock[i].top = dstBlock[i].top < dstBlock[j].top ? dstBlock[i].top : dstBlock[j].top;
+                                    dstBlock[i].bottom = dstBlock[i].bottom > dstBlock[j].bottom ? dstBlock[i].bottom : dstBlock[j].bottom;
 
-                            dstBlock[j].blockid = -1;
-                        }
+                                    dstBlock[j].blockid = -1;
+                                }
 
+                            }
+                        }
                     }
                 }
             }
             return dstBlock;
+        }
+
+        #endregion
+
+        #region ②合并交叉,包含,相邻连通域
+
+        public block[] MergeConDomain2(block[] dstBlock, int threshold)
+        {
+            int distance = -1;
+            int y1; int x1; int y2; int x2;
+            //计算两个连通域中心距离，偏小的合并在一起
+            for (int i = 0; i < dstBlock.Length; i++)
+            {
+                if (dstBlock[i].blockid != -1)
+                {
+                    for (int j = 0; j < dstBlock.Length; j++)
+                    {
+                        if (i != j)
+                        {
+                            if (dstBlock[j].blockid != -1)
+                            {
+
+                                y1 = dstBlock[i].top + (dstBlock[i].bottom - dstBlock[i].top) / 2;
+                                x1 = dstBlock[i].left + (dstBlock[i].right - dstBlock[i].left) / 2;
+                                y2 = dstBlock[j].top + (dstBlock[j].bottom - dstBlock[j].top) / 2;
+                                x2 = dstBlock[j].left + (dstBlock[j].right - dstBlock[j].left) / 2;
+                                distance = calDistance(y1, x1, y2, x2);
+                                if (distance < threshold)
+                                {
+                                    //合并到i
+                                    dstBlock[i].length += dstBlock[j].length;
+                                    dstBlock[i].left = dstBlock[i].left < dstBlock[j].left ? dstBlock[i].left : dstBlock[j].left;
+                                    dstBlock[i].right = dstBlock[i].right > dstBlock[j].right ? dstBlock[i].right : dstBlock[j].right;
+                                    dstBlock[i].top = dstBlock[i].top < dstBlock[j].top ? dstBlock[i].top : dstBlock[j].top;
+                                    dstBlock[i].bottom = dstBlock[i].bottom > dstBlock[j].bottom ? dstBlock[i].bottom : dstBlock[j].bottom;
+
+                                    dstBlock[j].blockid = -1;
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+
+                return dstBlock;
+        }
+
+        #endregion
+
+        #region 计算两点之间的距离
+
+        public int calDistance(int y1, int x1, int y2 , int x2)
+        {
+            int distance = 0;
+            distance = Convert.ToInt32(Math.Sqrt((y1 - y2) * (y1 - y2) + (x1 - x2) * (x1 - x2)));
+            return distance;
         }
 
         #endregion
@@ -2935,6 +2998,8 @@ namespace ImageProcessing
             int flag = -1;
             int dstImgWidth = 0;
             int dstImgHeight = 0;
+
+            //单字图像
             List<Bitmap> dstBitmaps = new List<Bitmap>();
             for (int i = 0; i < dstBlock.Length; i++)
             {
@@ -2967,10 +3032,12 @@ namespace ImageProcessing
 
         #region 切分粘连
 
+        public void cut(block[] dstBlock)
+        {
 
+        }
 
         #endregion
-
 
         #region 在图片上画线
 
