@@ -2755,8 +2755,16 @@ namespace ImageProcessing
             //合并交叉，包含连通域
             dstBlock = MergeConDomain(dstBlock, 2);
             dstBlock = MergeConDomain(dstBlock, 2);
+
+            //根据中心点之间的距离，合并连通域
             //dstBlock = MergeConDomain2(dstBlock, 63);
 
+            //动态设置阈值
+            int treshold = calAvgChLen(dstBlock);
+            dstBlock = MergeConDomain2(dstBlock, treshold);
+
+            //删除已被合并的连通域
+            dstBlock = delMergedConDomain(dstBlock);
 
             //sw.Stop();
             //TimeSpan ts2 = sw.Elapsed;
@@ -2773,7 +2781,7 @@ namespace ImageProcessing
             //    if (i == allblock[i].blockid)
             //    {
             //        conNum++;
-            //        avgArea = avgArea+(allblock[i].bottom-allblock[i].top)*(allblock[i].right - allblock[i].left);
+            //        avgArea = avgArea + (allblock[i].bottom - allblock[i].top) * (allblock[i].right - allblock[i].left);
             //    }
             //}
             //avgArea /= conNum;
@@ -2781,7 +2789,7 @@ namespace ImageProcessing
             //{
             //    if (i == allblock[i].blockid)
             //    {
-            //        if ((allblock[i].bottom - allblock[i].top) * (allblock[i].right - allblock[i].left) > avgArea|| (allblock[i].bottom - allblock[i].top) * (allblock[i].right - allblock[i].left)<avgArea*0.015)
+            //        if ((allblock[i].bottom - allblock[i].top) * (allblock[i].right - allblock[i].left) > avgArea || (allblock[i].bottom - allblock[i].top) * (allblock[i].right - allblock[i].left) < avgArea * 0.015)
             //        {
             //            allblock[i].blockid = -1;
             //        }
@@ -2799,12 +2807,12 @@ namespace ImageProcessing
                 //if (dstBlock[i].id != 0&&dstBlock[i].blockid != 0 &&dstBlock[i].length != 0 && dstBlock[i].left != 0 && dstBlock[i].right != 0 && dstBlock[i].top != 0 && dstBlock[i].bottom != 0)
                 if (dstBlock[i].blockid !=-1)
                 {
-                    for (int rectW = dstBlock[i].left; rectW <= dstBlock[i].right; rectW += 2)
+                    for (int rectW = dstBlock[i].left; rectW <= dstBlock[i].right; rectW ++ )
                     {
                         BinaryArray[dstBlock[i].top, rectW] = 0;
                         BinaryArray[dstBlock[i].bottom, rectW] = 0;
                     }
-                    for (int rectH = dstBlock[i].top; rectH <= dstBlock[i].bottom; rectH += 2)
+                    for (int rectH = dstBlock[i].top; rectH <= dstBlock[i].bottom; rectH ++ )
                     {
                         BinaryArray[rectH, dstBlock[i].left] = 0;
                         BinaryArray[rectH, dstBlock[i].right] = 0;
@@ -2823,12 +2831,6 @@ namespace ImageProcessing
         #endregion
         
         #region ①获取真实连通域
-
-        /// <summary>
-        /// 获取真实连通域
-        /// </summary>
-        /// <param name="allblock"></param>
-        /// <returns></returns>
 
         /// <summary>
         /// 获取真实连通域
@@ -2929,13 +2931,20 @@ namespace ImageProcessing
                     }
                 }
             }
+            dstBlock = delMergedConDomain(dstBlock);
             return dstBlock;
         }
 
         #endregion
 
-        #region ②合并交叉,包含,相邻连通域
+        #region ③根据中心点之间的距离，合并连通域
 
+        /// <summary>
+        /// 根据中心点之间的距离，合并连通域
+        /// </summary>
+        /// <param name="dstBlock">所有连通域</param>
+        /// <param name="threshold">合并连通域所依据的中心点之间的距离阈值</param>
+        /// <returns></returns>
         public block[] MergeConDomain2(block[] dstBlock, int threshold)
         {
             int distance = -1;
@@ -2945,48 +2954,155 @@ namespace ImageProcessing
             {
                 if (dstBlock[i].blockid != -1)
                 {
-                    for (int j = 0; j < dstBlock.Length; j++)
+                    for (int j = i + 1; j < dstBlock.Length; j++)
                     {
-                        if (i != j)
+                        if (dstBlock[j].blockid != -1)
                         {
-                            if (dstBlock[j].blockid != -1)
+                            y1 = dstBlock[i].top + (dstBlock[i].bottom - dstBlock[i].top) / 2;
+                            x1 = dstBlock[i].left + (dstBlock[i].right - dstBlock[i].left) / 2;
+                            y2 = dstBlock[j].top + (dstBlock[j].bottom - dstBlock[j].top) / 2;
+                            x2 = dstBlock[j].left + (dstBlock[j].right - dstBlock[j].left) / 2;
+                            distance = calDistance(y1, x1, y2, x2);
+                            if (distance < threshold)
                             {
+                                //合并到i
+                                dstBlock[i].length += dstBlock[j].length;
+                                dstBlock[i].left = dstBlock[i].left < dstBlock[j].left ? dstBlock[i].left : dstBlock[j].left;
+                                dstBlock[i].right = dstBlock[i].right > dstBlock[j].right ? dstBlock[i].right : dstBlock[j].right;
+                                dstBlock[i].top = dstBlock[i].top < dstBlock[j].top ? dstBlock[i].top : dstBlock[j].top;
+                                dstBlock[i].bottom = dstBlock[i].bottom > dstBlock[j].bottom ? dstBlock[i].bottom : dstBlock[j].bottom;
 
-                                y1 = dstBlock[i].top + (dstBlock[i].bottom - dstBlock[i].top) / 2;
-                                x1 = dstBlock[i].left + (dstBlock[i].right - dstBlock[i].left) / 2;
-                                y2 = dstBlock[j].top + (dstBlock[j].bottom - dstBlock[j].top) / 2;
-                                x2 = dstBlock[j].left + (dstBlock[j].right - dstBlock[j].left) / 2;
-                                distance = calDistance(y1, x1, y2, x2);
-                                if (distance < threshold)
-                                {
-                                    //合并到i
-                                    dstBlock[i].length += dstBlock[j].length;
-                                    dstBlock[i].left = dstBlock[i].left < dstBlock[j].left ? dstBlock[i].left : dstBlock[j].left;
-                                    dstBlock[i].right = dstBlock[i].right > dstBlock[j].right ? dstBlock[i].right : dstBlock[j].right;
-                                    dstBlock[i].top = dstBlock[i].top < dstBlock[j].top ? dstBlock[i].top : dstBlock[j].top;
-                                    dstBlock[i].bottom = dstBlock[i].bottom > dstBlock[j].bottom ? dstBlock[i].bottom : dstBlock[j].bottom;
-
-                                    dstBlock[j].blockid = -1;
-                                }
+                                dstBlock[j].blockid = -1;
                             }
                         }
                     }
                 }
 
             }
-
-                return dstBlock;
+            dstBlock = delMergedConDomain(dstBlock);
+            return dstBlock;
         }
 
         #endregion
 
-        #region 计算两点之间的距离
+        #region ③计算两点之间的距离
 
+        /// <summary>
+        /// 计算两点之间的距离
+        /// </summary>
+        /// <param name="y1">第一个中心点的纵坐标</param>
+        /// <param name="x1">第一个中心点的横坐标</param>
+        /// <param name="y2">第二个中心点的纵坐标</param>
+        /// <param name="x2">第二个中心点的横坐标</param>
+        /// <returns></returns>
         public int calDistance(int y1, int x1, int y2 , int x2)
         {
             int distance = 0;
             distance = Convert.ToInt32(Math.Sqrt((y1 - y2) * (y1 - y2) + (x1 - x2) * (x1 - x2)));
             return distance;
+        }
+
+        #endregion
+
+        #region 计算连通域中心距离平均值
+
+        public int calAvgCenterDis(block[] dstBlock)
+        {
+            int avgCenterDis = 0;
+            int sumCenterDis = 0;
+            int countNum = 0;
+            int distance = -1;
+            int y1; int x1; int y2; int x2;
+            //计算两个连通域中心距离，偏小的合并在一起
+            for (int i = 0; i < dstBlock.Length; i++)
+            {
+                if (dstBlock[i].blockid != -1)
+                {
+                    for (int j = i + 1; j < dstBlock.Length; j++)
+                    {
+                        if (dstBlock[j].blockid != -1)
+                        {
+                            y1 = dstBlock[i].top + (dstBlock[i].bottom - dstBlock[i].top) / 2;
+                            x1 = dstBlock[i].left + (dstBlock[i].right - dstBlock[i].left) / 2;
+                            y2 = dstBlock[j].top + (dstBlock[j].bottom - dstBlock[j].top) / 2;
+                            x2 = dstBlock[j].left + (dstBlock[j].right - dstBlock[j].left) / 2;
+                            distance = calDistance(y1, x1, y2, x2);
+                            sumCenterDis += distance;
+                            countNum++;
+                        }
+                    }
+                }
+            }
+            avgCenterDis = sumCenterDis / countNum;
+            return avgCenterDis;
+        }
+
+        #endregion
+
+        #region 统计连通域平均宽度，平均长度
+
+        public int calAvgChLen(block[] dstBlock)
+        {
+            int avgChLen = 0;
+            int sumChLen = 0;
+            int avgChWidth = 0;
+            int sumChWidth = 0;
+            int threshold = 0;
+            int y1; int x1; int y2; int x2;
+            //计算两个连通域中心距离，偏小的合并在一起
+            for (int i = 0; i < dstBlock.Length; i++)
+            {
+                sumChLen = sumChLen + dstBlock[i].bottom - dstBlock[i].top;
+                sumChWidth = sumChWidth + dstBlock[i].right - dstBlock[i].left;
+            }
+            //平均字域长度
+            avgChLen = sumChLen / dstBlock.Length;
+            //平均字域宽度
+            avgChWidth = sumChWidth / dstBlock.Length;
+
+            threshold = Convert.ToInt32(Math.Sqrt(avgChLen * avgChLen + avgChWidth * avgChWidth));
+
+            return threshold;
+        }
+
+        #endregion
+
+        #region 删除被合并了的连通域
+
+        public block[] delMergedConDomain(block[] dstBlock)
+        {
+            int lineEnd = dstBlock.Length - 1;
+            for (int i = 0; i < dstBlock.Length; i++)
+            {
+                if (dstBlock[i].blockid == -1)
+                {
+                    for (int j = lineEnd; j >i; j--)
+                    {
+                        if (dstBlock[j].blockid != -1)
+                        {//把j挪到前面需要删除的位置
+                            dstBlock[i].id = dstBlock[j].id;
+                            dstBlock[i].blockid = dstBlock[j].blockid;
+                            dstBlock[i].left = dstBlock[j].left;
+                            dstBlock[i].right = dstBlock[j].right;
+                            dstBlock[i].top = dstBlock[j].top;
+                            dstBlock[i].bottom = dstBlock[j].bottom;
+                            dstBlock[i].length = dstBlock[j].length;
+
+                            lineEnd = j - 1;
+                        }
+                    }
+                }
+            }
+            return dstBlock;
+        }
+
+        #endregion
+
+        #region 切分粘连
+
+        public void SegmentalAdhesion(block[] dstBlock)
+        {
+
         }
 
         #endregion
@@ -3015,7 +3131,7 @@ namespace ImageProcessing
                     {
                         for (int x = 0; x < dstImgWidth; x++)
                         {
-                            dstBinaryArray[y, x] = BinaryArray[pY, pX];
+                            dstBinaryArray[y, x] = BinaryArray[ pY, pX];
                             pX++;
                         }
                         pY++;
@@ -3026,15 +3142,6 @@ namespace ImageProcessing
 
             }
             return flag;
-        }
-
-        #endregion
-
-        #region 切分粘连
-
-        public void cut(block[] dstBlock)
-        {
-
         }
 
         #endregion
