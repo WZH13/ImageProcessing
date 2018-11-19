@@ -2753,8 +2753,8 @@ namespace ImageProcessing
             block[] dstBlock= getRealConDomain(allblock,1);
 
             //合并交叉，包含连通域
-            dstBlock = MergeConDomain(dstBlock, 2);
-            dstBlock = MergeConDomain(dstBlock, 2);
+            dstBlock = MergeConDomain(dstBlock, 10,3);
+            dstBlock = MergeConDomain(dstBlock, 10,3);
 
             //根据中心点之间的距离，合并连通域
             //dstBlock = MergeConDomain2(dstBlock, 63);
@@ -2764,11 +2764,12 @@ namespace ImageProcessing
             dstBlock = MergeConDomain2(dstBlock, treshold);
 
             //删除已被合并的连通域
-            dstBlock = delMergedConDomain(dstBlock);
+            //dstBlock = delMergedConDomain(dstBlock);
 
             //sw.Stop();
             //TimeSpan ts2 = sw.Elapsed;
             //MessageBox.Show(ts2.TotalMilliseconds.ToString());
+            BinaryArray = SegmentalAdhesion(dstBlock, BinaryArray);
 
 
             #region 去边框，去噪
@@ -2891,7 +2892,7 @@ namespace ImageProcessing
         /// <param name="dstBlock">block[]类型</param>
         /// <param name="expand">expand的值指示相邻多远的连通域将被合并</param>
         /// <returns>合并后的连通域数组</returns>
-        public block[] MergeConDomain(block[] dstBlock,int expand)
+        public block[] MergeConDomain(block[] dstBlock,int expandLR,int expandTB)
         {
             for (int i = 0; i < dstBlock.Length; i++)
             {
@@ -2911,10 +2912,10 @@ namespace ImageProcessing
                                     dstBlock[j].blockid = -1;//标记为-1表示已经被合并到另一连通域
                                 }
                                 //判断交叉
-                                if (((dstBlock[i].left - expand <= dstBlock[j].left - expand && dstBlock[j].left - expand <= dstBlock[i].right + expand) ||
-                                    (dstBlock[i].left - expand <= dstBlock[j].right + expand && dstBlock[j].right + expand <= dstBlock[i].right + expand)) &&
-                                    ((dstBlock[i].top - expand <= dstBlock[j].top - expand && dstBlock[j].top - expand <= dstBlock[i].bottom + expand) ||
-                                    (dstBlock[i].top - expand <= dstBlock[j].bottom + expand && dstBlock[j].bottom + expand <= dstBlock[i].bottom - expand)))
+                                if (((dstBlock[i].left - expandLR <= dstBlock[j].left - expandLR && dstBlock[j].left - expandLR <= dstBlock[i].right + expandLR) ||
+                                    (dstBlock[i].left - expandLR <= dstBlock[j].right + expandLR && dstBlock[j].right + expandLR <= dstBlock[i].right + expandLR)) &&
+                                    ((dstBlock[i].top - expandTB <= dstBlock[j].top - expandTB && dstBlock[j].top - expandTB <= dstBlock[i].bottom + expandTB) ||
+                                    (dstBlock[i].top - expandTB <= dstBlock[j].bottom + expandTB && dstBlock[j].bottom + expandTB <= dstBlock[i].bottom - expandTB)))
                                 {
                                     //合并到i
                                     dstBlock[i].length += dstBlock[j].length;
@@ -2931,7 +2932,7 @@ namespace ImageProcessing
                     }
                 }
             }
-            dstBlock = delMergedConDomain(dstBlock);
+            //dstBlock = delMergedConDomain(dstBlock);
             return dstBlock;
         }
 
@@ -2979,8 +2980,43 @@ namespace ImageProcessing
                 }
 
             }
-            dstBlock = delMergedConDomain(dstBlock);
+            //dstBlock = delMergedConDomain(dstBlock);
             return dstBlock;
+        }
+
+        #endregion
+
+        #region ③统计连通域平均宽度，平均长度
+
+        public int calAvgChLen(block[] dstBlock)
+        {
+            int avgChLen = 0;
+            int sumChLen = 0;
+            int avgChWidth = 0;
+            int sumChWidth = 0;
+            int avgChArea = 0;
+            int sumChArea = 0;
+            int threshold = 0;
+            //计算两个连通域中心距离，偏小的合并在一起
+            for (int i = 0; i < dstBlock.Length; i++)
+            {
+                if (dstBlock[i].blockid != -1)
+                {
+                    sumChLen += dstBlock[i].bottom - dstBlock[i].top;
+                    sumChWidth += dstBlock[i].right - dstBlock[i].left;
+                    sumChArea *= (dstBlock[i].right - dstBlock[i].left) * (dstBlock[i].bottom - dstBlock[i].top);
+                }
+            }
+            //平均字域长度
+            avgChLen = sumChLen / dstBlock.Length;
+            //平均字域宽度
+            avgChWidth = sumChWidth / dstBlock.Length;
+            //平均面积
+            avgChArea = sumChArea / dstBlock.Length;
+
+            threshold = Convert.ToInt32(Math.Sqrt(avgChLen * avgChLen + avgChWidth * avgChWidth));
+
+            return threshold;
         }
 
         #endregion
@@ -3004,65 +3040,16 @@ namespace ImageProcessing
 
         #endregion
 
-        #region 计算连通域中心距离平均值
+        #region 0合并小连通域
+        //将尺寸远小于标准尺寸（小于标准尺寸的 0.15 倍），且距离邻近字域较近（距离小于标准尺寸的 0.1）的独立字域归并到离它最近的字域中。
+        //例如一些汉字中的独立的“点”笔划，可能存在这种情况。
 
-        public int calAvgCenterDis(block[] dstBlock)
+
+        public block[] calAvgCenterDis(block[] dstBlock)
         {
-            int avgCenterDis = 0;
-            int sumCenterDis = 0;
-            int countNum = 0;
-            int distance = -1;
-            int y1; int x1; int y2; int x2;
-            //计算两个连通域中心距离，偏小的合并在一起
-            for (int i = 0; i < dstBlock.Length; i++)
-            {
-                if (dstBlock[i].blockid != -1)
-                {
-                    for (int j = i + 1; j < dstBlock.Length; j++)
-                    {
-                        if (dstBlock[j].blockid != -1)
-                        {
-                            y1 = dstBlock[i].top + (dstBlock[i].bottom - dstBlock[i].top) / 2;
-                            x1 = dstBlock[i].left + (dstBlock[i].right - dstBlock[i].left) / 2;
-                            y2 = dstBlock[j].top + (dstBlock[j].bottom - dstBlock[j].top) / 2;
-                            x2 = dstBlock[j].left + (dstBlock[j].right - dstBlock[j].left) / 2;
-                            distance = calDistance(y1, x1, y2, x2);
-                            sumCenterDis += distance;
-                            countNum++;
-                        }
-                    }
-                }
-            }
-            avgCenterDis = sumCenterDis / countNum;
-            return avgCenterDis;
-        }
+            
 
-        #endregion
-
-        #region 统计连通域平均宽度，平均长度
-
-        public int calAvgChLen(block[] dstBlock)
-        {
-            int avgChLen = 0;
-            int sumChLen = 0;
-            int avgChWidth = 0;
-            int sumChWidth = 0;
-            int threshold = 0;
-            int y1; int x1; int y2; int x2;
-            //计算两个连通域中心距离，偏小的合并在一起
-            for (int i = 0; i < dstBlock.Length; i++)
-            {
-                sumChLen = sumChLen + dstBlock[i].bottom - dstBlock[i].top;
-                sumChWidth = sumChWidth + dstBlock[i].right - dstBlock[i].left;
-            }
-            //平均字域长度
-            avgChLen = sumChLen / dstBlock.Length;
-            //平均字域宽度
-            avgChWidth = sumChWidth / dstBlock.Length;
-
-            threshold = Convert.ToInt32(Math.Sqrt(avgChLen * avgChLen + avgChWidth * avgChWidth));
-
-            return threshold;
+            return dstBlock;
         }
 
         #endregion
@@ -3100,9 +3087,63 @@ namespace ImageProcessing
 
         #region 切分粘连
 
-        public void SegmentalAdhesion(block[] dstBlock)
+        public byte[,] SegmentalAdhesion(block[] dstBlock, byte[,] BinaryArray)
+        {
+            int blockWidth = 0;
+            int blockHeight = 0;
+            double ratio = 0.0;
+            int nullLine = 0;
+            //如果一个字域的高宽比在 0.8 - 1.2之间，则认为是一个汉字；如果其高度是宽度的1.6倍以上，则认为是多个字，需要进行再次切分。
+            //此时对组成此字域的连通域局部采用横向投影法，决定其切分位置。
+            for (int i = 0; i < dstBlock.Length; i++)
+            {
+                if (dstBlock[i].blockid != -1)
+                {
+                    blockWidth = dstBlock[i].right - dstBlock[i].left;
+                    blockHeight = dstBlock[i].bottom - dstBlock[i].top;
+                    ratio = 1;
+                    if (blockWidth > 0)
+                    {
+                        ratio = blockHeight / blockWidth;
+                    }
+                    
+                    if (ratio > 1.6)
+                    {
+                        //需要切分
+                        for (int y = dstBlock[i].top; y < dstBlock[i].bottom; y++)
+                        {
+                            for (int x = dstBlock[i].left; x < dstBlock[i].right; x++)
+                            {
+                                if (BinaryArray[y, x] == 0)
+                                {
+                                    //投影到黑像素了
+                                    nullLine++;
+                                }
+                            }
+                            //找到空白行来切分
+                            if (nullLine < 5)
+                            {
+                                for (int x = dstBlock[i].left; x < dstBlock[i].right; x+=2)
+                                {
+                                    BinaryArray[y, x] = 0;
+                                }
+                            }
+                            nullLine = 0;
+                        }
+                    }
+                }
+            }
+            return BinaryArray;
+        }
+
+        #endregion
+
+        #region 水平投影
+
+        public block[] horProjection(block[] dstBlock)
         {
 
+            return dstBlock;
         }
 
         #endregion
