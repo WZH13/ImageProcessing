@@ -2753,8 +2753,8 @@ namespace ImageProcessing
             block[] dstBlock= getRealConDomain(allblock,1);
 
             //合并交叉，包含连通域
-            dstBlock = MergeConDomain(dstBlock, 10,3);
-            dstBlock = MergeConDomain(dstBlock, 10,3);
+            dstBlock = MergeConDomain(dstBlock, 10,0);
+            dstBlock = MergeConDomain(dstBlock, 10,0);
 
             //根据中心点之间的距离，合并连通域
             //dstBlock = MergeConDomain2(dstBlock, 63);
@@ -2997,6 +2997,7 @@ namespace ImageProcessing
             int avgChArea = 0;
             int sumChArea = 0;
             int threshold = 0;
+            int blockNum = 0;
             //计算两个连通域中心距离，偏小的合并在一起
             for (int i = 0; i < dstBlock.Length; i++)
             {
@@ -3005,16 +3006,17 @@ namespace ImageProcessing
                     sumChLen += dstBlock[i].bottom - dstBlock[i].top;
                     sumChWidth += dstBlock[i].right - dstBlock[i].left;
                     sumChArea *= (dstBlock[i].right - dstBlock[i].left) * (dstBlock[i].bottom - dstBlock[i].top);
+                    blockNum++;
                 }
             }
             //平均字域长度
-            avgChLen = sumChLen / dstBlock.Length;
+            avgChLen = sumChLen / blockNum;
             //平均字域宽度
-            avgChWidth = sumChWidth / dstBlock.Length;
+            avgChWidth = sumChWidth / blockNum;
             //平均面积
-            avgChArea = sumChArea / dstBlock.Length;
+            avgChArea = sumChArea / blockNum;
 
-            threshold = Convert.ToInt32(Math.Sqrt(avgChLen * avgChLen + avgChWidth * avgChWidth));
+            threshold = Convert.ToInt32(Math.Sqrt(avgChLen * avgChLen + avgChWidth * avgChWidth))/2;
 
             return threshold;
         }
