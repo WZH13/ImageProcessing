@@ -2761,7 +2761,8 @@ namespace ImageProcessing
 
             //动态设置阈值
             int treshold = calAvgChLen(dstBlock);
-            dstBlock = MergeConDomain2(dstBlock, treshold);
+            dstBlock = MergeConDomain2(dstBlock, treshold+1);
+
 
             //删除已被合并的连通域
             //dstBlock = delMergedConDomain(dstBlock);
@@ -2769,6 +2770,8 @@ namespace ImageProcessing
             //sw.Stop();
             //TimeSpan ts2 = sw.Elapsed;
             //MessageBox.Show(ts2.TotalMilliseconds.ToString());
+
+            //投影分割
             BinaryArray = SegmentalAdhesion(dstBlock, BinaryArray);
 
 
