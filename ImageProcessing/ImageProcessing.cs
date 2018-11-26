@@ -3479,5 +3479,233 @@ namespace ImageProcessing
         }
 
         #endregion
+
+        #region 细化算法
+
+        ///// <summary> 
+        ///// 计算八联结的联结数，计算公式为： 
+        /////     (p6 - p6*p7*p0) + sigma(pk - pk*p(k+1)*p(k+2)), k = {0,2,4) 
+        ///// </summary> 
+        ///// <param name="list"></param> 
+        ///// <returns></returns> 
+        //private unsafe Int32 DetectConnectivity(Int32* list)
+        //{
+        //    Int32 count = list[6] - list[6] * list[7] * list[0];
+        //    count += list[0] - list[0] * list[1] * list[2];
+        //    count += list[2] - list[2] * list[3] * list[4];
+        //    count += list[4] - list[4] * list[5] * list[6];
+        //    return count;
+        //}
+
+        //private unsafe void FillNeighbors(Byte* p, Int32* list, Int32 width, Byte foreground = 255)
+        //{
+        //    // list 存储的是补集，即前景点为0，背景点为1，以方便联结数的计算
+
+        //    list[0] = p[1] == foreground ? 0 : 1;
+        //    list[1] = p[1 - width] == foreground ? 0 : 1;
+        //    list[2] = p[-width] == foreground ? 0 : 1;
+        //    list[3] = p[-1 - width] == foreground ? 0 : 1;
+        //    list[4] = p[-1] == foreground ? 0 : 1;
+        //    list[5] = p[-1 + width] == foreground ? 0 : 1;
+        //    list[6] = p[width] == foreground ? 0 : 1;
+        //    list[7] = p[1 + width] == foreground ? 0 : 1;
+        //}
+
+        ///// <summary> 
+        ///// 使用 hilditch 算法进行细化 
+        ///// </summary> 
+        //public unsafe void Thinning(Byte foreground = 255)
+        //{
+        //    Byte* start = this.Start;
+        //    Int32 width = this.Width;
+        //    Int32 height = this.Height;
+        //    Int32* list = stackalloc Int32[8];
+        //    Byte background = (Byte)(255 - foreground);
+        //    Int32 length = this.Length;
+
+        //    using (ImageU8 mask = new ImageU8(this.Width, this.Height))
+        //    {
+        //        mask.Fill(0);
+
+        //        Boolean loop = true;
+        //        while (loop == true)
+        //        {
+        //            loop = false;
+        //            for (Int32 r = 1; r < height - 1; r++)
+        //            {
+        //                for (Int32 c = 1; c < width - 1; c++)
+        //                {
+        //                    Byte* p = start + r * width + c;
+
+        //                    // 条件1：p 必须是前景点 
+        //                    if (*p != foreground) continue;
+
+        //                    //  p3  p2  p1 
+        //                    //  p4  p   p0 
+        //                    //  p5  p6  p7 
+        //                    // list 存储的是补集，即前景点为0，背景点为1，以方便联结数的计算 
+        //                    FillNeighbors(p, list, width, foreground);
+
+        //                    // 条件2：p0,p2,p4,p6 不皆为前景点 
+        //                    if (list[0] == 0 && list[2] == 0 && list[4] == 0 && list[6] == 0)
+        //                        continue;
+
+        //                    // 条件3: p0~p7至少两个是前景点 
+        //                    Int32 count = 0;
+        //                    for (int i = 0; i < 8; i++)
+        //                    {
+        //                        count += list[i];
+        //                    }
+
+        //                    if (count > 6) continue;
+
+        //                    // 条件4：联结数等于1 
+        //                    if (DetectConnectivity(list) != 1) continue;
+
+        //                    // 条件5: 假设p2已标记删除，则令p2为背景，不改变p的联结数 
+        //                    if (mask[r - 1, c] == 1)
+        //                    {
+        //                        list[2] = 1;
+        //                        if (DetectConnectivity(list) != 1)
+        //                            continue;
+        //                        list[2] = 0;
+        //                    }
+
+        //                    // 条件6: 假设p4已标记删除，则令p4为背景，不改变p的联结数 
+        //                    if (mask[r, c - 1] == 1)
+        //                    {
+        //                        list[4] = 1;
+        //                        if (DetectConnectivity(list) != 1)
+        //                            continue;
+        //                    }
+        //                    mask[r, c] = 1; // 标记删除 
+        //                    loop = true;
+        //                }
+        //            }
+
+        //            for (int i = 0; i < length; i++)
+        //            {
+        //                if (mask[i] == 1)
+        //                {
+        //                    this[i] = background;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
+        ///// <summary>
+        ///// Hilditch细化算法
+        ///// </summary>
+        ///// <param name="input"></param>
+        ///// <returns></returns>
+        //private int[,] ThinnerHilditch(int[,] input)
+        //{
+        //    int lWidth = input.GetLength(0);
+        //    int lHeight = input.GetLength(1);
+
+        //    bool IsModified = true;
+        //    int Counter = 1;
+        //    int[] nnb = new int[9];
+        //    //去掉边框像素
+        //    for (int i = 0; i < lWidth; i++)
+        //    {
+        //        input[i, 0] = 0;
+        //        input[i, lHeight - 1] = 0;
+        //    }
+        //    for (int j = 0; j < lHeight; j++)
+        //    {
+        //        input[0, j] = 0;
+        //        input[lWidth - 1, j] = 0;
+        //    }
+        //    do
+        //    {
+        //        Counter++;
+        //        IsModified = false;
+        //        int[,] nb = new int[3, 3];
+        //        for (int i = 1; i < lWidth; i++)
+        //        {
+        //            for (int j = 1; j < lHeight; j++)
+        //            {
+        //                //条件1必须为黑点
+        //                if (input[i, j] != 1)
+        //                {
+        //                    continue;
+        //                }
+
+        //                //取3*3领域
+        //                for (int m = 0; m < 3; m++)
+        //                {
+        //                    for (int n = 0; n < 3; n++)
+        //                    {
+        //                        nb[m, n] = input[i - 1 + m, j - 1 + n];
+        //                    }
+        //                }
+        //                //复制
+        //                nnb[0] = nb[2, 1] == 1 ? 0 : 1;
+        //                nnb[1] = nb[2, 0] == 1 ? 0 : 1;
+        //                nnb[2] = nb[1, 0] == 1 ? 0 : 1;
+        //                nnb[3] = nb[0, 0] == 1 ? 0 : 1;
+        //                nnb[4] = nb[0, 1] == 1 ? 0 : 1;
+        //                nnb[5] = nb[0, 2] == 1 ? 0 : 1;
+        //                nnb[6] = nb[1, 2] == 1 ? 0 : 1;
+        //                nnb[7] = nb[2, 2] == 1 ? 0 : 1;
+
+        //                // 条件2：p0,p2,p4,p6 不皆为前景点 
+        //                if (nnb[0] == 0 && nnb[2] == 0 && nnb[4] == 0 && nnb[6] == 0)
+        //                {
+        //                    continue;
+        //                }
+        //                // 条件3: p0~p7至少两个是前景点 
+        //                int iCount = 0;
+        //                for (int ii = 0; ii < 8; ii++)
+        //                {
+        //                    iCount += nnb[ii];
+        //                }
+        //                if (iCount > 6) continue;
+
+        //                // 条件4：联结数等于1 
+        //                if (DetectConnectivity(nnb) != 1)
+        //                {
+        //                    continue;
+        //                }
+        //                // 条件5: 假设p2已标记删除，则令p2为背景，不改变p的联结数 
+        //                if (input[i, j - 1] == -1)
+        //                {
+        //                    nnb[2] = 1;
+        //                    if (DetectConnectivity(nnb) != 1)
+        //                        continue;
+        //                    nnb[2] = 0;
+        //                }
+        //                // 条件6: 假设p4已标记删除，则令p4为背景，不改变p的联结数 
+        //                if (input[i, j + 1] == -1)
+        //                {
+        //                    nnb[6] = 1;
+        //                    if (DetectConnectivity(nnb) != 1)
+        //                        continue;
+        //                    nnb[6] = 0;
+        //                }
+
+        //                input[i, j] = -1;
+        //                IsModified = true;
+        //            }
+        //        }
+        //        for (int i = 0; i < lWidth; i++)
+        //        {
+        //            for (int j = 0; j < lHeight; j++)
+        //            {
+        //                if (input[i, j] == -1)
+        //                {
+        //                    input[i, j] = 0;
+        //                }
+        //            }
+        //        }
+
+        //    } while (IsModified);
+
+        //    return input;
+        //}
+
+        #endregion
     }
 }
