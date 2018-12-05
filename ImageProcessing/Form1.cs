@@ -485,5 +485,11 @@ namespace ImageProcessing
 
             Invalidate();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            curBitmap = imageProcessing.thin(curBitmap);
+            Invalidate();
+        }
     }
 }

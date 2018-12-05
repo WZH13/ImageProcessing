@@ -58,6 +58,7 @@
             this.btn_open = new System.Windows.Forms.Button();
             this.btn_exit = new System.Windows.Forms.Button();
             this.btn_save = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tab_preprocessing.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
@@ -77,6 +78,7 @@
             // 
             // tab_preprocessing
             // 
+            this.tab_preprocessing.Controls.Add(this.button1);
             this.tab_preprocessing.Controls.Add(this.btn_Connected);
             this.tab_preprocessing.Controls.Add(this.btn_StrokeDensity);
             this.tab_preprocessing.Controls.Add(this.btn_projection);
@@ -425,6 +427,16 @@
             this.btn_save.UseVisualStyleBackColor = true;
             this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(856, 13);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 16;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -485,6 +497,7 @@
         private System.Windows.Forms.Button btn_projection;
         private System.Windows.Forms.Button btn_StrokeDensity;
         private System.Windows.Forms.Button btn_Connected;
+        private System.Windows.Forms.Button button1;
     }
 }
 

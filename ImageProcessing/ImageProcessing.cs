@@ -2753,8 +2753,8 @@ namespace ImageProcessing
             block[] dstBlock= getRealConDomain(allblock,1);
 
             //合并交叉，包含连通域
-            dstBlock = MergeConDomain(dstBlock, 10,0);
-            dstBlock = MergeConDomain(dstBlock, 10,0);
+            dstBlock = MergeConDomain(dstBlock, 10,2);
+            dstBlock = MergeConDomain(dstBlock, 10,2);
 
             //根据中心点之间的距离，合并连通域
             //dstBlock = MergeConDomain2(dstBlock, 63);
@@ -3594,117 +3594,153 @@ namespace ImageProcessing
         //    }
         //}
 
-        ///// <summary>
-        ///// Hilditch细化算法
-        ///// </summary>
-        ///// <param name="input"></param>
-        ///// <returns></returns>
-        //private int[,] ThinnerHilditch(int[,] input)
-        //{
-        //    int lWidth = input.GetLength(0);
-        //    int lHeight = input.GetLength(1);
 
-        //    bool IsModified = true;
-        //    int Counter = 1;
-        //    int[] nnb = new int[9];
-        //    //去掉边框像素
-        //    for (int i = 0; i < lWidth; i++)
-        //    {
-        //        input[i, 0] = 0;
-        //        input[i, lHeight - 1] = 0;
-        //    }
-        //    for (int j = 0; j < lHeight; j++)
-        //    {
-        //        input[0, j] = 0;
-        //        input[lWidth - 1, j] = 0;
-        //    }
-        //    do
-        //    {
-        //        Counter++;
-        //        IsModified = false;
-        //        int[,] nb = new int[3, 3];
-        //        for (int i = 1; i < lWidth; i++)
-        //        {
-        //            for (int j = 1; j < lHeight; j++)
-        //            {
-        //                //条件1必须为黑点
-        //                if (input[i, j] != 1)
-        //                {
-        //                    continue;
-        //                }
+        public Bitmap thin(Bitmap bmp)
+        {
+            int imgWidth = bmp.Width;
+            int imgHeight = bmp.Height;
+            byte[,] BinaryArray = new byte[imgHeight, imgWidth];
+            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat);
+            if (depth != 1)//判断位深度 
+            {
+                int threshold = 0;
+                BinaryArray = ToBinaryArray(bmp, out threshold);
+            }
+            else
+            {
+                BinaryArray = BinaryBitmapToBinaryArray(bmp);
+            }
+            BinaryArray = ThinnerHilditch(BinaryArray);
+            Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
+            return dstBmp;
+        }
+        
+        /// <summary>
+        /// Hilditch细化算法
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private byte[,] ThinnerHilditch(byte[,] input)
+        {
+            int lWidth = input.GetLength(0);
+            int lHeight = input.GetLength(1);
 
-        //                //取3*3领域
-        //                for (int m = 0; m < 3; m++)
-        //                {
-        //                    for (int n = 0; n < 3; n++)
-        //                    {
-        //                        nb[m, n] = input[i - 1 + m, j - 1 + n];
-        //                    }
-        //                }
-        //                //复制
-        //                nnb[0] = nb[2, 1] == 1 ? 0 : 1;
-        //                nnb[1] = nb[2, 0] == 1 ? 0 : 1;
-        //                nnb[2] = nb[1, 0] == 1 ? 0 : 1;
-        //                nnb[3] = nb[0, 0] == 1 ? 0 : 1;
-        //                nnb[4] = nb[0, 1] == 1 ? 0 : 1;
-        //                nnb[5] = nb[0, 2] == 1 ? 0 : 1;
-        //                nnb[6] = nb[1, 2] == 1 ? 0 : 1;
-        //                nnb[7] = nb[2, 2] == 1 ? 0 : 1;
+            bool IsModified = true;
+            int Counter = 1;
+            int[] nnb = new int[9];
+            //去掉边框像素
+            //for (int i = 0; i < lWidth; i++)
+            //{
+            //    input[i, 0] = 0;
+            //    input[i, lHeight - 1] = 0;
+            //}
+            //for (int j = 0; j < lHeight; j++)
+            //{
+            //    input[0, j] = 0;
+            //    input[lWidth - 1, j] = 0;
+            //}
+            do
+            {
+                Counter++;
+                IsModified = false;
+                int[,] nb = new int[3, 3];
+                for (int i = 1; i < lWidth; i++)
+                {
+                    for (int j = 1; j < lHeight; j++)
+                    {
+                        //条件1必须为黑点
+                        if (input[i, j] != 0)
+                        {
+                            continue;
+                        }
 
-        //                // 条件2：p0,p2,p4,p6 不皆为前景点 
-        //                if (nnb[0] == 0 && nnb[2] == 0 && nnb[4] == 0 && nnb[6] == 0)
-        //                {
-        //                    continue;
-        //                }
-        //                // 条件3: p0~p7至少两个是前景点 
-        //                int iCount = 0;
-        //                for (int ii = 0; ii < 8; ii++)
-        //                {
-        //                    iCount += nnb[ii];
-        //                }
-        //                if (iCount > 6) continue;
+                        //取3*3领域
+                        for (int m = 0; m < 3; m++)
+                        {
+                            for (int n = 0; n < 3; n++)
+                            {
+                                nb[m, n] = input[i - 1 + m, j - 1 + n];
+                            }
+                        }
+                        //复制
+                        nnb[0] = nb[2, 1] == 255 ? 1 : 0;
+                        nnb[1] = nb[2, 0] == 255 ? 1 : 0;
+                        nnb[2] = nb[1, 0] == 255 ? 1 : 0;
+                        nnb[3] = nb[0, 0] == 255 ? 1 : 0;
+                        nnb[4] = nb[0, 1] == 255 ? 1 : 0;
+                        nnb[5] = nb[0, 2] == 255 ? 1 : 0;
+                        nnb[6] = nb[1, 2] == 255 ? 1 : 0;
+                        nnb[7] = nb[2, 2] == 255 ? 1 : 0;
 
-        //                // 条件4：联结数等于1 
-        //                if (DetectConnectivity(nnb) != 1)
-        //                {
-        //                    continue;
-        //                }
-        //                // 条件5: 假设p2已标记删除，则令p2为背景，不改变p的联结数 
-        //                if (input[i, j - 1] == -1)
-        //                {
-        //                    nnb[2] = 1;
-        //                    if (DetectConnectivity(nnb) != 1)
-        //                        continue;
-        //                    nnb[2] = 0;
-        //                }
-        //                // 条件6: 假设p4已标记删除，则令p4为背景，不改变p的联结数 
-        //                if (input[i, j + 1] == -1)
-        //                {
-        //                    nnb[6] = 1;
-        //                    if (DetectConnectivity(nnb) != 1)
-        //                        continue;
-        //                    nnb[6] = 0;
-        //                }
+                        // 条件2：p0,p2,p4,p6 不皆为前景点 
+                        if (nnb[0] == 0 && nnb[2] == 0 && nnb[4] == 0 && nnb[6] == 0)
+                        {
+                            continue;
+                        }
+                        // 条件3: p0~p7至少两个是前景点 
+                        int iCount = 0;
+                        for (int ii = 0; ii < 8; ii++)
+                        {
+                            iCount += nnb[ii];
+                        }
+                        if (iCount > 6) continue;
 
-        //                input[i, j] = -1;
-        //                IsModified = true;
-        //            }
-        //        }
-        //        for (int i = 0; i < lWidth; i++)
-        //        {
-        //            for (int j = 0; j < lHeight; j++)
-        //            {
-        //                if (input[i, j] == -1)
-        //                {
-        //                    input[i, j] = 0;
-        //                }
-        //            }
-        //        }
+                        // 条件4：联结数等于1 
+                        if (DetectConnectivity(nnb) != 1)
+                        {
+                            continue;
+                        }
+                        // 条件5: 假设p2已标记删除，则令p2为背景，不改变p的联结数 
+                        if (input[i, j - 1] == 100)
+                        {
+                            nnb[2] = 1;
+                            if (DetectConnectivity(nnb) != 1)
+                                continue;
+                            //nnb[2] = 0;
+                        }
+                        // 条件6: 假设p4已标记删除，则令p4为背景，不改变p的联结数 
+                        if (input[i, j + 1] == 100)
+                        {
+                            nnb[4] = 1;
+                            if (DetectConnectivity(nnb) != 1)
+                                continue;
+                            //nnb[4] = 0;
+                        }
 
-        //    } while (IsModified);
+                        input[i, j] = 100;
+                        IsModified = true;
+                    }
+                }
+                for (int i = 0; i < lWidth; i++)
+                {
+                    for (int j = 0; j < lHeight; j++)
+                    {
+                        if (input[i, j] == 100)
+                        {
+                            input[i, j] = 255;
+                        }
+                    }
+                }
 
-        //    return input;
-        //}
+            } while (IsModified);
+
+            return input;
+        }
+        /// <summary> 
+        /// 计算八联结的联结数，计算公式为： 
+        ///     (p6 - p6*p7*p0) + sigma(pk - pk*p(k+1)*p(k+2)), k = {0,2,4) 
+        /// </summary> 
+        /// <param name="list"></param> 
+        /// <returns></returns> 
+        private int DetectConnectivity(int[] list)
+        {
+            int count = list[6] - list[6] * list[7] * list[0];
+            count += list[0] - list[0] * list[1] * list[2];
+            count += list[2] - list[2] * list[3] * list[4];
+            count += list[4] - list[4] * list[5] * list[6];
+            return count;
+        }
+        
 
         #endregion
     }
