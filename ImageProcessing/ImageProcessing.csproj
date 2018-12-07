@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="AutoSizeFormClass.cs" />
     <Compile Include="ByteUtil.cs" />
+    <Compile Include="CPPDLL.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

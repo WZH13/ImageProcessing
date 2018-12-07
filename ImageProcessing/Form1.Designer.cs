@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tab_preprocessing = new System.Windows.Forms.TabPage();
+            this.button1 = new System.Windows.Forms.Button();
             this.btn_Connected = new System.Windows.Forms.Button();
             this.btn_StrokeDensity = new System.Windows.Forms.Button();
             this.btn_projection = new System.Windows.Forms.Button();
@@ -58,7 +59,7 @@
             this.btn_open = new System.Windows.Forms.Button();
             this.btn_exit = new System.Windows.Forms.Button();
             this.btn_save = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tab_preprocessing.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
@@ -78,6 +79,7 @@
             // 
             // tab_preprocessing
             // 
+            this.tab_preprocessing.Controls.Add(this.button2);
             this.tab_preprocessing.Controls.Add(this.button1);
             this.tab_preprocessing.Controls.Add(this.btn_Connected);
             this.tab_preprocessing.Controls.Add(this.btn_StrokeDensity);
@@ -93,6 +95,16 @@
             this.tab_preprocessing.TabIndex = 2;
             this.tab_preprocessing.Text = "图像预处理";
             this.tab_preprocessing.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(856, 13);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(55, 23);
+            this.button1.TabIndex = 16;
+            this.button1.Text = "细化";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // btn_Connected
             // 
@@ -427,15 +439,15 @@
             this.btn_save.UseVisualStyleBackColor = true;
             this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
-            // button1
+            // button2
             // 
-            this.button1.Location = new System.Drawing.Point(856, 13);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 16;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button2.Location = new System.Drawing.Point(950, 13);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 17;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // Form1
             // 
@@ -498,6 +510,7 @@
         private System.Windows.Forms.Button btn_StrokeDensity;
         private System.Windows.Forms.Button btn_Connected;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }
 

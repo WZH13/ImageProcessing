@@ -491,5 +491,10 @@ namespace ImageProcessing
             curBitmap = imageProcessing.thin(curBitmap);
             Invalidate();
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            imageProcessing.thinCPP(curBitmap);
+        }
     }
 }
