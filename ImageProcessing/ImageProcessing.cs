@@ -2996,7 +2996,7 @@ namespace ImageProcessing
             //MessageBox.Show(ts2.TotalMilliseconds.ToString());
 
             //投影分割
-            BinaryArray = SegmentalAdhesion(dstBlock, BinaryArray);
+            //BinaryArray = SegmentalAdhesion(dstBlock, BinaryArray);
 
 
             #region 去边框，去噪
@@ -3335,7 +3335,7 @@ namespace ImageProcessing
                     {
                         ratio = blockHeight / blockWidth;
                     }
-                    
+
                     if (ratio > 1.6)
                     {
                         //需要切分
@@ -3352,7 +3352,7 @@ namespace ImageProcessing
                             //找到空白行来切分
                             if (nullLine < 5)
                             {
-                                for (int x = dstBlock[i].left; x < dstBlock[i].right; x+=2)
+                                for (int x = dstBlock[i].left; x < dstBlock[i].right; x += 2)
                                 {
                                     BinaryArray[y, x] = 0;
                                 }
@@ -3624,34 +3624,55 @@ namespace ImageProcessing
         /// <returns></returns>
         private byte[,] ThinnerHilditch(byte[,] input)
         {
-            int lWidth = input.GetLength(0);
-            int lHeight = input.GetLength(1);
+            int lHeight = input.GetLength(0);
+            int lWidth = input.GetLength(1);
+            for (int y = 0; y < lHeight; y++)
+            {
+                for (int x = 0; x < lWidth; x++)
+                {
+                    if (input[y,x]==255)
+                    {
+                        input[y, x] = 0;
+                    }
+                    else
+                    {
+                        input[y, x] = 255;
+                    }
+                }
+            }
 
             bool IsModified = true;
             int Counter = 1;
             int[] nnb = new int[9];
             //去掉边框像素
-            //for (int i = 0; i < lWidth; i++)
-            //{
-            //    input[i, 0] = 0;
-            //    input[i, lHeight - 1] = 0;
-            //}
-            //for (int j = 0; j < lHeight; j++)
-            //{
-            //    input[0, j] = 0;
-            //    input[lWidth - 1, j] = 0;
-            //}
+            for (int y = 0; y < lHeight; y++)
+            {
+                input[y, 0] = 255;
+                input[y, 1] = 255;
+                input[y, 2] = 255;
+
+                input[y, lWidth - 1] = 255;
+                input[y, lWidth - 2] = 255;
+            }
+            for (int x = 0; x < lWidth; x++)
+            {
+                input[0, x] = 255;
+                input[1, x] = 255;
+
+                input[lHeight - 1, x] = 255;
+                input[lHeight - 2, x] = 255;
+            }
             do
             {
                 Counter++;
                 IsModified = false;
                 int[,] nb = new int[3, 3];
-                for (int i = 1; i < lWidth; i++)
+                for (int y = 1; y < lHeight; y++)
                 {
-                    for (int j = 1; j < lHeight; j++)
+                    for (int x = 1; x < lWidth; x++)
                     {
                         //条件1必须为黑点
-                        if (input[i, j] != 0)
+                        if (input[y, x] != 0)
                         {
                             continue;
                         }
@@ -3661,10 +3682,10 @@ namespace ImageProcessing
                         {
                             for (int n = 0; n < 3; n++)
                             {
-                                nb[m, n] = input[i - 1 + m, j - 1 + n];
+                                nb[m, n] = input[y - 1 + m, x - 1 + n];
                             }
                         }
-                        //复制
+                        //复制   1为背景点，0为前景点
                         nnb[0] = nb[2, 1] == 255 ? 1 : 0;
                         nnb[1] = nb[2, 0] == 255 ? 1 : 0;
                         nnb[2] = nb[1, 0] == 255 ? 1 : 0;
@@ -3693,7 +3714,7 @@ namespace ImageProcessing
                             continue;
                         }
                         // 条件5: 假设p2已标记删除，则令p2为背景，不改变p的联结数 
-                        if (input[i, j - 1] == 100)
+                        if (input[y, x - 1] == 100)
                         {
                             nnb[2] = 1;
                             if (DetectConnectivity(nnb) != 1)
@@ -3701,7 +3722,7 @@ namespace ImageProcessing
                             //nnb[2] = 0;
                         }
                         // 条件6: 假设p4已标记删除，则令p4为背景，不改变p的联结数 
-                        if (input[i, j + 1] == 100)
+                        if (input[y, x + 1] == 100)
                         {
                             nnb[4] = 1;
                             if (DetectConnectivity(nnb) != 1)
@@ -3709,17 +3730,17 @@ namespace ImageProcessing
                             //nnb[4] = 0;
                         }
 
-                        input[i, j] = 100;
+                        input[y, x] = 100;
                         IsModified = true;
                     }
                 }
-                for (int i = 0; i < lWidth; i++)
+                for (int y = 0; y < lHeight; y++)
                 {
-                    for (int j = 0; j < lHeight; j++)
+                    for (int x = 0; x < lWidth; x++)
                     {
-                        if (input[i, j] == 100)
+                        if (input[y, x] == 100)
                         {
-                            input[i, j] = 255;
+                            input[y, x] = 255;
                         }
                     }
                 }
@@ -3743,10 +3764,7 @@ namespace ImageProcessing
             return count;
         }
 
-
-        #endregion
-
-
+        #endregion 
 
         #region 测试___调用非托管C++生成的DLL文件
         public void thinCPP(Bitmap srcBitmap)
