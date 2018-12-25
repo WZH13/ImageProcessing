@@ -486,15 +486,21 @@ namespace ImageProcessing
             Invalidate();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            curBitmap = imageProcessing.thin(curBitmap);
-            Invalidate();
-        }
-
         private void button2_Click(object sender, EventArgs e)
         {
             imageProcessing.thinCPP(curBitmap);
+        }
+
+        private void btn_hilditch_Click(object sender, EventArgs e)
+        {
+            curBitmap = imageProcessing.HilditchThin(curBitmap);
+            Invalidate();
+        }
+
+        private void btn_Zhang_thin_improve_Click(object sender, EventArgs e)
+        {
+            curBitmap = imageProcessing.zhang_thinimage_improve(curBitmap);
+            Invalidate();
         }
     }
 }
