@@ -502,5 +502,11 @@ namespace ImageProcessing
             curBitmap = imageProcessing.zhang_thinimage_improve(curBitmap);
             Invalidate();
         }
+
+        private void btn_zhang_skeleton_Click(object sender, EventArgs e)
+        {
+            curBitmap = imageProcessing.zhang_thin_improve_Background_skeleton(curBitmap);
+            Invalidate();
+        }
     }
 }

@@ -3655,7 +3655,12 @@ namespace ImageProcessing
 
         #region 改进 Zhang-Suen algorithm
 
-        public Bitmap zhang_thinimage_improve(Bitmap bmp)
+        /// <summary>
+        /// Zhang-Suen细化算法
+        /// </summary>
+        /// <param name="bmp">原图片</param>
+        /// <returns>细化后图片</returns>
+        public Bitmap Zhang_thinimage_improve(Bitmap bmp)
         {
             int imgWidth = bmp.Width;
             int imgHeight = bmp.Height;
@@ -3819,10 +3824,127 @@ namespace ImageProcessing
 
         #endregion
 
+        #region 背景骨架细化（使用 Zhang-Suen细化算法 ）
 
+        /// <summary>
+        /// 将图片颜色取反，再调用Zhang-Suen细化算法对背景骨架进行细化
+        /// </summary>
+        public Bitmap Zhang_thin_improve_Background_skeleton(Bitmap bmp)
+        {
+            int imgWidth = bmp.Width;
+            int imgHeight = bmp.Height;
+            byte[,] BinaryArray = new byte[imgHeight, imgWidth];
+            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat);
+            if (depth != 1)//判断位深度 
+            {
+                int threshold = 0;
+                BinaryArray = ToBinaryArray(bmp, out threshold);
+            }
+            else
+            {
+                BinaryArray = BinaryBitmapToBinaryArray(bmp);
+            }
 
+            for (int y = 0; y < imgHeight; y++)
+            {
+                for (int x = 0; x < imgWidth; x++)
+                {
+                    if (BinaryArray[y, x] == 0)
+                    {
+                        BinaryArray[y, x] = 255;
+                    }
+                    else
+                    {
+                        BinaryArray[y, x] = 0;
+                    }
+                }
+            }
+            Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
+            dstBmp= Zhang_thinimage_improve(dstBmp);
+            dstBmp=DelBounder(dstBmp);
+            return dstBmp;
 
+        }
 
+        #endregion
+
+        #region 去除细化后的边框
+
+        /// <summary>
+        /// 将细化后的背景骨架边框去除
+        /// </summary>
+        public Bitmap DelBounder(Bitmap bmp)
+        {
+            int imgWidth = bmp.Width;
+            int imgHeight = bmp.Height;
+            byte[,] BinaryArray = new byte[imgHeight, imgWidth];
+            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat);
+            if (depth != 1)//判断位深度 
+            {
+                int threshold = 0;
+                BinaryArray = ToBinaryArray(bmp, out threshold);
+            }
+            else
+            {
+                BinaryArray = BinaryBitmapToBinaryArray(bmp);
+            }
+            for (int y = 0; y < imgHeight; y++)
+            {
+                BinaryArray[y, 0] = 255;
+                BinaryArray[y, imgWidth-1] = 255;
+            }
+            for (int x = 0; x < imgWidth; x++)
+            {
+                BinaryArray[0, x] = 255;
+                BinaryArray[imgHeight-1, x] = 255;
+            }
+            Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
+
+            return dstBmp;
+        }
+
+        #endregion
+
+        #region 寻找可能切分路径
+
+        public void SegmentationPaths(Bitmap bmp)
+        {
+            int imgWidth = bmp.Width;
+            int imgHeight = bmp.Height;
+            byte[,] BinaryArray = new byte[imgHeight, imgWidth];
+            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat);
+            if (depth != 1)//判断位深度 
+            {
+                int threshold = 0;
+                BinaryArray = ToBinaryArray(bmp, out threshold);
+            }
+            else
+            {
+                BinaryArray = BinaryBitmapToBinaryArray(bmp);
+            }
+
+            List<List<Point>> cutPaths = new List<List<Point>>();
+            //int[] branchPos = new int[10];
+            int listCount = 0;//标识list行数
+
+            for (int x = 1; x < imgWidth-1; x++)
+            {
+                for (int y = 1; y < imgHeight-1; y++)
+                {
+                    if (BinaryArray[y, x] == 0)//开始搜索路径
+                    {
+                        cutPaths.Add(new List<Point>());
+                        cutPaths[listCount].Add(new Point(y, x));//将起始黑点存入list
+                        if (BinaryArray[y-1, x]==0)//上
+                        {
+                            cutPaths[listCount].Add(new Point(y-1, x));
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
 
 
 

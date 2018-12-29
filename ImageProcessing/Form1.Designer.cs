@@ -61,6 +61,7 @@
             this.btn_exit = new System.Windows.Forms.Button();
             this.btn_save = new System.Windows.Forms.Button();
             this.btn_hilditch = new System.Windows.Forms.Button();
+            this.btn_zhang_skeleton = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tab_preprocessing.SuspendLayout();
             this.tab_changepixel.SuspendLayout();
@@ -80,6 +81,7 @@
             // 
             // tab_preprocessing
             // 
+            this.tab_preprocessing.Controls.Add(this.btn_zhang_skeleton);
             this.tab_preprocessing.Controls.Add(this.btn_hilditch);
             this.tab_preprocessing.Controls.Add(this.button2);
             this.tab_preprocessing.Controls.Add(this.btn_Zhang_thin_improve);
@@ -453,13 +455,23 @@
             // 
             // btn_hilditch
             // 
-            this.btn_hilditch.Location = new System.Drawing.Point(833, 16);
+            this.btn_hilditch.Location = new System.Drawing.Point(832, 17);
             this.btn_hilditch.Name = "btn_hilditch";
             this.btn_hilditch.Size = new System.Drawing.Size(75, 23);
             this.btn_hilditch.TabIndex = 18;
             this.btn_hilditch.Text = "Hilditch细化";
             this.btn_hilditch.UseVisualStyleBackColor = true;
             this.btn_hilditch.Click += new System.EventHandler(this.btn_hilditch_Click);
+            // 
+            // btn_zhang_skeleton
+            // 
+            this.btn_zhang_skeleton.Location = new System.Drawing.Point(1025, 17);
+            this.btn_zhang_skeleton.Name = "btn_zhang_skeleton";
+            this.btn_zhang_skeleton.Size = new System.Drawing.Size(75, 23);
+            this.btn_zhang_skeleton.TabIndex = 19;
+            this.btn_zhang_skeleton.Text = "背景细化";
+            this.btn_zhang_skeleton.UseVisualStyleBackColor = true;
+            this.btn_zhang_skeleton.Click += new System.EventHandler(this.btn_zhang_skeleton_Click);
             // 
             // Form1
             // 
@@ -524,6 +536,7 @@
         private System.Windows.Forms.Button btn_Zhang_thin_improve;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button btn_hilditch;
+        private System.Windows.Forms.Button btn_zhang_skeleton;
     }
 }
 
