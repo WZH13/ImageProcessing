@@ -80,6 +80,7 @@
     <Compile Include="PointBitmap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeqStack.cs" />
     <Compile Include="shapinForm.cs">
       <SubType>Form</SubType>
     </Compile>

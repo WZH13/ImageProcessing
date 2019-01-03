@@ -3580,6 +3580,7 @@ namespace ImageProcessing
                         nnb[5] = nb[0, 2] == 255 ? 1 : 0;
                         nnb[6] = nb[1, 2] == 255 ? 1 : 0;
                         nnb[7] = nb[2, 2] == 255 ? 1 : 0;
+                        //nnb[8] = nb[2, 2] == 255 ? 1 : 0;
 
                         // 条件2：p0,p2,p4,p6 不皆为前景点 
                         if (nnb[0] == 0 && nnb[2] == 0 && nnb[4] == 0 && nnb[6] == 0)
@@ -3909,6 +3910,7 @@ namespace ImageProcessing
 
         public void SegmentationPaths(Bitmap bmp)
         {
+            bmp = DelBounder(bmp);
             int imgWidth = bmp.Width;
             int imgHeight = bmp.Height;
             byte[,] BinaryArray = new byte[imgHeight, imgWidth];
@@ -3926,19 +3928,79 @@ namespace ImageProcessing
             List<List<Point>> cutPaths = new List<List<Point>>();
             //int[] branchPos = new int[10];
             int listCount = 0;//标识list行数
+            Point currentPoint = new Point();
+            Point parentPoint = new Point();
+            int nextNodeNum = 0;//相邻像素连通数
+            //for (int x = 1; x < imgWidth-1; x++)
+            //{
+            //int x = 1;
+            int order = 0;
+            Point[] cP = new Point[8];//中心点周围8个点
 
-            for (int x = 1; x < imgWidth-1; x++)
+            for (int y = 1; y < imgHeight - 1; y++)
             {
-                for (int y = 1; y < imgHeight-1; y++)
+                if (BinaryArray[y, 1] == 0)//开始搜索路径
                 {
-                    if (BinaryArray[y, x] == 0)//开始搜索路径
+                    currentPoint.X = y;
+                    currentPoint.Y = 1;
+                    parentPoint = currentPoint;
+
+                    //树的深度优先遍历，同时存储路径
+                    //利用栈结构思想
+                    SeqStack<Point> stack = new SeqStack<Point>(imgWidth * 3);
+                    stack.Push(currentPoint);
+
+                    while (!stack.IsEmpty())
                     {
+
+                        currentPoint = stack.Pop();
+
+                        //list记录出栈点，做路径记录
                         cutPaths.Add(new List<Point>());
-                        cutPaths[listCount].Add(new Point(y, x));//将起始黑点存入list
-                        if (BinaryArray[y-1, x]==0)//上
+                        cutPaths[listCount].Add(currentPoint);//将出栈的点加入list路径中
+
+
+
+                        nextNodeNum = 0;
+
+                        //从中心点上方开始顺时针编号
+                        cP[0] = new Point(currentPoint.X - 1, currentPoint.Y);
+                        cP[1] = new Point(currentPoint.X - 1, currentPoint.Y + 1);
+                        cP[2] = new Point(currentPoint.X, currentPoint.Y + 1);
+                        cP[3] = new Point(currentPoint.X + 1, currentPoint.Y + 1);
+                        cP[4] = new Point(currentPoint.X + 1, currentPoint.Y);
+                        cP[5] = new Point(currentPoint.X + 1, currentPoint.Y - 1);
+                        cP[6] = new Point(currentPoint.X, currentPoint.Y - 1);
+                        cP[7] = new Point(currentPoint.X - 1, currentPoint.Y - 1);
+
+                        while (order < 8)
                         {
-                            cutPaths[listCount].Add(new Point(y-1, x));
+                            if (BinaryArray[cP[order].X, cP[order].Y] == 0 && cP[order] != parentPoint)//找下一结点，除去父结点
+                            {
+                                stack.Push(cP[order]);
+                                nextNodeNum++;
+                            }
                         }
+
+                        if (nextNodeNum == 0)//某一分支到达终点
+                        {
+                            if (currentPoint.Y == imgWidth)
+                            {
+                                listCount++;//当前list被保留下来作为一条路径
+                            }
+                            else
+                            {
+                                cutPaths.RemoveAt(listCount);//如果到达终点，当前点横坐标不在图像最右侧，则这条路径不能贯穿图像。删除这条失败路径。RemoveAt索引前移,故listCount不必改变。
+                            }
+                        }
+
+                        for (int i = 0; i < nextNodeNum - 1; i++)
+                        {
+                            cutPaths.Add(new List<Point>(cutPaths[listCount]));//在分叉处复制共同路径
+                            //cutPaths.ForEach(j => cutPaths.Add(j));
+                        }
+
+                        parentPoint = currentPoint;//赋值之前parPoint是上一个出栈的结点
                     }
                 }
             }

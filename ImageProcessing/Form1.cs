@@ -486,11 +486,6 @@ namespace ImageProcessing
             Invalidate();
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            imageProcessing.thinCPP(curBitmap);
-        }
-
         private void btn_hilditch_Click(object sender, EventArgs e)
         {
             curBitmap = imageProcessing.HilditchThin(curBitmap);
@@ -499,14 +494,31 @@ namespace ImageProcessing
 
         private void btn_Zhang_thin_improve_Click(object sender, EventArgs e)
         {
-            curBitmap = imageProcessing.zhang_thinimage_improve(curBitmap);
+            curBitmap = imageProcessing.Zhang_thinimage_improve(curBitmap);
             Invalidate();
         }
 
         private void btn_zhang_skeleton_Click(object sender, EventArgs e)
         {
-            curBitmap = imageProcessing.zhang_thin_improve_Background_skeleton(curBitmap);
+            curBitmap = imageProcessing.Zhang_thin_improve_Background_skeleton(curBitmap);
             Invalidate();
+        }
+
+
+
+
+
+
+
+        private void btn_DLL_test_Click(object sender, EventArgs e)
+        {
+            imageProcessing.thinCPP(curBitmap);
+            Invalidate();
+        }
+
+        private void btn_paths_searched_Click(object sender, EventArgs e)
+        {
+            imageProcessing.SegmentationPaths(curBitmap);
         }
     }
 }
