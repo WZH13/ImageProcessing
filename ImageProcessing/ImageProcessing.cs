@@ -3930,6 +3930,8 @@ namespace ImageProcessing
             int listCount = 0;//标识list行数
             Point currentPoint = new Point();
             Point parentPoint = new Point();
+            Point tempParentPoint = new Point();
+
             int nextNodeNum = 0;//相邻像素连通数
             //for (int x = 1; x < imgWidth-1; x++)
             //{
@@ -3945,6 +3947,9 @@ namespace ImageProcessing
                     currentPoint.Y = 1;
                     parentPoint = currentPoint;
 
+                    //list记录出栈点，做路径记录
+                    cutPaths.Add(new List<Point>());
+
                     //树的深度优先遍历，同时存储路径
                     //利用栈结构思想
                     SeqStack<Point> stack = new SeqStack<Point>(imgWidth * 3);
@@ -3955,11 +3960,8 @@ namespace ImageProcessing
 
                         currentPoint = stack.Pop();
 
-                        //list记录出栈点，做路径记录
-                        cutPaths.Add(new List<Point>());
+                        
                         cutPaths[listCount].Add(currentPoint);//将出栈的点加入list路径中
-
-
 
                         nextNodeNum = 0;
 
@@ -3973,6 +3975,7 @@ namespace ImageProcessing
                         cP[6] = new Point(currentPoint.X, currentPoint.Y - 1);
                         cP[7] = new Point(currentPoint.X - 1, currentPoint.Y - 1);
 
+                        order = 0;
                         while (order < 8)
                         {
                             if (BinaryArray[cP[order].X, cP[order].Y] == 0 && cP[order] != parentPoint)//找下一结点，除去父结点
@@ -3980,30 +3983,65 @@ namespace ImageProcessing
                                 stack.Push(cP[order]);
                                 nextNodeNum++;
                             }
+                            order++;
                         }
-
-                        if (nextNodeNum == 0)//某一分支到达终点
+                        if (currentPoint.Y ==90)
                         {
-                            if (currentPoint.Y == imgWidth)
-                            {
-                                listCount++;//当前list被保留下来作为一条路径
-                            }
-                            else
-                            {
-                                cutPaths.RemoveAt(listCount);//如果到达终点，当前点横坐标不在图像最右侧，则这条路径不能贯穿图像。删除这条失败路径。RemoveAt索引前移,故listCount不必改变。
-                            }
+
                         }
+                        parentPoint = currentPoint;//赋值之前parPoint是上一个出栈的结点
 
                         for (int i = 0; i < nextNodeNum - 1; i++)
                         {
                             cutPaths.Add(new List<Point>(cutPaths[listCount]));//在分叉处复制共同路径
+                            //listCount++;
                             //cutPaths.ForEach(j => cutPaths.Add(j));
                         }
 
-                        parentPoint = currentPoint;//赋值之前parPoint是上一个出栈的结点
+                        if (nextNodeNum == 0)//某一分支到达终点
+                        {
+                            if (currentPoint.Y == imgWidth - 2)
+                            {
+                                if (listCount  >= cutPaths.Count-1)//当前处理的是list中存储的最后一条分叉路径
+                                {
+                                    continue;
+                                    //或者清空栈？？
+                                }
+                                else
+                                {
+                                    listCount++;//当前list被保留下来作为一条路径,继续处理下一条分叉路径（当前处理的不是list中存储的最后一条分叉路径）
+                                    parentPoint = cutPaths[listCount][cutPaths[listCount].Count - 1];
+                                }
+                            }
+                            else
+                            {
+                                cutPaths.RemoveAt(listCount);//如果到达终点，当前点横坐标不在图像最右侧，则这条路径不能贯穿图像。删除这条失败路径。RemoveAt索引前移,故listCount不必改变。
+
+                                if (listCount >= cutPaths.Count - 1)//当前处理的是list中存储的最后一条分叉路径
+                                {
+                                    continue;
+                                    //或者清空栈？？
+                                }
+                                else
+                                {
+                                    parentPoint = cutPaths[listCount][cutPaths[listCount].Count - 1];
+                                }
+                                
+                            }
+                        }
+
+                        //for (int i = 0; i < nextNodeNum - 1; i++)
+                        //{
+                        //    cutPaths.Add(new List<Point>(cutPaths[listCount]));//在分叉处复制共同路径
+                        //    //cutPaths.ForEach(j => cutPaths.Add(j));
+                        //}
+
+                        
                     }
                 }
+                //listCount++;
             }
+            int aa = 0;
         }
 
         #endregion
