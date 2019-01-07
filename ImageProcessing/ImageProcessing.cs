@@ -3983,26 +3983,29 @@ namespace ImageProcessing
                         cP[2] = new Point(currentPoint.X, currentPoint.Y + 1);
                         cP[3] = new Point(currentPoint.X + 1, currentPoint.Y + 1);
                         cP[4] = new Point(currentPoint.X + 1, currentPoint.Y);
-                        cP[5] = new Point(currentPoint.X + 1, currentPoint.Y - 1);
-                        cP[6] = new Point(currentPoint.X, currentPoint.Y - 1);
-                        cP[7] = new Point(currentPoint.X - 1, currentPoint.Y - 1);
+                        //cP[5] = new Point(currentPoint.X + 1, currentPoint.Y - 1);
+                        //cP[6] = new Point(currentPoint.X, currentPoint.Y - 1);
+                        //cP[7] = new Point(currentPoint.X - 1, currentPoint.Y - 1);
 
                         order = 0;
-                        while (order < 8)
+                        while (order < 5)
                         {
-                            if (BinaryArray[cP[order].X, cP[order].Y] == 0 &&
-                                    BinaryArray[cP[(order + 1) % 8].X, cP[(order + 1) % 8].Y] == 0)
+                            if (order<4)
                             {
-                                if (order % 2 == 0)
+                                if (BinaryArray[cP[order].X, cP[order].Y] == 0 &&
+                                    BinaryArray[cP[order + 1].X, cP[order + 1].Y] == 0)
                                 {
-                                    isProcessed[cP[order].X, cP[order].Y] = true;
+                                    if (order % 2 == 0)
+                                    {
+                                        isProcessed[cP[order].X, cP[order].Y] = true;
+                                    }
+                                    if (order % 2 == 1)
+                                    {
+                                        isProcessed[cP[order + 1].X, cP[order + 1].Y] = true;
+                                    }
+                                    order++;
+                                    continue;
                                 }
-                                if (order % 2 == 1)
-                                {
-                                    isProcessed[cP[(order + 1) % 8].X, cP[order].Y] = true;
-                                }
-                                order++;
-                                continue;
                             }
                             if (BinaryArray[cP[order].X, cP[order].Y] == 0 && isProcessed[cP[order].X, cP[order].Y] == false)//找下一结点，除去已经处理过的点
                             {
