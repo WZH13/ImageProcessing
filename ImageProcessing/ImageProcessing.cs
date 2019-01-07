@@ -2179,6 +2179,11 @@ namespace ImageProcessing
 
         #region 读取二值图像存入二值数组
 
+        /// <summary>
+        /// 读取二值图像存入二值数组
+        /// </summary>
+        /// <param name="bmp"></param>
+        /// <returns></returns>
         public byte[,] BinaryBitmapToBinaryArray(Bitmap bmp)
         {
             int imgWidth = bmp.Width;
@@ -3908,6 +3913,14 @@ namespace ImageProcessing
 
         #region 寻找可能切分路径
 
+        public struct pointSign
+        {
+            /// <summary>
+            /// 标识是否已经处理过
+            /// </summary>
+            public bool isProcessed;
+        }
+
         public void SegmentationPaths(Bitmap bmp)
         {
             bmp = DelBounder(bmp);
@@ -3930,7 +3943,9 @@ namespace ImageProcessing
             int listCount = 0;//标识list行数
             Point currentPoint = new Point();
             Point parentPoint = new Point();
-            Point tempParentPoint = new Point();
+            //Point tempParentPoint = new Point();
+
+            bool[,] isProcessed = new bool[imgHeight, imgWidth];
 
             int nextNodeNum = 0;//相邻像素连通数
             //for (int x = 1; x < imgWidth-1; x++)
@@ -3943,6 +3958,7 @@ namespace ImageProcessing
             {
                 if (BinaryArray[y, 1] == 0)//开始搜索路径
                 {
+                    isProcessed[y, 1] = true;
                     currentPoint.X = y;
                     currentPoint.Y = 1;
                     parentPoint = currentPoint;
@@ -3959,8 +3975,8 @@ namespace ImageProcessing
                     {
 
                         currentPoint = stack.Pop();
+                        isProcessed[currentPoint.X, currentPoint.Y] = true;
 
-                        
                         cutPaths[listCount].Add(currentPoint);//将出栈的点加入list路径中
 
                         nextNodeNum = 0;
@@ -3978,17 +3994,16 @@ namespace ImageProcessing
                         order = 0;
                         while (order < 8)
                         {
-                            if (BinaryArray[cP[order].X, cP[order].Y] == 0 && cP[order] != parentPoint)//找下一结点，除去父结点
+                            //if (BinaryArray[cP[order].X, cP[order].Y] == 0 && cP[order] != parentPoint)//找下一结点，除去父结点isProcessed
+                            if (BinaryArray[cP[order].X, cP[order].Y] == 0 && isProcessed[cP[order].X, cP[order].Y] == false)//找下一结点，除去已经处理过的点
                             {
                                 stack.Push(cP[order]);
+                                //isProcessed[cP[order].X, cP[order].Y] = true;
                                 nextNodeNum++;
                             }
                             order++;
                         }
-                        if (currentPoint.Y ==90)
-                        {
 
-                        }
                         parentPoint = currentPoint;//赋值之前parPoint是上一个出栈的结点
 
                         for (int i = 0; i < nextNodeNum - 1; i++)
@@ -4029,12 +4044,6 @@ namespace ImageProcessing
                                 
                             }
                         }
-
-                        //for (int i = 0; i < nextNodeNum - 1; i++)
-                        //{
-                        //    cutPaths.Add(new List<Point>(cutPaths[listCount]));//在分叉处复制共同路径
-                        //    //cutPaths.ForEach(j => cutPaths.Add(j));
-                        //}
 
                         
                     }
