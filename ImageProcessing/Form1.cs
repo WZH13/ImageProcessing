@@ -518,7 +518,8 @@ namespace ImageProcessing
 
         private void btn_paths_searched_Click(object sender, EventArgs e)
         {
-            imageProcessing.SegmentationPaths(curBitmap);
+            curBitmap = imageProcessing.SegmentationPaths(curBitmap);
+            Invalidate();
         }
     }
 }
