@@ -3904,6 +3904,7 @@ namespace ImageProcessing
                 BinaryArray[0, x] = 255;
                 BinaryArray[imgHeight-1, x] = 255;
             }
+            BinaryArray = RemovalPixels(BinaryArray);
             Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
 
             return dstBmp;
@@ -3933,6 +3934,8 @@ namespace ImageProcessing
             {
                 BinaryArray = BinaryBitmapToBinaryArray(bmp);
             }
+
+            BinaryArray = RemovalPixels(BinaryArray);
 
             List<List<Point>> cutPaths = new List<List<Point>>();//存储路径
             int listCount = 0;//标识list行数
@@ -3966,16 +3969,11 @@ namespace ImageProcessing
 
                     while (!stack.IsEmpty())
                     {
-                        
                         currentPoint = stack.Pop();
-                        isProcessed[currentPoint.X, currentPoint.Y] = true;
-                        if (currentPoint.X==8&&currentPoint.Y==9)
-                        {
-
-                        }
+                        isProcessed[currentPoint.X, currentPoint.Y] = true;//出栈进行处理，则修改标记，标记为已处理
                         cutPaths[listCount].Add(currentPoint);//将出栈的点加入list路径中
 
-                        nodeNum = 0;  
+                        nodeNum = 0;
 
                         //从中心点上方开始顺时针编号
                         cP[0] = new Point(currentPoint.X - 1, currentPoint.Y);
@@ -3983,40 +3981,26 @@ namespace ImageProcessing
                         cP[2] = new Point(currentPoint.X, currentPoint.Y + 1);
                         cP[3] = new Point(currentPoint.X + 1, currentPoint.Y + 1);
                         cP[4] = new Point(currentPoint.X + 1, currentPoint.Y);
-                        //cP[5] = new Point(currentPoint.X + 1, currentPoint.Y - 1);
-                        //cP[6] = new Point(currentPoint.X, currentPoint.Y - 1);
-                        //cP[7] = new Point(currentPoint.X - 1, currentPoint.Y - 1);
+                        cP[5] = new Point(currentPoint.X + 1, currentPoint.Y - 1);
+                        cP[6] = new Point(currentPoint.X, currentPoint.Y - 1);
+                        cP[7] = new Point(currentPoint.X - 1, currentPoint.Y - 1);
 
                         order = 0;
-                        while (order < 5)
+                        while (order < 8)
                         {
-                            if (order<4)
-                            {
-                                if (BinaryArray[cP[order].X, cP[order].Y] == 0 &&
-                                    BinaryArray[cP[order + 1].X, cP[order + 1].Y] == 0)
-                                {
-                                    if (order % 2 == 0)
-                                    {
-                                        isProcessed[cP[order].X, cP[order].Y] = true;
-                                    }
-                                    if (order % 2 == 1)
-                                    {
-                                        isProcessed[cP[order + 1].X, cP[order + 1].Y] = true;
-                                    }
-                                    order++;
-                                    continue;
-                                }
-                            }
                             if (BinaryArray[cP[order].X, cP[order].Y] == 0 && isProcessed[cP[order].X, cP[order].Y] == false)//找下一结点，除去已经处理过的点
                             {
-                                
-                                    stack.Push(cP[order]);
-                                    nodeNum++;
+                                stack.Push(cP[order]);
+                                nodeNum++;
                             }
                             order++;
                         }
-
                         parentPoint = currentPoint;//赋值之前parPoint是上一个出栈的结点
+
+                        if (nodeNum > 1)
+                        {
+
+                        }
 
                         for (int i = 0; i < nodeNum - 1; i++)
                         {
@@ -4029,7 +4013,7 @@ namespace ImageProcessing
                         {
                             if (currentPoint.Y == imgWidth - 2)
                             {
-                                if (listCount  >= cutPaths.Count-1)//当前处理的是list中存储的最后一条分叉路径
+                                if (listCount >= cutPaths.Count - 1)//当前处理的是list中存储的最后一条分叉路径
                                 {
                                     continue;
                                     //或者清空栈？？
@@ -4053,11 +4037,11 @@ namespace ImageProcessing
                                 {
                                     parentPoint = cutPaths[listCount][cutPaths[listCount].Count - 1];
                                 }
-                                
+
                             }
                         }
 
-                        
+
                     }
                 }
                 //listCount++;
@@ -4086,6 +4070,56 @@ namespace ImageProcessing
         #endregion
 
 
+        #region 去除不改变连通性的多余像素点
+
+        public byte[,] RemovalPixels(byte[,] BinaryArray)
+        {
+            int imgHeight = BinaryArray.GetLength(0);
+            int imgWidth = BinaryArray.GetLength(1);
+            Point[] cP = new Point[8];//中心点周围8个点
+            for (int y = 1; y < imgHeight - 1; y++)
+            {
+                for (int x = 1; x < imgWidth - 1; x++)
+                {
+                    if (BinaryArray[y, x] == 0)
+                    {
+
+                        //从中心点上方开始顺时针编号
+                        cP[0] = new Point(y - 1, x);
+                        cP[1] = new Point(y - 1, x + 1);
+                        cP[2] = new Point(y, x + 1);
+                        cP[3] = new Point(y + 1, x + 1);
+                        cP[4] = new Point(y + 1, x);
+                        cP[5] = new Point(y + 1, x - 1);
+                        cP[6] = new Point(y, x - 1);
+                        cP[7] = new Point(y - 1, x - 1);
+                        //去除不改变连通性的点
+                        if (((BinaryArray[cP[0].X, cP[0].Y] == 0 && BinaryArray[cP[2].X, cP[2].Y] == 0)&& 
+                            ((!(BinaryArray[cP[4].X, cP[4].Y] == 255 && BinaryArray[cP[6].X, cP[6].Y] == 255))||
+                            (BinaryArray[cP[4].X, cP[4].Y] == 255 && BinaryArray[cP[5].X, cP[5].Y] == 255 && BinaryArray[cP[6].X, cP[6].Y] == 255))) ||
+
+                            ((BinaryArray[cP[0].X, cP[0].Y] == 0 && BinaryArray[cP[6].X, cP[6].Y] == 0) &&
+                            ((!(BinaryArray[cP[2].X, cP[2].Y] == 255 && BinaryArray[cP[4].X, cP[4].Y] == 255)) ||
+                            (BinaryArray[cP[2].X, cP[2].Y] == 255 && BinaryArray[cP[3].X, cP[3].Y] == 255 && BinaryArray[cP[4].X, cP[4].Y] == 255))) ||
+
+                            ((BinaryArray[cP[4].X, cP[4].Y] == 0 && BinaryArray[cP[6].X, cP[6].Y] == 0) &&
+                            ((!(BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[2].X, cP[2].Y] == 255))||
+                            (BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[2].X, cP[2].Y] == 255&& BinaryArray[cP[1].X, cP[1].Y]==255)))||
+
+                            ((BinaryArray[cP[2].X, cP[2].Y] == 0 && BinaryArray[cP[4].X, cP[4].Y] == 0) &&
+                            ((!(BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[6].X, cP[6].Y] == 255))||
+                            (BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[7].X, cP[7].Y] == 255 && BinaryArray[cP[6].X, cP[6].Y] == 255))))
+                        {
+                            BinaryArray[y, x] = 255;
+                        }
+
+                    }
+                }
+            }
+            return BinaryArray;
+        }
+
+        #endregion
 
 
 
