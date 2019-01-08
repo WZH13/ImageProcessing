@@ -3659,14 +3659,14 @@ namespace ImageProcessing
 
         #endregion
 
-        #region 改进 Zhang-Suen algorithm
+        #region 将图像二值化并存入二维数组
 
         /// <summary>
-        /// Zhang-Suen细化算法
+        /// 将图像二值化并存入二维数组
         /// </summary>
-        /// <param name="bmp">原图片</param>
-        /// <returns>细化后图片</returns>
-        public Bitmap Zhang_thinimage_improve(Bitmap bmp)
+        /// <param name="bmp">源图像</param>
+        /// <returns>二维数组:0表示黑像素，255表示白像素</returns>
+        public byte[,] GetBinaryArray(Bitmap bmp)
         {
             int imgWidth = bmp.Width;
             int imgHeight = bmp.Height;
@@ -3681,6 +3681,23 @@ namespace ImageProcessing
             {
                 BinaryArray = BinaryBitmapToBinaryArray(bmp);
             }
+            return BinaryArray;
+        }
+
+        #endregion
+
+        #region 改进 Zhang-Suen algorithm
+
+            /// <summary>
+            /// Zhang-Suen细化算法
+            /// </summary>
+            /// <param name="bmp">原图片</param>
+            /// <returns>细化后图片</returns>
+        public Bitmap Zhang_thinimage_improve(Bitmap bmp)
+        {
+            byte[,] BinaryArray = GetBinaryArray(bmp);
+            int imgHeight = BinaryArray.GetLength(0);
+            int imgWidth = BinaryArray.GetLength(1);
             int[] Zhangmude = new int[9];
             //int deletecount = 0;
             List<Point> deletelist = new List<Point>();
@@ -3823,6 +3840,7 @@ namespace ImageProcessing
                 }
                 deletelist.Clear();
             }
+            //BinaryArray = RemovalPixels(BinaryArray);//去除不改变连通性的多余像素点
             Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
             return dstBmp;
 
@@ -3837,19 +3855,9 @@ namespace ImageProcessing
         /// </summary>
         public Bitmap Zhang_thin_improve_Background_skeleton(Bitmap bmp)
         {
-            int imgWidth = bmp.Width;
-            int imgHeight = bmp.Height;
-            byte[,] BinaryArray = new byte[imgHeight, imgWidth];
-            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat);
-            if (depth != 1)//判断位深度 
-            {
-                int threshold = 0;
-                BinaryArray = ToBinaryArray(bmp, out threshold);
-            }
-            else
-            {
-                BinaryArray = BinaryBitmapToBinaryArray(bmp);
-            }
+            byte[,] BinaryArray = GetBinaryArray(bmp);
+            int imgHeight = BinaryArray.GetLength(0);
+            int imgWidth = BinaryArray.GetLength(1);
 
             for (int y = 0; y < imgHeight; y++)
             {
@@ -3881,19 +3889,9 @@ namespace ImageProcessing
         /// </summary>
         public Bitmap DelBounder(Bitmap bmp)
         {
-            int imgWidth = bmp.Width;
-            int imgHeight = bmp.Height;
-            byte[,] BinaryArray = new byte[imgHeight, imgWidth];
-            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat);
-            if (depth != 1)//判断位深度 
-            {
-                int threshold = 0;
-                BinaryArray = ToBinaryArray(bmp, out threshold);
-            }
-            else
-            {
-                BinaryArray = BinaryBitmapToBinaryArray(bmp);
-            }
+            byte[,] BinaryArray = GetBinaryArray(bmp);
+            int imgHeight = BinaryArray.GetLength(0);
+            int imgWidth = BinaryArray.GetLength(1);
             for (int y = 0; y < imgHeight; y++)
             {
                 BinaryArray[y, 0] = 255;
@@ -3911,167 +3909,13 @@ namespace ImageProcessing
         }
 
         #endregion
-
-        #region 寻找可能切分路径
-
-        /// <summary>
-        /// 在背景骨架细化图上寻找可能切分路径
-        /// </summary>
-        /// <param name="bmp"></param>
-        public Bitmap SegmentationPaths(Bitmap bmp)
-        {
-            bmp = DelBounder(bmp);
-            int imgWidth = bmp.Width;
-            int imgHeight = bmp.Height;
-            byte[,] BinaryArray = new byte[imgHeight, imgWidth];
-            int depth = Bitmap.GetPixelFormatSize(bmp.PixelFormat);
-            if (depth != 1)//判断位深度 
-            {
-                int threshold = 0;
-                BinaryArray = ToBinaryArray(bmp, out threshold);
-            }
-            else
-            {
-                BinaryArray = BinaryBitmapToBinaryArray(bmp);
-            }
-
-            BinaryArray = RemovalPixels(BinaryArray);
-
-            List<List<Point>> cutPaths = new List<List<Point>>();//存储路径
-            int listCount = 0;//标识list行数
-
-            Point currentPoint = new Point();//出栈点
-            Point parentPoint = new Point();//父结点
-
-            bool[,] isProcessed = new bool[imgHeight, imgWidth];//标识是否已经处理过
-            bool[,] isPushed = new bool[imgHeight, imgWidth];//标识是否已经入栈过
-
-            int nodeNum = 0;//相邻像素连通数
-            int order = 0;//像素点周围8个像素点的序号
-            Point[] cP = new Point[8];//中心点周围8个点
-
-            for (int y = 1; y < imgHeight - 1; y++)
-            {
-                if (BinaryArray[y, 1] == 0)//开始搜索路径
-                {
-                    isProcessed[y, 1] = true;
-                    currentPoint.X = y;
-                    currentPoint.Y = 1;
-                    parentPoint = currentPoint;
-
-                    //list记录出栈点，做路径记录
-                    cutPaths.Add(new List<Point>());
-
-                    //树的深度优先遍历，同时存储路径
-                    //利用栈结构思想
-                    SeqStack<Point> stack = new SeqStack<Point>(imgWidth * 3);
-                    stack.Push(currentPoint);
-
-                    while (!stack.IsEmpty())
-                    {
-                        currentPoint = stack.Pop();
-                        isProcessed[currentPoint.X, currentPoint.Y] = true;//出栈进行处理，则修改标记，标记为已处理
-                        cutPaths[listCount].Add(currentPoint);//将出栈的点加入list路径中
-
-                        nodeNum = 0;
-
-                        //从中心点上方开始顺时针编号
-                        cP[0] = new Point(currentPoint.X - 1, currentPoint.Y);
-                        cP[1] = new Point(currentPoint.X - 1, currentPoint.Y + 1);
-                        cP[2] = new Point(currentPoint.X, currentPoint.Y + 1);
-                        cP[3] = new Point(currentPoint.X + 1, currentPoint.Y + 1);
-                        cP[4] = new Point(currentPoint.X + 1, currentPoint.Y);
-                        cP[5] = new Point(currentPoint.X + 1, currentPoint.Y - 1);
-                        cP[6] = new Point(currentPoint.X, currentPoint.Y - 1);
-                        cP[7] = new Point(currentPoint.X - 1, currentPoint.Y - 1);
-
-                        order = 0;
-                        while (order < 8)
-                        {
-                            if (BinaryArray[cP[order].X, cP[order].Y] == 0 && isProcessed[cP[order].X, cP[order].Y] == false)//找下一结点，除去已经处理过的点
-                            {
-                                stack.Push(cP[order]);
-                                nodeNum++;
-                            }
-                            order++;
-                        }
-                        parentPoint = currentPoint;//赋值之前parPoint是上一个出栈的结点
-
-                        if (nodeNum > 1)
-                        {
-
-                        }
-
-                        for (int i = 0; i < nodeNum - 1; i++)
-                        {
-                            cutPaths.Add(new List<Point>(cutPaths[listCount]));//在分叉处复制共同路径
-                            //listCount++;
-                            //cutPaths.ForEach(j => cutPaths.Add(j));
-                        }
-
-                        if (nodeNum == 0)//某一分支到达终点
-                        {
-                            if (currentPoint.Y == imgWidth - 2)
-                            {
-                                if (listCount >= cutPaths.Count - 1)//当前处理的是list中存储的最后一条分叉路径
-                                {
-                                    continue;
-                                    //或者清空栈？？
-                                }
-                                else
-                                {
-                                    listCount++;//当前list被保留下来作为一条路径,继续处理下一条分叉路径（当前处理的不是list中存储的最后一条分叉路径）
-                                    parentPoint = cutPaths[listCount][cutPaths[listCount].Count - 1];
-                                }
-                            }
-                            else
-                            {
-                                cutPaths.RemoveAt(listCount);//如果到达终点，当前点横坐标不在图像最右侧，则这条路径不能贯穿图像。删除这条失败路径。RemoveAt索引前移,故listCount不必改变。
-
-                                if (listCount >= cutPaths.Count - 1)//当前处理的是list中存储的最后一条分叉路径
-                                {
-                                    continue;
-                                    //或者清空栈？？
-                                }
-                                else
-                                {
-                                    parentPoint = cutPaths[listCount][cutPaths[listCount].Count - 1];
-                                }
-
-                            }
-                        }
-
-
-                    }
-                }
-                //listCount++;
-            }
-
-            for (int i = 0; i < imgHeight; i++)
-            {
-                for (int j = 0; j < imgWidth; j++)
-                {
-                    BinaryArray[i, j] = 255;
-                }
-            }
-
-            for (int i = 0; i < cutPaths.Count; i++)
-            {
-                for (int j = 0; j < cutPaths[i].Count; j++)
-                {
-                    BinaryArray[cutPaths[i][j].X, cutPaths[i][j].Y] = 0;
-                }
-            }
-            Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
-
-            return dstBmp;
-        }
-
-        #endregion
-
-
         #region 去除不改变连通性的多余像素点
 
+        /// <summary>
+        /// 去除不改变连通性的像素点
+        /// </summary>
+        /// <param name="BinaryArray"></param>
+        /// <returns></returns>
         public byte[,] RemovalPixels(byte[,] BinaryArray)
         {
             int imgHeight = BinaryArray.GetLength(0);
@@ -4094,8 +3938,8 @@ namespace ImageProcessing
                         cP[6] = new Point(y, x - 1);
                         cP[7] = new Point(y - 1, x - 1);
                         //去除不改变连通性的点
-                        if (((BinaryArray[cP[0].X, cP[0].Y] == 0 && BinaryArray[cP[2].X, cP[2].Y] == 0)&& 
-                            ((!(BinaryArray[cP[4].X, cP[4].Y] == 255 && BinaryArray[cP[6].X, cP[6].Y] == 255))||
+                        if (((BinaryArray[cP[0].X, cP[0].Y] == 0 && BinaryArray[cP[2].X, cP[2].Y] == 0) &&
+                            ((!(BinaryArray[cP[4].X, cP[4].Y] == 255 && BinaryArray[cP[6].X, cP[6].Y] == 255)) ||
                             (BinaryArray[cP[4].X, cP[4].Y] == 255 && BinaryArray[cP[5].X, cP[5].Y] == 255 && BinaryArray[cP[6].X, cP[6].Y] == 255))) ||
 
                             ((BinaryArray[cP[0].X, cP[0].Y] == 0 && BinaryArray[cP[6].X, cP[6].Y] == 0) &&
@@ -4103,11 +3947,11 @@ namespace ImageProcessing
                             (BinaryArray[cP[2].X, cP[2].Y] == 255 && BinaryArray[cP[3].X, cP[3].Y] == 255 && BinaryArray[cP[4].X, cP[4].Y] == 255))) ||
 
                             ((BinaryArray[cP[4].X, cP[4].Y] == 0 && BinaryArray[cP[6].X, cP[6].Y] == 0) &&
-                            ((!(BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[2].X, cP[2].Y] == 255))||
-                            (BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[2].X, cP[2].Y] == 255&& BinaryArray[cP[1].X, cP[1].Y]==255)))||
+                            ((!(BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[2].X, cP[2].Y] == 255)) ||
+                            (BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[2].X, cP[2].Y] == 255 && BinaryArray[cP[1].X, cP[1].Y] == 255))) ||
 
                             ((BinaryArray[cP[2].X, cP[2].Y] == 0 && BinaryArray[cP[4].X, cP[4].Y] == 0) &&
-                            ((!(BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[6].X, cP[6].Y] == 255))||
+                            ((!(BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[6].X, cP[6].Y] == 255)) ||
                             (BinaryArray[cP[0].X, cP[0].Y] == 255 && BinaryArray[cP[7].X, cP[7].Y] == 255 && BinaryArray[cP[6].X, cP[6].Y] == 255))))
                         {
                             BinaryArray[y, x] = 255;
@@ -4120,6 +3964,153 @@ namespace ImageProcessing
         }
 
         #endregion
+
+        #region 寻找可能切分路径
+
+        /// <summary>
+        /// 在背景骨架细化图上寻找可能切分路径
+        /// </summary>
+        /// <param name="bmp"></param>
+        public Bitmap SegmentationPaths(Bitmap bmp)
+        {
+            bmp=DelBounder(bmp);
+            byte[,] BinaryArray = GetBinaryArray(bmp);
+            int imgHeight = BinaryArray.GetLength(0);
+            int imgWidth = BinaryArray.GetLength(1);
+
+            BinaryArray = RemovalPixels(BinaryArray);
+
+            List<List<Point>> cutPaths = new List<List<Point>>();//存储路径
+            int listCount = 0;//标识list行数
+
+            List<List<Point>> dstPaths = new List<List<Point>>();//存储路径
+
+            Point currentPoint = new Point();//出栈点
+            //Point parentPoint = new Point();//父结点
+
+            bool[,] isProcessed = new bool[imgHeight, imgWidth];//标识是否已经处理过
+            bool[,] isPushed = new bool[imgHeight, imgWidth];//标识是否已经入栈过
+
+            int nodeNum = 0;//相邻像素连通数
+            int order = 0;//像素点周围8个像素点的序号
+            Point[] cP = new Point[8];//中心点周围8个点
+            int pathNum = 0;
+
+            for (int y = 1; y < imgHeight - 1; y++)
+            {
+                if (BinaryArray[y, 1] == 0)//开始搜索路径
+                {
+                    isProcessed[y, 1] = true;
+                    currentPoint.X = y;
+                    currentPoint.Y = 1;
+                    //parentPoint = currentPoint;
+
+                    //list记录出栈点，做路径记录
+                    cutPaths.Add(new List<Point>());
+
+                    //树的深度优先遍历，同时存储路径
+                    //利用栈结构思想
+                    SeqStack<Point> stack = new SeqStack<Point>(imgWidth * 3);
+                    stack.Push(currentPoint);
+
+                    while (!stack.IsEmpty())
+                    {
+                        if (currentPoint.X == 50 && currentPoint.Y == 46)
+                        {
+
+                        }
+
+                        currentPoint = stack.Pop();
+                        isProcessed[currentPoint.X, currentPoint.Y] = true;//出栈进行处理，则修改标记，标记为已处理
+                        cutPaths[listCount].Add(currentPoint);//将出栈的点加入list路径中
+
+                        nodeNum = 0;
+
+                        //从中心点上方开始顺时针编号
+                        cP[0] = new Point(currentPoint.X - 1, currentPoint.Y);
+                        cP[1] = new Point(currentPoint.X - 1, currentPoint.Y + 1);
+                        cP[2] = new Point(currentPoint.X, currentPoint.Y + 1);
+                        cP[3] = new Point(currentPoint.X + 1, currentPoint.Y + 1);
+                        cP[4] = new Point(currentPoint.X + 1, currentPoint.Y);
+                        cP[5] = new Point(currentPoint.X + 1, currentPoint.Y - 1);
+                        cP[6] = new Point(currentPoint.X, currentPoint.Y - 1);
+                        cP[7] = new Point(currentPoint.X - 1, currentPoint.Y - 1);
+
+                        order = 7;
+                        while (order >= 0)
+                        {
+                            if (BinaryArray[cP[order].X, cP[order].Y] == 0 && isProcessed[cP[order].X, cP[order].Y] == false)//找下一结点，除去已经处理过的点
+                            {
+                                if (cP[order].X == 50 && cP[order].Y == 46)
+                                {
+
+                                }
+                                stack.Push(cP[order]);
+                                nodeNum++;
+                            }
+                            order--;
+                        }
+                        //parentPoint = currentPoint;//赋值之前parPoint是上一个出栈的结点
+
+                        //如果遇到两个待处理的点就是成环了
+                        if (nodeNum > 1)
+                        {
+
+                        }
+
+                        for (int i = 0; i < nodeNum - 1; i++)
+                        {
+                            cutPaths.Add(new List<Point>(cutPaths[listCount]));//在分叉处复制共同路径
+                            //listCount++;
+                            //cutPaths.ForEach(j => cutPaths.Add(j));
+                        }
+
+                        if (nodeNum == 0)//某一分支到达终点
+                        {
+                            if (currentPoint.Y == imgWidth - 2)
+                            {
+                                dstPaths.Add(new List<Point>(cutPaths[listCount]));
+                            }
+                            cutPaths.RemoveAt(listCount);//如果到达终点，当前点横坐标不在图像最右侧，则这条路径不能贯穿图像。删除这条失败路径。RemoveAt索引前移,故listCount不必改变。
+                            if (cutPaths.Count == 0)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                listCount = cutPaths.Count - 1;
+                            }
+                        }
+
+
+                    }
+                }
+                //listCount++;
+            }
+
+            for (int i = 0; i < imgHeight; i++)
+            {
+                for (int j = 0; j < imgWidth; j++)
+                {
+                    BinaryArray[i, j] = 255;
+                }
+            }
+
+            for (int i = 0; i < dstPaths.Count; i++)
+            {
+                for (int j = 0; j < dstPaths[i].Count; j++)
+                {
+                    BinaryArray[dstPaths[i][j].X, dstPaths[i][j].Y] = 0;
+                }
+            }
+            Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
+
+            return dstBmp;
+        }
+
+        #endregion
+
+
 
 
 
