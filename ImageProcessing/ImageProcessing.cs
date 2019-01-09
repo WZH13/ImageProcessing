@@ -3983,7 +3983,9 @@ namespace ImageProcessing
             List<List<Point>> cutPaths = new List<List<Point>>();//存储路径
             int listCount = 0;//标识list行数
 
-            List<List<Point>> dstPaths = new List<List<Point>>();//存储路径
+            List<List<Point>> dstPaths = new List<List<Point>>();//最终存储路径
+
+            List<List<Point>> tempPaths = new List<List<Point>>();//存储环的共用路径
 
             Point currentPoint = new Point();//出栈点
             //Point parentPoint = new Point();//父结点
@@ -3992,9 +3994,9 @@ namespace ImageProcessing
             bool[,] isPushed = new bool[imgHeight, imgWidth];//标识是否已经入栈过
 
             int nodeNum = 0;//相邻像素连通数
+            int metProcessed = 0;//标识遇到的已经被标记过的点
             int order = 0;//像素点周围8个像素点的序号
             Point[] cP = new Point[8];//中心点周围8个点
-            int pathNum = 0;
 
             for (int y = 1; y < imgHeight - 1; y++)
             {
@@ -4015,11 +4017,6 @@ namespace ImageProcessing
 
                     while (!stack.IsEmpty())
                     {
-                        if (currentPoint.X == 50 && currentPoint.Y == 46)
-                        {
-
-                        }
-
                         currentPoint = stack.Pop();
                         isProcessed[currentPoint.X, currentPoint.Y] = true;//出栈进行处理，则修改标记，标记为已处理
                         cutPaths[listCount].Add(currentPoint);//将出栈的点加入list路径中
@@ -4032,36 +4029,58 @@ namespace ImageProcessing
                         cP[2] = new Point(currentPoint.X, currentPoint.Y + 1);
                         cP[3] = new Point(currentPoint.X + 1, currentPoint.Y + 1);
                         cP[4] = new Point(currentPoint.X + 1, currentPoint.Y);
-                        cP[5] = new Point(currentPoint.X + 1, currentPoint.Y - 1);
-                        cP[6] = new Point(currentPoint.X, currentPoint.Y - 1);
-                        cP[7] = new Point(currentPoint.X - 1, currentPoint.Y - 1);
+                        //cP[5] = new Point(currentPoint.X + 1, currentPoint.Y - 1);
+                        //cP[6] = new Point(currentPoint.X, currentPoint.Y - 1);
+                        //cP[7] = new Point(currentPoint.X - 1, currentPoint.Y - 1);
+                        //不要向左发展的像素->避免了成环现象和大多数无用路径
 
-                        order = 7;
+                        order = 4;
                         while (order >= 0)
                         {
-                            if (BinaryArray[cP[order].X, cP[order].Y] == 0 && isProcessed[cP[order].X, cP[order].Y] == false)//找下一结点，除去已经处理过的点
-                            {
-                                if (cP[order].X == 50 && cP[order].Y == 46)
-                                {
+                            //if (BinaryArray[cP[order].X, cP[order].Y] == 0 && isProcessed[cP[order].X, cP[order].Y] == false)//找下一结点，除去已经处理过的点
+                            //{
+                            //    stack.Push(cP[order]);
+                            //    nodeNum++;
+                            //}
+                            //if (BinaryArray[cP[order].X, cP[order].Y] == 0 && isProcessed[cP[order].X, cP[order].Y] == true)
+                            //{
+                            //    metProcessed++;
+                            //}
+                            //order--;
 
+                            if (BinaryArray[cP[order].X, cP[order].Y] == 0)
+                            {
+                                if (isProcessed[cP[order].X, cP[order].Y] == false)//找下一结点，除去已经处理过的点
+                                {
+                                    stack.Push(cP[order]);
+                                    nodeNum++;
                                 }
-                                stack.Push(cP[order]);
-                                nodeNum++;
+                                if (isProcessed[cP[order].X, cP[order].Y] == true)//下一结点，已经处理过的点
+                                {
+                                    //这个点不存在于当前的这条路径，说明这个邻接点是成环的交点
+                                    if (FindPoint(cutPaths[listCount],new Point(cP[order].X, cP[order].Y)))//这个点不存在于当前的这条路径
+                                    {
+                                        //在已经成功的路径集合中，复制这个点以及它后面的路径部分
+                                        tempPaths = FindPointInList(dstPaths, new Point(cP[order].X, cP[order].Y));
+                                        for (int i = 0; i < tempPaths.Count; i++)
+                                        {
+                                            dstPaths.Add(cutPaths[listCount]);
+                                            dstPaths[dstPaths.Count - 1].AddRange(tempPaths[i]);
+                                        }
+                                    }
+                                }
                             }
                             order--;
+                            
                         }
                         //parentPoint = currentPoint;//赋值之前parPoint是上一个出栈的结点
 
-                        //如果遇到两个待处理的点就是成环了
-                        if (nodeNum > 1)
-                        {
-
-                        }
+                        //如果遇到两个已经处理的点就是成环了
+                        //像素往左才可能成环
 
                         for (int i = 0; i < nodeNum - 1; i++)
                         {
-                            cutPaths.Add(new List<Point>(cutPaths[listCount]));//在分叉处复制共同路径
-                            //listCount++;
+                            cutPaths.Add(new List<Point>(dstPaths[listCount]));//在分叉处复制共同路径
                             //cutPaths.ForEach(j => cutPaths.Add(j));
                         }
 
@@ -4081,11 +4100,8 @@ namespace ImageProcessing
                                 listCount = cutPaths.Count - 1;
                             }
                         }
-
-
                     }
                 }
-                //listCount++;
             }
 
             for (int i = 0; i < imgHeight; i++)
@@ -4094,7 +4110,7 @@ namespace ImageProcessing
                 {
                     BinaryArray[i, j] = 255;
                 }
-            }
+            }//显示路径
 
             for (int i = 0; i < dstPaths.Count; i++)
             {
@@ -4102,7 +4118,7 @@ namespace ImageProcessing
                 {
                     BinaryArray[dstPaths[i][j].X, dstPaths[i][j].Y] = 0;
                 }
-            }
+            }//显示路径
             Bitmap dstBmp = BinaryArrayToBinaryBitmap(BinaryArray);
 
             return dstBmp;
@@ -4110,8 +4126,44 @@ namespace ImageProcessing
 
         #endregion
 
+        #region 找一个点是否在list中，如果有，返回包含这个点的路径后半部分的集合
 
+        public List<List<Point>> FindPointInList(List<List<Point>> srcPaths,Point srcPoint)
+        {
+            int listCount = 0;
+            while (listCount<= srcPaths.Count-1)
+            {
+                for (int i = 0; i < srcPaths[listCount].Count; i++)//一条路径的遍历
+                {
+                    if (srcPaths[listCount][i].X== srcPoint.X&& srcPaths[listCount][i].Y == srcPoint.Y)//找到点了，这个点之前的路径部分删掉。这条list被保留下来
+                    {
+                        srcPaths[listCount].RemoveRange(0, i);
+                        listCount++;
+                    }
+                }
+                srcPaths.RemoveAt(listCount);
+            }
+            return srcPaths;
+        }
 
+        #endregion
+
+        #region 找一个点是否在list中，如果有，返回包含这个点的路径后半部分的集合
+
+        public bool FindPoint(List<Point> srcPaths, Point srcPoint)
+        {
+            bool isFind = false;
+                for (int i = 0; i < srcPaths.Count; i++)//一条路径的遍历
+                {
+                    if (srcPaths[i].X == srcPoint.X && srcPaths[i].Y == srcPoint.Y)//找到点了，这个点之前的路径部分删掉。这条list被保留下来
+                    {
+                    isFind = true;
+                    }
+                }
+            return isFind;
+        }
+
+        #endregion
 
 
 
