@@ -3994,11 +3994,13 @@ namespace ImageProcessing
             bool[,] isPushed = new bool[imgHeight, imgWidth];//标识是否已经入栈过
 
             int nodeNum = 0;//相邻像素连通数
-            int metProcessed = 0;//标识遇到的已经被标记过的点
+            //int metProcessed = 0;//标识遇到的已经被标记过的点
             int order = 0;//像素点周围8个像素点的序号
             Point[] cP = new Point[8];//中心点周围8个点
+            int startHeight = Convert.ToInt32(imgHeight * 0.3);
+            int endHeight = Convert.ToInt32(imgHeight * 0.7);
 
-            for (int y = 1; y < imgHeight - 1; y++)
+            for (int y = startHeight; y < endHeight; y++)
             {
                 if (BinaryArray[y, 1] == 0)//开始搜索路径
                 {
@@ -4058,7 +4060,7 @@ namespace ImageProcessing
                                 if (isProcessed[cP[order].X, cP[order].Y] == true)//下一结点，已经处理过的点
                                 {
                                     //这个点不存在于当前的这条路径，说明这个邻接点是成环的交点
-                                    if (FindPoint(cutPaths[listCount],new Point(cP[order].X, cP[order].Y)))//这个点不存在于当前的这条路径
+                                    if (!FindPoint(cutPaths[listCount],new Point(cP[order].X, cP[order].Y)))//这个点不存在于当前的这条路径
                                     {
                                         //在已经成功的路径集合中，复制这个点以及它后面的路径部分
                                         tempPaths = FindPointInList(dstPaths, new Point(cP[order].X, cP[order].Y));
@@ -4080,7 +4082,7 @@ namespace ImageProcessing
 
                         for (int i = 0; i < nodeNum - 1; i++)
                         {
-                            cutPaths.Add(new List<Point>(dstPaths[listCount]));//在分叉处复制共同路径
+                            cutPaths.Add(new List<Point>(cutPaths[listCount]));//在分叉处复制共同路径
                             //cutPaths.ForEach(j => cutPaths.Add(j));
                         }
 
@@ -4130,36 +4132,39 @@ namespace ImageProcessing
 
         public List<List<Point>> FindPointInList(List<List<Point>> srcPaths,Point srcPoint)
         {
+            List<List<Point>> tempPaths = new List<List<Point>>();
             int listCount = 0;
-            while (listCount<= srcPaths.Count-1)
+            int listCount2 = 0;
+            while (listCount< srcPaths.Count)
             {
                 for (int i = 0; i < srcPaths[listCount].Count; i++)//一条路径的遍历
                 {
-                    if (srcPaths[listCount][i].X== srcPoint.X&& srcPaths[listCount][i].Y == srcPoint.Y)//找到点了，这个点之前的路径部分删掉。这条list被保留下来
+                    if (srcPaths[listCount][i].X == srcPoint.X && srcPaths[listCount][i].Y == srcPoint.Y)//找到点了，这个点之前的路径部分删掉。这条list被保留下来
                     {
-                        srcPaths[listCount].RemoveRange(0, i);
-                        listCount++;
+                        tempPaths.Add(new List<Point>(srcPaths[listCount]));
+                        tempPaths[listCount2].RemoveRange(0, i);
+                        listCount2++;
                     }
                 }
-                srcPaths.RemoveAt(listCount);
+                    listCount++;
             }
-            return srcPaths;
+            return tempPaths;
         }
 
         #endregion
 
-        #region 找一个点是否在list中，如果有，返回包含这个点的路径后半部分的集合
+        #region 找一个点是否在list中，如果有，返回
 
         public bool FindPoint(List<Point> srcPaths, Point srcPoint)
         {
             bool isFind = false;
-                for (int i = 0; i < srcPaths.Count; i++)//一条路径的遍历
+            for (int i = 0; i < srcPaths.Count; i++)//一条路径的遍历
+            {
+                if (srcPaths[i].X == srcPoint.X && srcPaths[i].Y == srcPoint.Y)//找到点了，这个点之前的路径部分删掉。这条list被保留下来
                 {
-                    if (srcPaths[i].X == srcPoint.X && srcPaths[i].Y == srcPoint.Y)//找到点了，这个点之前的路径部分删掉。这条list被保留下来
-                    {
                     isFind = true;
-                    }
                 }
+            }
             return isFind;
         }
 
